@@ -6,8 +6,12 @@ Uniqlo 台灣官網商品爬蟲（學校專題用，小量資料）
   2. JSON  → src/main/resources/data/products.json（欄位對應資料庫 products / product_variants）
 
 用法（在專案根目錄執行）：
-  python tools/scraper/uniqlo_scraper.py --limit 2      # 先小量測試
-  python tools/scraper/uniqlo_scraper.py --limit 10     # 每個分類 10 個商品
+  python tools/scraper/uniqlo_scraper.py --check all_kids-outer   # 加新分類前先確認代碼存在
+  python tools/scraper/uniqlo_scraper.py --limit 2                # 先小量測試
+  python tools/scraper/uniqlo_scraper.py --limit 10               # 每個分類 10 個商品
+  python tools/scraper/verify_products.py                         # 爬完檢查資料能不能進 DB
+
+完整流程見 .claude/skills/uniqlo-scrape/SKILL.md
 
 資料來源（用瀏覽器 DevTools 觀察官網得到的 API）：
   列表：POST https://d.uniqlo.com/tw/p/search/products/by-category
@@ -225,10 +229,32 @@ def build_product(list_item: dict, detail: dict, main_cat: str, sub_cat: str, pr
 
 # ------------------------------------------------------------------ 主流程
 
+def check_category(code: str) -> None:
+    """只查分類存不存在、叫什麼、有幾件，不下載任何東西。加新分類前先用這個確認代碼。"""
+    body = {
+        "pageInfo": {"page": 1, "pageSize": 1}, "belongTo": "pc", "rank": "overall",
+        "priceRange": {"low": 0, "high": 0}, "color": [], "size": [], "identity": [], "exist": [],
+        "categoryCode": code, "searchFlag": False, "description": "", "stockFilter": "warehouse",
+    }
+    r = session.post(API_LIST, json=body, timeout=20)
+    data = r.json()
+    resp = (data.get("resp") or [{}])[0]
+    if not data.get("success") or not resp.get("productList"):
+        print(f"✗ {code}：找不到這個分類，或分類下沒有商品（msg={data.get('msg')}）")
+        return
+    print(f"✓ {code}：「{resp.get('categoryTitleName')}」共 {resp.get('productSum')} 件")
+    print(f"  第一件：{resp['productList'][0].get('name')}")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--limit", type=int, default=10, help="每個分類最多抓幾個商品")
+    ap.add_argument("--check", metavar="CATEGORY_CODE", help="只確認分類代碼是否存在，不下載")
     args = ap.parse_args()
+
+    if args.check:
+        check_category(args.check)
+        return
 
     products = []
     seen_slugs = set()

@@ -35,7 +35,11 @@ public class Member {
     private String name;
 
     @Column(nullable = false)
-    private String phone = "";
+    private String phone;
+
+    // 可 NULL；結帳時當宅配地址的預設值
+    @Column(length = 255)
+    private String address;
 
     // male / female
     @Column(nullable = false)

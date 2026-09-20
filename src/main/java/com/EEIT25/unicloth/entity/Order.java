@@ -54,6 +54,7 @@ public class Order {
     @Column(name = "payment_method", nullable = false)
     private String paymentMethod;
 
+    @Column(nullable = true)
     private String note;
 
     // 商品小計
@@ -64,9 +65,9 @@ public class Order {
     @Column(nullable = false)
     private Integer discount = 0;
 
-    // 運費（滿 1490 免運、否則 60）
+    // 運費（滿 1490 免運、否則 50）
     @Column(name = "shipping_fee", nullable = false)
-    private Integer shippingFee = 0;
+    private Integer shippingFee = 50;
 
     // 實付 = subtotal - discount + shippingFee
     @Column(nullable = false)
@@ -90,12 +91,4 @@ public class Order {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    // 訂單明細；存訂單時一併存明細（cascade）
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OrderItem> items = new ArrayList<>();
-
-    public void addItem(OrderItem item) {
-        items.add(item);
-        item.setOrder(this);
-    }
 }

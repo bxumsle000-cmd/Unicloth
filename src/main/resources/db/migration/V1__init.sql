@@ -1,18 +1,3 @@
--- ============================================================================
--- V1__init.sql  Unicloth 初始資料表
---
--- 依 docs/database-design.xlsx 建立。設計文件是 MySQL 語法，這裡翻成 SQL Server：
---   BIGINT UNSIGNED + AUTO_INCREMENT → BIGINT IDENTITY(1,1)
---   INT UNSIGNED                     → INT（SQL Server 沒有 UNSIGNED）
---   TINYINT(1)                       → BIT
---   VARCHAR / TEXT                   → NVARCHAR / NVARCHAR(MAX)（要存中文一定要用 N 開頭的型別）
---   DATETIME + CURRENT_TIMESTAMP     → DATETIME2(0) + SYSDATETIME()
---
--- 建表順序要照 FK 依賴：被參照的表先建。
--- orders 與 member_coupons 互相參照，所以 member_coupons.order_id 的 FK 放到最後用 ALTER TABLE 補。
--- ============================================================================
-
-
 -- ============================== 商品相關 ==============================
 
 -- 分類（主 / 副分類合併，用 parent_id 分層）
@@ -52,7 +37,7 @@ CREATE TABLE product_variants (
     color        NVARCHAR(30)  NOT NULL,       -- 白 / 黑 / 藏青…
     size         NVARCHAR(20)  NOT NULL,       -- S / M / L / 110cm…
     sku_code     NVARCHAR(50)  NOT NULL,       -- 貨號
-    stock        INT           NOT NULL CONSTRAINT df_variants_stock DEFAULT 0,   -- 這個組合的庫存
+    stock        INT           NOT NULL,       -- 這個組合的庫存
     published_at DATETIME2(0)  NOT NULL CONSTRAINT df_variants_published_at DEFAULT SYSDATETIME(),
     url          NVARCHAR(500) NOT NULL,       -- 現階段存 img/colth/... 相對路徑
     CONSTRAINT pk_product_variants PRIMARY KEY (id),
@@ -70,7 +55,7 @@ CREATE TABLE members (
     email         NVARCHAR(255) NOT NULL,      -- 登入帳號，存小寫
     password_hash NVARCHAR(255) NOT NULL,      -- BCrypt 雜湊，絕對不存明碼
     name          NVARCHAR(50)  NOT NULL,
-    phone         NVARCHAR(20)  NOT NULL CONSTRAINT df_members_phone DEFAULT N'',
+    phone         NVARCHAR(20)  NOT NULL,
     gender        NVARCHAR(10)  NOT NULL,      -- male / female
     birthday      DATE          NOT NULL,
     status        NVARCHAR(20)  NOT NULL CONSTRAINT df_members_status DEFAULT N'active',  -- active / disabled
@@ -84,7 +69,7 @@ CREATE TABLE cart_items (
     id         BIGINT IDENTITY(1,1) NOT NULL,
     member_id  BIGINT       NOT NULL,
     variant_id BIGINT       NOT NULL,
-    qty        INT          NOT NULL CONSTRAINT df_cart_qty DEFAULT 1,
+    qty        INT          NOT NULL,
     created_at DATETIME2(0) NOT NULL CONSTRAINT df_cart_created_at DEFAULT SYSDATETIME(),
     CONSTRAINT pk_cart_items PRIMARY KEY (id),
     CONSTRAINT uk_cart_member_variant UNIQUE (member_id, variant_id),
@@ -113,9 +98,9 @@ CREATE TABLE coupons (
     code           NVARCHAR(30)  NOT NULL,     -- WELCOME100，存大寫
     title          NVARCHAR(100) NOT NULL,     -- 新會員購物金
     type           NVARCHAR(20)  NOT NULL,     -- amount / percent / shipping
-    value          INT           NOT NULL CONSTRAINT df_coupons_value DEFAULT 0,  -- amount → 折多少元；percent → 折幾 %（10 = 9 折）；shipping → 0
-    min_subtotal   INT           NOT NULL CONSTRAINT df_coupons_min_subtotal DEFAULT 0,   -- 消費門檻
-    valid_days     INT           NOT NULL CONSTRAINT df_coupons_valid_days DEFAULT 30,    -- 有效期間
+    value          INT           NOT NULL,     -- amount → 折多少元；percent → 折幾 %（10 = 9 折）；shipping → 0
+    min_subtotal   INT           NOT NULL,     -- 消費門檻
+    valid_days     INT           NOT NULL,     -- 有效期間
     is_signup_gift BIT           NOT NULL CONSTRAINT df_coupons_is_signup_gift DEFAULT 0, -- 註冊自動發放
     is_active      BIT           NOT NULL CONSTRAINT df_coupons_is_active DEFAULT 1,      -- 可否領取
     created_at     DATETIME2(0)  NOT NULL CONSTRAINT df_coupons_created_at DEFAULT SYSDATETIME(),
@@ -155,7 +140,7 @@ CREATE TABLE orders (
     note             NVARCHAR(255) NULL,       -- 備註（結帳頁的 f-note）
     subtotal         INT           NOT NULL,   -- 商品小計
     discount         INT           NOT NULL CONSTRAINT df_orders_discount DEFAULT 0,      -- 折價券折抵
-    shipping_fee     INT           NOT NULL CONSTRAINT df_orders_shipping_fee DEFAULT 0,  -- 運費（滿 1490 免運、否則 60）
+    shipping_fee     INT           NOT NULL CONSTRAINT df_orders_shipping_fee DEFAULT 50, -- 運費（滿 1490 免運、否則 50）
     total            INT           NOT NULL,   -- 實付 = subtotal - discount + shipping_fee
     member_coupon_id BIGINT        NULL,       -- 用了哪張券
     paid_at          DATETIME2(0)  NULL,

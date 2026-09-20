@@ -39,7 +39,7 @@ public class ProductVariant {
 
     // 這個組合的庫存
     @Column(nullable = false)
-    private Integer stock = 0;
+    private Integer stock;
 
     // 由 Hibernate 在 insert 時自動填入現在時間
     @CreationTimestamp
