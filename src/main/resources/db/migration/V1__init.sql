@@ -29,6 +29,7 @@ CREATE TABLE products (
 CREATE INDEX idx_products_category ON products (category_id);
 CREATE INDEX idx_products_name     ON products (name);
 CREATE INDEX idx_products_hot      ON products (is_hot);
+CREATE INDEX idx_products_new     ON products (is_new);
 
 -- SKU（顏色 × 尺寸）
 CREATE TABLE product_variants (
@@ -58,6 +59,7 @@ CREATE TABLE members (
     phone         NVARCHAR(20)  NOT NULL,
     gender        NVARCHAR(10)  NOT NULL,      -- male / female
     birthday      DATE          NOT NULL,
+    address       NVARCHAR(255) NULL,
     status        NVARCHAR(20)  NOT NULL CONSTRAINT df_members_status DEFAULT N'active',  -- active / disabled
     created_at    DATETIME2(0)  NOT NULL CONSTRAINT df_members_created_at DEFAULT SYSDATETIME(),
     CONSTRAINT pk_members PRIMARY KEY (id),
@@ -150,9 +152,6 @@ CREATE TABLE orders (
     CONSTRAINT pk_orders PRIMARY KEY (id),
     CONSTRAINT uk_orders_no UNIQUE (order_no),
     CONSTRAINT fk_orders_member FOREIGN KEY (member_id) REFERENCES members (id),
-    -- 設計文件寫 ON DELETE SET NULL，但 orders 與 member_coupons 互相參照，
-    -- SQL Server 不允許兩邊都設連鎖動作（會報 multiple cascade paths），
-    -- 所以這邊改成預設的 NO ACTION，只保留 member_coupons.order_id 那邊的 SET NULL。
     CONSTRAINT fk_orders_member_coupon FOREIGN KEY (member_coupon_id) REFERENCES member_coupons (id)
 );
 CREATE INDEX idx_orders_member_time ON orders (member_id, created_at DESC);
@@ -168,7 +167,7 @@ CREATE TABLE order_items (
     image_url    NVARCHAR(500) NULL,           -- 快照
     unit_price   INT           NOT NULL,       -- 下單當時單價
     qty          INT           NOT NULL,
-    line_total   INT           NOT NULL,       -- unit_price x qty，存起來方便報表
+    total_price   INT           NOT NULL,       -- unit_price x qty，存起來方便報表
     CONSTRAINT pk_order_items PRIMARY KEY (id),
     CONSTRAINT fk_order_items_order   FOREIGN KEY (order_id)   REFERENCES orders (id)           ON DELETE CASCADE,
     CONSTRAINT fk_order_items_variant FOREIGN KEY (variant_id) REFERENCES product_variants (id) ON DELETE SET NULL
@@ -196,4 +195,3 @@ CREATE TABLE support_tickets (
     CONSTRAINT uk_tickets_no UNIQUE (ticket_no),
     CONSTRAINT fk_tickets_member FOREIGN KEY (member_id) REFERENCES members (id) ON DELETE SET NULL
 );
-CREATE INDEX idx_tickets_member ON support_tickets (member_id);

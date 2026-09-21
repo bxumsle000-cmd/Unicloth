@@ -5,6 +5,7 @@ import com.EEIT25.unicloth.entity.Product;
 import com.EEIT25.unicloth.entity.ProductVariant;
 import com.EEIT25.unicloth.repository.seed.CategoryRepository;
 import com.EEIT25.unicloth.repository.seed.ProductRepository;
+import com.EEIT25.unicloth.repository.seed.ProductVariantRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -32,6 +33,7 @@ public class DataSeeder implements CommandLineRunner {
     private final ObjectMapper objectMapper;
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
+    private final ProductVariantRepository variantRepository;
 
     @Override
     @Transactional   // 整批一起成功或一起失敗，不會匯到一半
@@ -50,7 +52,11 @@ public class DataSeeder implements CommandLineRunner {
                 continue;
             }
             Category sub = findOrCreateCategory(json.mainCategory(), json.subCategory());
-            productRepository.save(toProduct(json, sub));
+            // Product 不認識 variants（沒有 @OneToMany），所以先存商品拿到 id，再逐一存 SKU
+            Product p = productRepository.save(toProduct(json, sub));
+            for (ProductJson.VariantJson vj : json.variants()) {
+                variantRepository.save(toVariant(vj, p));
+            }
             inserted++;
         }
         log.info("[seed] 完成：新增 {} 件、跳過 {} 件（已存在）", inserted, skipped);
@@ -73,7 +79,7 @@ public class DataSeeder implements CommandLineRunner {
                 });
     }
 
-    /** JSON → Entity。variants 透過 Product 的 cascade 一起存。 */
+    /** JSON → Product（不含 variants，variants 由 toVariant 另外建） */
     private Product toProduct(ProductJson json, Category category) {
         Product p = new Product();
         p.setSlug(json.slug());
@@ -84,16 +90,18 @@ public class DataSeeder implements CommandLineRunner {
         p.setOrigPrice(json.origPrice());
         p.setNewArrival(json.isNew());
         p.setHot(json.isHot());
-
-        for (ProductJson.VariantJson vj : json.variants()) {
-            ProductVariant v = new ProductVariant();
-            v.setColor(vj.color());
-            v.setSize(vj.size());
-            v.setSkuCode(vj.skuCode());
-            v.setStock(vj.stock());
-            v.setUrl(vj.url());
-            p.addVariant(v);   // 同時設好 v.product = p
-        }
         return p;
+    }
+
+    /** JSON → ProductVariant，並指定所屬商品 */
+    private ProductVariant toVariant(ProductJson.VariantJson vj, Product product) {
+        ProductVariant v = new ProductVariant();
+        v.setProduct(product);
+        v.setColor(vj.color());
+        v.setSize(vj.size());
+        v.setSkuCode(vj.skuCode());
+        v.setStock(vj.stock());
+        v.setUrl(vj.url());
+        return v;
     }
 }

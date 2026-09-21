@@ -50,6 +50,6 @@ public class OrderItem {
     private Integer qty;
 
     // unitPrice × qty
-    @Column(name = "line_total", nullable = false)
-    private Integer lineTotal;
+    @Column(name = "total_price", nullable = false)
+    private Integer totalPrice;
 }
