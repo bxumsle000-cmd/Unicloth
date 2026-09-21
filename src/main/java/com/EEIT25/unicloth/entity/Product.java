@@ -33,6 +33,7 @@ public class Product {
     @Column(nullable = false)
     private String name;
 
+    @Column(nullable = true)
     private String description;
 
     // 售價
@@ -55,13 +56,4 @@ public class Product {
     @Column(nullable = false)
     private String status = "on_sale";
 
-    // 一個商品有多個 SKU（顏色 × 尺寸）。mappedBy 表示關聯的擁有者在 ProductVariant.product。
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProductVariant> variants = new ArrayList<>();
-
-    // 方便一次建立雙向關聯
-    public void addVariant(ProductVariant variant) {
-        variants.add(variant);
-        variant.setProduct(this);
-    }
 }
