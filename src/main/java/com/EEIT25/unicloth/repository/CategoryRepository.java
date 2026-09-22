@@ -1,4 +1,4 @@
-package com.EEIT25.unicloth.repository.seed;
+package com.EEIT25.unicloth.repository;
 
 import com.EEIT25.unicloth.entity.Category;
 import org.springframework.data.jpa.repository.JpaRepository;
