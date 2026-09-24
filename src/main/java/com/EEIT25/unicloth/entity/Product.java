@@ -1,6 +1,8 @@
 package com.EEIT25.unicloth.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,6 +18,8 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Product {
 
     @Id
@@ -54,6 +58,7 @@ public class Product {
 
     // on_sale / off_shelf
     @Column(nullable = false)
+    @Builder.Default
     private String status = "on_sale";
 
 }

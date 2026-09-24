@@ -1,6 +1,8 @@
 package com.EEIT25.unicloth.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,6 +20,8 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Order {
 
     @Id
@@ -34,6 +38,7 @@ public class Order {
 
     // pending / shipped / ... / cancelled
     @Column(nullable = false)
+    @Builder.Default
     private String status = "pending";
 
     @Column(name = "receiver_name", nullable = false)
@@ -63,10 +68,12 @@ public class Order {
 
     // 折價券折抵
     @Column(nullable = false)
+    @Builder.Default
     private Integer discount = 0;
 
     // 運費（滿 1490 免運、否則 50）
     @Column(name = "shipping_fee", nullable = false)
+    @Builder.Default
     private Integer shippingFee = 50;
 
     // 實付 = subtotal - discount + shippingFee

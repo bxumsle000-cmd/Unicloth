@@ -1,6 +1,8 @@
 package com.EEIT25.unicloth.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,6 +18,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Coupon {
 
     @Id
@@ -50,6 +54,7 @@ public class Coupon {
 
     // 可否領取
     @Column(name = "is_active", nullable = false)
+    @Builder.Default
     private boolean active = true;
 
     @CreationTimestamp

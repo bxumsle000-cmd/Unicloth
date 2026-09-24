@@ -1,6 +1,8 @@
 package com.EEIT25.unicloth.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,6 +18,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class SupportTicket {
 
     @Id
@@ -43,6 +47,7 @@ public class SupportTicket {
 
     // IN_PROGRESS / PENDING / RESOLVED
     @Column(nullable = false)
+    @Builder.Default
     private String status = "IN_PROGRESS";
 
     @CreationTimestamp

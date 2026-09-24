@@ -1,6 +1,8 @@
 package com.EEIT25.unicloth.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,6 +19,8 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Member {
 
     @Id
@@ -50,6 +54,7 @@ public class Member {
 
     // active / disabled
     @Column(nullable = false)
+    @Builder.Default
     private String status = "active";
 
     @CreationTimestamp
