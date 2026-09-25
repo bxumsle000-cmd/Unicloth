@@ -31,4 +31,8 @@ public class Category {
 
     @Column(nullable = false)
     private String name;
+
+    // 固定代碼（Uniqlo 分類代碼，例如 all_men-tops-t-shirts），前端與網址用它，不用 id
+    @Column(length = 100)
+    private String code;
 }

@@ -51,9 +51,9 @@ public class DataSeeder implements CommandLineRunner {
                 skipped++;
                 continue;
             }
-            Category sub = findOrCreateCategory(json.mainCategory(), json.subCategory());
+            Category leaf = findOrCreateCategory(json.categoryCode(), json.categoryPath());
             // Product 不認識 variants（沒有 @OneToMany），所以先存商品拿到 id，再逐一存 SKU
-            Product p = productRepository.save(toProduct(json, sub));
+            Product p = productRepository.save(toProduct(json, leaf));
             for (ProductJson.VariantJson vj : json.variants()) {
                 variantRepository.save(toVariant(vj, p));
             }
@@ -62,21 +62,29 @@ public class DataSeeder implements CommandLineRunner {
         log.info("[seed] 完成：新增 {} 件、跳過 {} 件（已存在）", inserted, skipped);
     }
 
-    /** 主分類（女裝）→ 副分類（外套類），沒有就建 */
-    private Category findOrCreateCategory(String mainName, String subName) {
-        Category main = categoryRepository.findByNameAndParentIsNull(mainName)
-                .orElseGet(() -> {
-                    Category c = new Category();
-                    c.setName(mainName);
-                    return categoryRepository.save(c);
-                });
-        return categoryRepository.findByNameAndParent(subName, main)
-                .orElseGet(() -> {
-                    Category c = new Category();
-                    c.setName(subName);
-                    c.setParent(main);
-                    return categoryRepository.save(c);
-                });
+    /**
+     * 性別（男裝）→ 大類（T恤/背心）→ 細類（長袖），一層一層用 code 找，沒有就建。
+     * 回傳最後一層（細類），商品掛在細類上。
+     */
+    private Category findOrCreateCategory(List<String> codes, List<String> names) {
+        if (codes == null || names == null || codes.size() != names.size() || codes.isEmpty()) {
+            throw new IllegalArgumentException("categoryCode 與 categoryPath 必須一樣長：" + codes + " / " + names);
+        }
+        Category parent = null;
+        for (int i = 0; i < codes.size(); i++) {
+            String code = codes.get(i);
+            String name = names.get(i);
+            Category finalParent = parent;   // lambda 裡只能用不會再變的變數
+            parent = categoryRepository.findByCode(code)
+                    .orElseGet(() -> {
+                        Category c = new Category();
+                        c.setCode(code);
+                        c.setName(name);
+                        c.setParent(finalParent);
+                        return categoryRepository.save(c);
+                    });
+        }
+        return parent;
     }
 
     /** JSON → Product（不含 variants，variants 由 toVariant 另外建） */
