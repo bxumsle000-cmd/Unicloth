@@ -12,6 +12,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * 會員相關服務<br>
+ * - {@link #getMe()}：取得目前登入會員資料<br>
+ * - {@link #updateProfile(UpdateMemberRequest)}：修改會員資料<br>
+ * - {@link #changePassword(ChangePasswordRequest)}：修改密碼
+ */
 @Service
 @RequiredArgsConstructor
 public class MemberService {

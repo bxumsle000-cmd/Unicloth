@@ -6,6 +6,17 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 
+/**
+ * @param memberId 會員 ID
+ * @param email    Email
+ * @param name     姓名
+ * @param phone    手機
+ * @param gender   性別
+ * @param birthday 生日
+ * @param address  地址
+ * @param status   帳號狀態
+ * @param createAt 建立時間
+ */
 public record MemberResponse(
         Long memberId ,
         String email,

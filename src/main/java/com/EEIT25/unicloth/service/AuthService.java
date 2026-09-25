@@ -13,6 +13,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * 認證相關服務<br>
+ * - {@link #login(LoginRequest)}：會員登入<br>
+ * - {@link #register(RegisterRequest)}：會員註冊
+ */
 @Service
 @RequiredArgsConstructor
 public class AuthService {
