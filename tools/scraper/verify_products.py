@@ -3,6 +3,7 @@
 
 爬完之後、匯入資料庫之前跑一次：
   python tools/scraper/verify_products.py
+  python tools/scraper/verify_products.py src/main/resources/data/products-leaf.json   # 檢查其他 JSON
 
 檢查項目（對應 V1__init.sql 的限制）：
   1. 每個 variants[].url 指到的圖片檔真的存在
@@ -22,11 +23,19 @@ JSON_PATH = PROJECT_ROOT / "src/main/resources/data/products.json"
 STATIC_DIR = PROJECT_ROOT / "src/main/resources/static"
 
 
+def category_label(p: dict) -> str:
+    """舊格式 mainCategory / subCategory，新格式（uniqlo_leaf_scraper）categoryPath 三層"""
+    if "categoryPath" in p:
+        return " / ".join(p["categoryPath"])
+    return f"{p.get('mainCategory')} / {p.get('subCategory')}"
+
+
 def main() -> int:
-    if not JSON_PATH.exists():
-        print(f"找不到 {JSON_PATH}")
+    json_path = Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else JSON_PATH
+    if not json_path.exists():
+        print(f"找不到 {json_path}")
         return 1
-    products = json.loads(JSON_PATH.read_text(encoding="utf-8"))
+    products = json.loads(json_path.read_text(encoding="utf-8"))
     problems: list[str] = []
 
     slug_counts = Counter(p["slug"] for p in products)
@@ -41,9 +50,15 @@ def main() -> int:
 
     for p in products:
         slug = p["slug"]
-        for field in ("slug", "name", "mainCategory", "subCategory"):
+        category_fields = ("categoryPath", "categoryCode") if "categoryPath" in p else ("mainCategory", "subCategory")
+        for field in ("slug", "name") + category_fields:
             if not p.get(field):
                 problems.append(f"{slug}：欄位 {field} 是空的")
+        if "categoryPath" in p:
+            for field in ("categoryPath", "categoryCode"):
+                value = p.get(field) or []
+                if len(value) != 3 or not all(value):
+                    problems.append(f"{slug}：{field} 應該是三個非空值（{value}）")
         if not isinstance(p.get("price"), int) or p["price"] <= 0:
             problems.append(f"{slug}：price 不是正整數（{p.get('price')}）")
         if p.get("origPrice") is not None and p["origPrice"] <= p["price"]:
@@ -69,7 +84,7 @@ def main() -> int:
     orphan = sorted(image_files - used_urls)
 
     print(f"商品 {len(products)} 件、SKU {total_sku} 筆、圖片檔 {len(image_files)} 張")
-    cats = Counter(f"{p['mainCategory']} / {p['subCategory']}" for p in products)
+    cats = Counter(category_label(p) for p in products)
     for c, n in sorted(cats.items()):
         print(f"  {c}：{n} 件")
     if orphan:
