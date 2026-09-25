@@ -13,6 +13,7 @@ public record MemberResponse(
         String phone,
         String gender,
         LocalDate birthday,
+        String address,
         String status,
         LocalDateTime createAt
 ) {
@@ -24,6 +25,7 @@ public record MemberResponse(
                 member.getPhone(),
                 member.getGender(),
                 member.getBirthday(),
+                member.getAddress(),
                 member.getStatus(),
                 member.getCreatedAt());
     }
