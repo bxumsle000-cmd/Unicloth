@@ -10,4 +10,7 @@ public interface ProductVariantRepository extends JpaRepository<ProductVariant, 
 
     // 一次撈出多件商品的所有 SKU（列表頁拿縮圖用，避免一件商品查一次）
     List<ProductVariant> findByProductIdInOrderByIdAsc(Collection<Long> productIds);
+
+    // 一件商品的所有 SKU，照 id 排序（商品詳細頁用）
+    List<ProductVariant> findByProductIdOrderByIdAsc(Long productId);
 }

@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
  * @param birthday 生日
  * @param address  地址
  * @param status   帳號狀態
- * @param createAt 建立時間
+ * @param createdAt 建立時間
  */
 public record MemberResponse(
         Long memberId ,
@@ -25,7 +25,7 @@ public record MemberResponse(
         LocalDate birthday,
         String address,
         String status,
-        LocalDateTime createAt
+        LocalDateTime createdAt
 ) {
     public static MemberResponse from(Member member){
         return new MemberResponse(

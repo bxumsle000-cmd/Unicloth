@@ -27,6 +27,7 @@
 
         /* 商品卡片 */
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
+        .card { display: block; }
         .card img { width: 100%; aspect-ratio: 1; object-fit: cover; background: #f2f2f2; }
         .tag { font-size: 12px; color: #fff; padding: 1px 6px; margin-right: 4px; }
         .tag.new { background: #1a73e8; }
@@ -116,7 +117,7 @@
         document.getElementById('grid').innerHTML = data.content.map(p => {
             const onSale = p.origPrice != null && p.origPrice > p.price;
             return `
-                <div class="card">
+                <a class="card" href="product.html?slug=${encodeURIComponent(p.slug)}">
                     <img src="${p.imageUrl ?? ''}" alt="${p.name}">
                     <div>
                         ${p.newArrival ? '<span class="tag new">新品</span>' : ''}
@@ -128,7 +129,7 @@
                         ${onSale ? `<span class="orig">NT$${p.origPrice}</span>` : ''}
                     </div>
                     <small style="color:#888">${p.slug}</small>
-                </div>`;
+                </a>`;
         }).join('');
 
         const pager = [];
