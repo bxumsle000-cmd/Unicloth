@@ -1,10 +1,152 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>分類頁（測試用）</title>
+    <style>
+        body { font-family: sans-serif; margin: 0; color: #222; }
+        a { color: inherit; text-decoration: none; }
+
+        /* 導覽選單 */
+        nav { display: flex; gap: 24px; padding: 12px 24px; border-bottom: 1px solid #ddd; }
+        .top { position: relative; }
+        .top > span { font-weight: bold; cursor: pointer; }
+        .top ul { display: none; position: absolute; top: 100%; left: 0; z-index: 10;
+                  list-style: none; margin: 0; padding: 8px 0; min-width: 160px;
+                  background: #fff; border: 1px solid #ddd; }
+        .top:hover ul { display: block; }
+        .top li a { display: block; padding: 6px 16px; }
+        .top li a:hover { background: #f2f2f2; }
+
+        main { padding: 16px 24px; }
+        .breadcrumb a:hover { text-decoration: underline; }
+        .filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+        .filters a { padding: 6px 14px; border: 1px solid #999; border-radius: 16px; }
+        .filters a.active { background: #222; color: #fff; border-color: #222; }
+
+        /* 商品卡片 */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
+        .card img { width: 100%; aspect-ratio: 1; object-fit: cover; background: #f2f2f2; }
+        .tag { font-size: 12px; color: #fff; padding: 1px 6px; margin-right: 4px; }
+        .tag.new { background: #1a73e8; }
+        .tag.hot { background: #e8711a; }
+        .price { font-weight: bold; }
+        .price.sale { color: #d00; }
+        .orig { color: #888; text-decoration: line-through; margin-left: 6px; font-size: 13px; }
+
+        .pager { display: flex; align-items: center; gap: 12px; margin: 24px 0; }
+        .error { color: #d00; }
+    </style>
 </head>
 <body>
-    <p> SpringBoot 成功啟用</p>
+
+<nav id="menu"></nav>
+
+<main>
+    <div class="breadcrumb" id="breadcrumb"></div>
+    <h2 id="title">請從上方選單選擇分類</h2>
+    <div class="filters" id="filters"></div>
+    <p id="total"></p>
+    <div class="grid" id="grid"></div>
+    <div class="pager" id="pager"></div>
+</main>
+
+<script>
+    // 網址長這樣：index.html?code=all_men-tops-t-shirts&page=0
+    const params = new URLSearchParams(location.search);
+    const code = params.get('code');
+    const page = Number(params.get('page') || 0);
+    const SIZE = 20;
+
+    // 共用：打 API，失敗時把後端的 ErrorResponse.message 丟出來
+    async function getJson(url) {
+        const res = await fetch(url);
+        const body = await res.json();
+        if (!res.ok) throw new Error(body.message || res.status);
+        return body;
+    }
+
+    function link(c, p = 0) {
+        return `?code=${encodeURIComponent(c)}&page=${p}`;
+    }
+
+    // 1. 導覽選單：GET /api/categories
+    async function loadMenu() {
+        const menu = await getJson('/api/categories');
+        document.getElementById('menu').innerHTML = menu.map(top => `
+            <div class="top">
+                <span>${top.name}</span>
+                <ul>
+                    ${top.children.map(c => `<li><a href="${link(c.code)}">${c.name}</a></li>`).join('')}
+                </ul>
+            </div>`).join('');
+    }
+
+    // 2. 麵包屑 + 篩選按鈕：GET /api/categories/{code}
+    async function loadDetail() {
+        const detail = await getJson(`/api/categories/${encodeURIComponent(code)}`);
+        document.title = detail.name;
+        document.getElementById('title').textContent = detail.name;
+
+        document.getElementById('breadcrumb').innerHTML = detail.breadcrumb
+            .map((c, i) => i === 0 ? c.name : `<a href="${link(c.code)}">${c.name}</a>`)  // 第 1 層沒有自己的頁面
+            .join(' › ');
+
+        // 第 2 層：children 就是第 3 層按鈕
+        // 第 3 層：children 是空的 → 改拿上一層（第 2 層）的 children 當按鈕，並標出目前這個
+        let parent = detail;
+        if (detail.children.length === 0 && detail.breadcrumb.length >= 3) {
+            parent = await getJson(`/api/categories/${encodeURIComponent(detail.breadcrumb.at(-2).code)}`);
+        }
+        const buttons = [`<a href="${link(parent.code)}" class="${parent.code === code ? 'active' : ''}">全部</a>`]
+            .concat(parent.children.map(c =>
+                `<a href="${link(c.code)}" class="${c.code === code ? 'active' : ''}">${c.name}</a>`));
+        document.getElementById('filters').innerHTML = buttons.join('');
+    }
+
+    // 3. 商品：GET /api/categories/{code}/products?page=0&size=20
+    async function loadProducts() {
+        const data = await getJson(`/api/categories/${encodeURIComponent(code)}/products?page=${page}&size=${SIZE}`);
+        // via_dto 格式：{ content: [...], page: { size, number, totalElements, totalPages } }
+        const info = data.page;
+
+        document.getElementById('total').textContent = `共 ${info.totalElements} 件商品`;
+
+        document.getElementById('grid').innerHTML = data.content.map(p => {
+            const onSale = p.origPrice != null && p.origPrice > p.price;
+            return `
+                <div class="card">
+                    <img src="${p.imageUrl ?? ''}" alt="${p.name}">
+                    <div>
+                        ${p.newArrival ? '<span class="tag new">新品</span>' : ''}
+                        ${p.hot ? '<span class="tag hot">熱門</span>' : ''}
+                    </div>
+                    <div>${p.name}</div>
+                    <div>
+                        <span class="price ${onSale ? 'sale' : ''}">NT$${p.price}</span>
+                        ${onSale ? `<span class="orig">NT$${p.origPrice}</span>` : ''}
+                    </div>
+                    <small style="color:#888">${p.slug}</small>
+                </div>`;
+        }).join('');
+
+        const pager = [];
+        if (info.number > 0) pager.push(`<a href="${link(code, info.number - 1)}">‹ 上一頁</a>`);
+        pager.push(`<span>第 ${info.number + 1} / ${Math.max(info.totalPages, 1)} 頁</span>`);
+        if (info.number + 1 < info.totalPages) pager.push(`<a href="${link(code, info.number + 1)}">下一頁 ›</a>`);
+        document.getElementById('pager').innerHTML = pager.join('');
+    }
+
+    async function main() {
+        try {
+            await loadMenu();
+            if (code) await Promise.all([loadDetail(), loadProducts()]);
+        } catch (e) {
+            document.getElementById('title').innerHTML = `<span class="error">錯誤：${e.message}</span>`;
+        }
+    }
+    main();
+</script>
 </body>
 </html>

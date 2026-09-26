@@ -63,7 +63,7 @@ public class DataSeeder implements CommandLineRunner {
     }
 
     /**
-     * 性別（男裝）→ 大類（T恤/背心）→ 細類（長袖），一層一層用 code 找，沒有就建。
+     * 性別（男裝）→ 大類（T恤/背心/休閒）→ 細類（長袖），一層一層用 code 找，沒有就建。
      * 回傳最後一層（細類），商品掛在細類上。
      */
     private Category findOrCreateCategory(List<String> codes, List<String> names) {

@@ -7,8 +7,8 @@ import java.util.List;
  * record 的欄位名稱要跟 JSON 的 key 一模一樣，Jackson 才對得起來。
  *
  * 分類是三層：性別 › 大類 › 細類，名稱和代碼一一對應
- *   categoryPath = ["男裝", "T恤/背心", "長袖"]
- *   categoryCode = ["all_men", "all_men-tops-t-shirts", "all_men-tops-t-shirts-anchor01"]
+ *   categoryPath = ["男裝", "T恤/背心/休閒", "長袖"]
+ *   categoryCode = ["all_men", "all_men-tops", "all_men-tops-t-shirts-anchor01"]
  */
 public record ProductJson(
         String slug,
