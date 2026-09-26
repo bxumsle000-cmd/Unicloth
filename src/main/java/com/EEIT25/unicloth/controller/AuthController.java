@@ -1,8 +1,8 @@
 package com.EEIT25.unicloth.controller;
 
-import com.EEIT25.unicloth.dto.LoginRequest;
-import com.EEIT25.unicloth.dto.LoginResponse;
-import com.EEIT25.unicloth.dto.RegisterRequest;
+import com.EEIT25.unicloth.dto.auth.LoginRequest;
+import com.EEIT25.unicloth.dto.auth.LoginResponse;
+import com.EEIT25.unicloth.dto.auth.RegisterRequest;
 import com.EEIT25.unicloth.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

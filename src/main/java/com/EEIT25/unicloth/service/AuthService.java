@@ -1,9 +1,8 @@
 package com.EEIT25.unicloth.service;
 
-import com.EEIT25.unicloth.dto.LoginRequest;
-import com.EEIT25.unicloth.dto.LoginResponse;
-import com.EEIT25.unicloth.dto.MemberResponse;
-import com.EEIT25.unicloth.dto.RegisterRequest;
+import com.EEIT25.unicloth.dto.auth.LoginRequest;
+import com.EEIT25.unicloth.dto.auth.LoginResponse;
+import com.EEIT25.unicloth.dto.auth.RegisterRequest;
 import com.EEIT25.unicloth.entity.Member;
 import com.EEIT25.unicloth.exception.ApiException;
 import com.EEIT25.unicloth.repository.MemberRepository;

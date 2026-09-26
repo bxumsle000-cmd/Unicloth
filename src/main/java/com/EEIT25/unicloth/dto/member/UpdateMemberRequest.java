@@ -1,6 +1,4 @@
-package com.EEIT25.unicloth.dto;
-
-import java.time.LocalDate;
+package com.EEIT25.unicloth.dto.member;
 
 /**
  * @param name    姓名

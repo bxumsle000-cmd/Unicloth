@@ -1,7 +1,7 @@
 package com.EEIT25.unicloth.service;
 
-import com.EEIT25.unicloth.dto.CategoryDetailResponse;
-import com.EEIT25.unicloth.dto.CategoryResponse;
+import com.EEIT25.unicloth.dto.category.CategoryDetailResponse;
+import com.EEIT25.unicloth.dto.category.CategoryResponse;
 import com.EEIT25.unicloth.dto.ProductCardResponse;
 import com.EEIT25.unicloth.entity.Category;
 import com.EEIT25.unicloth.entity.Product;

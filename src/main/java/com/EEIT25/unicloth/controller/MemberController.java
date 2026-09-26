@@ -1,8 +1,8 @@
 package com.EEIT25.unicloth.controller;
 
-import com.EEIT25.unicloth.dto.ChangePasswordRequest;
-import com.EEIT25.unicloth.dto.MemberResponse;
-import com.EEIT25.unicloth.dto.UpdateMemberRequest;
+import com.EEIT25.unicloth.dto.member.ChangePasswordRequest;
+import com.EEIT25.unicloth.dto.member.MemberResponse;
+import com.EEIT25.unicloth.dto.member.UpdateMemberRequest;
 import com.EEIT25.unicloth.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

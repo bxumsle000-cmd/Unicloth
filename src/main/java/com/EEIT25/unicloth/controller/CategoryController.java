@@ -1,7 +1,7 @@
 package com.EEIT25.unicloth.controller;
 
-import com.EEIT25.unicloth.dto.CategoryDetailResponse;
-import com.EEIT25.unicloth.dto.CategoryResponse;
+import com.EEIT25.unicloth.dto.category.CategoryDetailResponse;
+import com.EEIT25.unicloth.dto.category.CategoryResponse;
 import com.EEIT25.unicloth.dto.ProductCardResponse;
 import com.EEIT25.unicloth.service.CategoryService;
 import lombok.RequiredArgsConstructor;

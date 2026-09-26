@@ -1,4 +1,4 @@
-package com.EEIT25.unicloth.dto;
+package com.EEIT25.unicloth.dto.category;
 
 import java.util.List;
 

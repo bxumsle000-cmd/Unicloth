@@ -1,8 +1,8 @@
 package com.EEIT25.unicloth.service;
 
-import com.EEIT25.unicloth.dto.ChangePasswordRequest;
-import com.EEIT25.unicloth.dto.MemberResponse;
-import com.EEIT25.unicloth.dto.UpdateMemberRequest;
+import com.EEIT25.unicloth.dto.member.ChangePasswordRequest;
+import com.EEIT25.unicloth.dto.member.MemberResponse;
+import com.EEIT25.unicloth.dto.member.UpdateMemberRequest;
 import com.EEIT25.unicloth.entity.Member;
 import com.EEIT25.unicloth.exception.ApiException;
 import com.EEIT25.unicloth.repository.MemberRepository;

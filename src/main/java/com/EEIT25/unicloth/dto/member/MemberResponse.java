@@ -1,10 +1,9 @@
-package com.EEIT25.unicloth.dto;
+package com.EEIT25.unicloth.dto.member;
 
 import com.EEIT25.unicloth.entity.Member;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 /**
  * @param memberId 會員 ID
