@@ -1,6 +1,7 @@
 package com.EEIT25.unicloth.dto.wishlist;
 
 import com.EEIT25.unicloth.entity.Product;
+import com.EEIT25.unicloth.entity.WishlistItem;
 
 /**
  * 追蹤清單上的一件商品
@@ -16,9 +17,11 @@ public record WishlistItemResponse(
 ) {
 
     /**
-     * @param product 被追蹤的商品（下架的也會傳進來，onSale 會是 false）
+     * @param wishlistItem 追蹤清單的一筆（商品下架的也會傳進來，onSale 會是 false）
      */
-    public static WishlistItemResponse from(Product product){
+    public static WishlistItemResponse from(WishlistItem wishlistItem){
+        Product product = wishlistItem.getProduct();
+
         return new WishlistItemResponse(product.getSlug(),
                 product.getName(),
                 product.getPrice(),

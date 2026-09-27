@@ -24,6 +24,14 @@ public class WishlistService {
     private final MemberRepository memberRepository;
     private final CurrentMember currentMember;
 
+    /** 我的追蹤清單，最新追蹤的在前面 */
+    @Transactional(readOnly = true)
+    public List<WishlistItemResponse> getWishlist(){
+        return wishlistItemRepository.findWishlistWithProducts(currentMember.getCurrentId())
+                .stream()
+                .map(wishlistItem -> WishlistItemResponse.from(wishlistItem))
+                .toList();
+    }
 
     @Transactional
     public void add(String slug){
@@ -57,12 +65,5 @@ public class WishlistService {
         return wishlistItemRepository.existsByMemberIdAndProductSlug(currentMember.getCurrentId(), slug);
     }
 
-    /** 我的追蹤清單，最新追蹤的在前面 */
-    @Transactional(readOnly = true)
-    public List<WishlistItemResponse> getWishlist(){
-        return wishlistItemRepository.findWishlistWithProducts(currentMember.getCurrentId())
-                .stream()
-                .map(w -> WishlistItemResponse.from(w.getProduct()))
-                .toList();
-    }
+
 }

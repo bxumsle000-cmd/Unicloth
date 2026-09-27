@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>追蹤清單（測試用）</title>
+    <style>
+        body { font-family: sans-serif; margin: 0; color: #222; }
+        a { color: inherit; text-decoration: none; }
+
+        main { padding: 16px 24px; }
+        .back { display: inline-block; margin-bottom: 12px; }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
+        .card img { width: 100%; aspect-ratio: 1; object-fit: cover; background: #f2f2f2; }
+        .card.off { opacity: .6; }
+        .card button { margin-top: 6px; }
+        .price { font-weight: bold; }
+        .tag { font-size: 12px; color: #fff; background: #888; padding: 1px 6px; margin-left: 6px; }
+        .error { color: #d00; }
+    </style>
+</head>
+<body>
+
+<main>
+    <a class="back" href="javascript:history.back()">‹ 回上一頁</a>
+    <a class="back" href="cart.html" style="float:right">購物車 ›</a>
+    <h2>追蹤清單</h2>
+    <p class="error" id="error"></p>
+    <div class="grid" id="grid"></div>
+</main>
+
+<script>
+    let items = [];   // API 回傳的 WishlistItemResponse 陣列
+
+    // 共用：打 API，失敗時把後端的 ErrorResponse.message 丟出來
+    // 加入 / 取消追蹤成功時後端回 204（沒有 body），不能呼叫 res.json()
+    async function api(url, options = {}) {
+        const res = await fetch(url, options);
+        const body = res.status === 204 ? null : await res.json();
+        if (!res.ok) throw new Error(body?.message || res.status);
+        return body;
+    }
+
+    function showError(message) {
+        document.getElementById('error').textContent = message ?? '';
+    }
+
+    function render() {
+        const grid = document.getElementById('grid');
+        if (items.length === 0) {
+            grid.innerHTML = '<p>還沒有追蹤任何商品</p>';
+            return;
+        }
+
+        grid.innerHTML = items.map(p => {
+            const body = `
+                <img src="${p.imageUrl ?? ''}" alt="${p.name}">
+                <div>${p.name}${p.onSale ? '' : '<span class="tag">已下架</span>'}</div>
+                <div class="price">NT$${p.price}</div>`;
+            // 下架的商品連不到商品頁，所以不做連結，但仍可取消追蹤
+            return `
+                <div class="card ${p.onSale ? '' : 'off'}">
+                    ${p.onSale ? `<a href="product.html?slug=${encodeURIComponent(p.slug)}">${body}</a>` : body}
+                    <button onclick="removeItem('${p.slug}')">取消追蹤</button>
+                </div>`;
+        }).join('');
+    }
+
+    // GET /api/wishlist
+    async function load() {
+        items = await api('/api/wishlist');
+        render();
+    }
+
+    // DELETE /api/wishlist/{slug}
+    async function removeItem(slug) {
+        showError();
+        try {
+            await api(`/api/wishlist/${encodeURIComponent(slug)}`, { method: 'DELETE' });
+            await load();
+        } catch (e) {
+            showError(e.message);
+        }
+    }
+
+    load().catch(e => showError('錯誤：' + e.message));
+</script>
+</body>
+</html>

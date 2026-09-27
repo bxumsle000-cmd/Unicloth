@@ -28,7 +28,13 @@
         .options button:disabled { color: #bbb; border-color: #ddd; text-decoration: line-through; cursor: not-allowed; }
 
         .selected { margin-top: 16px; color: #555; }
-        .cart { margin-top: 12px; padding: 10px 24px; }
+        .cart-row { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
+        .cart-row input { width: 64px; padding: 4px; }
+        .cart { padding: 10px 24px; }
+        #cartMsg { margin-top: 8px; }
+        .wish { margin-left: 8px; padding: 4px 12px; border: 1px solid #999; border-radius: 16px;
+                background: #fff; cursor: pointer; font-size: 14px; vertical-align: middle; }
+        .wish.on { color: #d00; border-color: #d00; }
         .error { color: #d00; }
     </style>
 </head>
@@ -36,6 +42,8 @@
 
 <main>
     <a class="back" href="javascript:history.back()">‹ 回上一頁</a>
+    <a class="back" href="cart.html" style="float:right">購物車 ›</a>
+    <a class="back" href="wishlist.html" style="float:right; margin-right:16px">追蹤清單 ›</a>
     <div id="page"></div>
 </main>
 
@@ -46,6 +54,7 @@
     let product = null;        // API 回傳的 ProductDetailResponse
     let colorIndex = 0;        // 目前選的顏色（colors 陣列的位置）
     let selectedSize = null;   // 目前選的 SizeOption
+    let inWishlist = false;    // 這件商品是否已追蹤
 
     // 共用：打 API，失敗時把後端的 ErrorResponse.message 丟出來
     async function getJson(url) {
@@ -65,7 +74,9 @@
             <div class="detail">
                 <img src="${color?.imageUrl ?? ''}" alt="${p.name}">
                 <div class="info">
-                    <h2>${p.name}</h2>
+                    <h2>${p.name}
+                        <button class="wish ${inWishlist ? 'on' : ''}" onclick="toggleWishlist()">${inWishlist ? '♥ 已追蹤' : '♡ 追蹤'}</button>
+                    </h2>
                     <div>
                         <span class="price ${onSale ? 'sale' : ''}">NT$${p.price}</span>
                         ${onSale ? `<span class="orig">NT$${p.origPrice}</span>` : ''}
@@ -93,7 +104,11 @@
                             ? `已選：${color.color} / ${selectedSize.size}（庫存 ${selectedSize.stock}，variantId ${selectedSize.variantId}）`
                             : '請選擇尺寸'}
                     </div>
-                    <button class="cart" disabled>加入購物車（尚未串接）</button>
+                    <div class="cart-row">
+                        <label>數量 <input id="qty" type="number" min="1" value="1"></label>
+                        <button class="cart" ${selectedSize ? '' : 'disabled'} onclick="addToCart()">加入購物車</button>
+                    </div>
+                    <div id="cartMsg"></div>
                 </div>
             </div>`;
     }
@@ -110,11 +125,61 @@
         render();
     }
 
+    // POST /api/cart   body: { variantId, qty }
+    // 成功時後端回 204（沒有 body），所以不能用 getJson（它會呼叫 res.json()）
+    async function addToCart() {
+        const msg = document.getElementById('cartMsg');
+        const qty = Number(document.getElementById('qty').value);
+        try {
+            // 後端還沒有 @Min(1)，先在前端擋掉 0 和負數
+            if (!Number.isInteger(qty) || qty < 1) throw new Error('數量至少要 1');
+            const res = await fetch('/api/cart', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ variantId: selectedSize.variantId, qty }),
+            });
+            if (!res.ok) {
+                const body = await res.json();
+                throw new Error(body.message || res.status);
+            }
+            msg.innerHTML = '已加入購物車，<a href="cart.html">前往購物車</a>';
+        } catch (e) {
+            msg.innerHTML = `<span class="error">${e.message}</span>`;
+        }
+    }
+
+    // 追蹤 / 取消追蹤：POST 或 DELETE /api/wishlist/{slug}
+    // 成功時後端回 204（沒有 body），所以不能用 getJson
+    async function toggleWishlist() {
+        const msg = document.getElementById('cartMsg');
+        try {
+            const res = await fetch(`/api/wishlist/${encodeURIComponent(slug)}`, {
+                method: inWishlist ? 'DELETE' : 'POST',
+            });
+            if (!res.ok) {
+                const body = await res.json();
+                throw new Error(body.message || res.status);
+            }
+            inWishlist = !inWishlist;
+            render();
+        } catch (e) {
+            msg.innerHTML = `<span class="error">${e.message}</span>`;
+        }
+    }
+
+    // GET /api/wishlist/{slug}：回傳 true / false
+    async function loadWishlistState() {
+        inWishlist = await getJson(`/api/wishlist/${encodeURIComponent(slug)}`);
+    }
+
     // GET /api/products/{slug}
     async function main() {
         try {
             if (!slug) throw new Error('網址缺少 slug，例如 product.html?slug=men-487511');
-            product = await getJson(`/api/products/${encodeURIComponent(slug)}`);
+            [product] = await Promise.all([
+                getJson(`/api/products/${encodeURIComponent(slug)}`),
+                loadWishlistState(),
+            ]);
             document.title = product.name;
             render();
         } catch (e) {

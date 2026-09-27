@@ -1,6 +1,8 @@
 package com.EEIT25.unicloth.repository;
 
 import com.EEIT25.unicloth.entity.CartItem;
+import com.EEIT25.unicloth.entity.Member;
+import com.EEIT25.unicloth.entity.ProductVariant;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -20,11 +22,13 @@ public interface CartItemRepository extends JpaRepository<CartItem, Long> {
             """)
     List<CartItem> findCartWithProducts(@Param("memberId") Long memberId);
 
-    // 加入購物車前先查：同一會員同一 SKU 已存在就累加 qty，不存在才新增
-    Optional<CartItem> findByMemberIdAndVariantId(Long memberId, Long variantId);
+    Optional<CartItem> findByVariant(ProductVariant variant);
 
-    // 改數量 / 刪除時確認這筆真的是該會員的
-    Optional<CartItem> findByIdAndMemberId(Long id, Long memberId);
+    Optional<CartItem> findByMemberAndVariant(Member member, ProductVariant variant);
+
+    Optional<CartItem> findByIdAndMember(long l,Member member);
+
+    long deleteByIdAndMember(Long id, Member member);
 
     // 結帳完成後清空購物車（delete 類方法要在 Service 加 @Transactional）
     void deleteByMemberId(Long memberId);

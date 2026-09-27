@@ -20,6 +20,12 @@ public class WishlistController {
         return wishlistService.getWishlist();
     }
 
+    /** 商品頁愛心要不要亮：這件商品是否已追蹤 */
+    @GetMapping("/{slug}")
+    public boolean isInWishlist(@PathVariable String slug){
+        return wishlistService.isInWishlist(slug);
+    }
+
     /** 加入追蹤 */
     @PostMapping("/{slug}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
