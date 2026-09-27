@@ -1,5 +1,6 @@
 package com.EEIT25.unicloth.service;
 
+import com.EEIT25.unicloth.dto.category.BreadcrumbResponse;
 import com.EEIT25.unicloth.dto.category.CategoryDetailResponse;
 import com.EEIT25.unicloth.dto.category.CategoryResponse;
 import com.EEIT25.unicloth.dto.category.ProductCardResponse;
@@ -25,7 +26,8 @@ import java.util.Map;
  * 分類篩選相關服務<br>
  * 分類三層：性別（男裝）› 大類（T恤/背心）› 細類（長袖），商品只掛在第 3 層。<br>
  * - {@link #getMenu()}：導覽選單，第 1 層 + 各自的第 2 層<br>
- * - {@link #getCategory(String)}：分類頁上方資訊（麵包屑 + 下一層篩選按鈕）<br>
+ * - {@link #getCategory(String)}：分類頁上方的下一層篩選按鈕<br>
+ * - {@link #getBreadcrumb(String)}：分類頁上方的麵包屑<br>
  * - {@link #getProducts(String, Pageable)}：第 2 層或第 3 層分類的商品，分頁
  */
 @Service
@@ -50,22 +52,30 @@ public class CategoryService {
                 .toList();
     }
 
-    /** 進入分類頁時，上方的麵包屑與下一層篩選按鈕 */
+    /** 進入分類頁時，上方的下一層篩選按鈕 */
     @Transactional
     public CategoryDetailResponse getCategory(String code) {
         Category category = categoryRepository.findByCode(code)
                 .orElseThrow(() -> ApiException.notFound("找不到分類：" + code));
 
-        // 麵包屑：從自己一路往 parent 爬，再倒過來 → [男裝, T恤/背心]
-        List<CategoryResponse> breadcrumb = new ArrayList<>();
-        for (Category c = category; c != null; c = c.getParent()) {
-            breadcrumb.add(0, CategoryResponse.from(c));
-        }
-
         List<CategoryResponse> children = categoryRepository.findByParentOrderByIdAsc(category)
                 .stream().map(CategoryResponse::from).toList();
 
-        return new CategoryDetailResponse(category.getCode(), category.getName(), breadcrumb, children);
+        return new CategoryDetailResponse(category.getCode(), category.getName(), children);
+    }
+
+    /** 分類頁上方的麵包屑，從第 1 層排到自己 → [男裝, T恤/背心, 長袖] */
+    @Transactional
+    public List<BreadcrumbResponse> getBreadcrumb(String code) {
+        Category category = categoryRepository.findByCode(code)
+                .orElseThrow(() -> ApiException.notFound("找不到分類：" + code));
+
+        // 從自己一路往 parent 爬，每次插到最前面 → 順序就是由上到下
+        List<BreadcrumbResponse> breadcrumb = new ArrayList<>();
+        for (Category c = category; c != null; c = c.getParent()) {
+            breadcrumb.add(0, BreadcrumbResponse.from(c));
+        }
+        return breadcrumb;
     }
 
     /**

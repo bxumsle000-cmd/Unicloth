@@ -84,21 +84,25 @@
             </div>`).join('');
     }
 
-    // 2. 麵包屑 + 篩選按鈕：GET /api/categories/{code}
+    // 2. 麵包屑：GET /api/categories/{code}/breadcrumb
+    //    篩選按鈕：GET /api/categories/{code}
     async function loadDetail() {
-        const detail = await getJson(`/api/categories/${encodeURIComponent(code)}`);
+        const [detail, breadcrumb] = await Promise.all([
+            getJson(`/api/categories/${encodeURIComponent(code)}`),
+            getJson(`/api/categories/${encodeURIComponent(code)}/breadcrumb`),
+        ]);
         document.title = detail.name;
         document.getElementById('title').textContent = detail.name;
 
-        document.getElementById('breadcrumb').innerHTML = detail.breadcrumb
+        document.getElementById('breadcrumb').innerHTML = breadcrumb
             .map((c, i) => i === 0 ? c.name : `<a href="${link(c.code)}">${c.name}</a>`)  // 第 1 層沒有自己的頁面
             .join(' › ');
 
         // 第 2 層：children 就是第 3 層按鈕
         // 第 3 層：children 是空的 → 改拿上一層（第 2 層）的 children 當按鈕，並標出目前這個
         let parent = detail;
-        if (detail.children.length === 0 && detail.breadcrumb.length >= 3) {
-            parent = await getJson(`/api/categories/${encodeURIComponent(detail.breadcrumb.at(-2).code)}`);
+        if (detail.children.length === 0 && breadcrumb.length >= 3) {
+            parent = await getJson(`/api/categories/${encodeURIComponent(breadcrumb.at(-2).code)}`);
         }
         const buttons = [`<a href="${link(parent.code)}" class="${parent.code === code ? 'active' : ''}">全部</a>`]
             .concat(parent.children.map(c =>
