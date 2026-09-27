@@ -56,6 +56,10 @@ public class Product {
     @Column(name = "is_hot", nullable = false)
     private boolean hot;
 
+    // 主圖（列表縮圖）；各顏色的圖在 ProductVariant.url
+    @Column(name = "image_url")
+    private String imageUrl;
+
     // on_sale / off_shelf
     @Column(nullable = false)
     @Builder.Default

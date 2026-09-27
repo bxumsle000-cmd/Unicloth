@@ -19,14 +19,13 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class ProductService {
-    private static final String ON_SALE = "on_sale";
 
     private final ProductRepository productRepository;
     private final ProductVariantRepository productVariantRepository;
 
     @Transactional
     public ProductDetailResponse getProductDetail(String slug){
-        Product product = productRepository.findBySlugAndStatus(slug, ON_SALE)
+        Product product = productRepository.findOnSaleBySlug(slug)
                 .orElseThrow(() -> ApiException.notFound("找不到商品：" + slug));
 
         List<ProductVariant> productVariantList = productVariantRepository

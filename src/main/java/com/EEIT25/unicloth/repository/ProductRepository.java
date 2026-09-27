@@ -4,6 +4,7 @@ import com.EEIT25.unicloth.entity.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -15,5 +16,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     /** 分類 id 在清單內、且狀態符合的商品（分頁）*/
     Page<Product> findByCategoryIdInAndStatus(Collection<Long> categoryIds, String status, Pageable pageable);
 
-    Optional<Product> findBySlugAndStatus(String slug, String status);
+    /** 上架中的商品（依 slug） */
+    @Query("SELECT p FROM Product p WHERE p.slug = :slug AND p.status = 'on_sale'")
+    Optional<Product> findOnSaleBySlug(String slug);
 }

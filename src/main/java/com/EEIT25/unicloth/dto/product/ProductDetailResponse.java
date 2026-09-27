@@ -23,6 +23,10 @@ public record ProductDetailResponse(
         Integer origPrice,
         List<ColorOption> colors
 ) {
+    /**
+     * @param product 要顯示的商品
+     * @param colors  已經依顏色分組好的選項（由 Service 組好再傳進來）
+     */
     public static ProductDetailResponse from(Product product,
                                              List<ColorOption> colors) {
         return new ProductDetailResponse(
@@ -46,6 +50,10 @@ public record ProductDetailResponse(
             String imageUrl,
             List<SizeOption> sizes
     ) {
+        /**
+         * @param color     顏色名稱，例如 黑色
+         * @param sameColor 這個顏色的所有 SKU（不能是空的，會取第一個的圖片）
+         */
         public static ColorOption from(String color, List<ProductVariant> sameColor) {
             List<SizeOption> sizes = sameColor.stream().map(SizeOption::from).toList();
             String imageUrl = sameColor.get(0).getUrl();   // 同顏色圖片一樣，取第一個
@@ -65,6 +73,9 @@ public record ProductDetailResponse(
             String size,
             Integer stock
     ) {
+        /**
+         * @param variant 某顏色底下的一個 SKU
+         */
         public static SizeOption from(ProductVariant variant) {
             return new SizeOption(variant.getId(), variant.getSize(), variant.getStock());
         }

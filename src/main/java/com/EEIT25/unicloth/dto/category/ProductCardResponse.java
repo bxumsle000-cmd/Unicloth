@@ -11,7 +11,7 @@ import com.EEIT25.unicloth.entity.Product;
  * @param origPrice  原價；有值且 > price 就顯示特價
  * @param newArrival 新品標籤
  * @param hot        熱門標籤
- * @param imageUrl   縮圖（第一個 SKU 的圖片），沒有 SKU 時是 null
+ * @param imageUrl   縮圖（商品主圖），沒有時是 null
  */
 public record ProductCardResponse(
         String slug,
@@ -22,7 +22,10 @@ public record ProductCardResponse(
         boolean hot,
         String imageUrl
 ) {
-    public static ProductCardResponse from(Product product, String imageUrl) {
+    /**
+     * @param product 要顯示成卡片的商品（縮圖取 product.imageUrl）
+     */
+    public static ProductCardResponse from(Product product) {
         return new ProductCardResponse(
                 product.getSlug(),
                 product.getName(),
@@ -30,6 +33,6 @@ public record ProductCardResponse(
                 product.getOrigPrice(),
                 product.isNewArrival(),
                 product.isHot(),
-                imageUrl);
+                product.getImageUrl());
     }
 }

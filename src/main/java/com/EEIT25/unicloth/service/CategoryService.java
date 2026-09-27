@@ -6,11 +6,9 @@ import com.EEIT25.unicloth.dto.category.CategoryResponse;
 import com.EEIT25.unicloth.dto.category.ProductCardResponse;
 import com.EEIT25.unicloth.entity.Category;
 import com.EEIT25.unicloth.entity.Product;
-import com.EEIT25.unicloth.entity.ProductVariant;
 import com.EEIT25.unicloth.exception.ApiException;
 import com.EEIT25.unicloth.repository.CategoryRepository;
 import com.EEIT25.unicloth.repository.ProductRepository;
-import com.EEIT25.unicloth.repository.ProductVariantRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,9 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 分類篩選相關服務<br>
@@ -37,7 +33,6 @@ public class CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
-    private final ProductVariantRepository variantRepository;
 
     /** 點「男裝」時展開的選單：第 1 層，每個底下帶第 2 層 */
     @Transactional
@@ -94,15 +89,6 @@ public class CategoryService {
                 : children.stream().map(Category::getId).toList();
 
         Page<Product> products = productRepository.findByCategoryIdInAndStatus(categoryIds, ON_SALE, pageable);
-
-        // 一次撈出這一頁所有商品的 SKU，每件商品取第一個 SKU 的圖當縮圖
-        List<Long> productIds = products.map(Product::getId).getContent();
-        Map<Long, String> imageByProductId = new HashMap<>();
-
-        for (ProductVariant v : variantRepository.findByProductIdInOrderByIdAsc(productIds)) {
-            imageByProductId.putIfAbsent(v.getProduct().getId(), v.getUrl());
-        }
-
-        return products.map(p -> ProductCardResponse.from(p, imageByProductId.get(p.getId())));
+        return products.map(ProductCardResponse::from);
     }
 }

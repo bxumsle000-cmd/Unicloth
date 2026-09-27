@@ -98,6 +98,10 @@ public class DataSeeder implements CommandLineRunner {
         p.setOrigPrice(json.origPrice());
         p.setNewArrival(json.isNew());
         p.setHot(json.isHot());
+        // JSON 沒有商品主圖，取第一個 SKU 的圖
+        if (json.variants() != null && !json.variants().isEmpty()) {
+            p.setImageUrl(json.variants().get(0).url());
+        }
         return p;
     }
 

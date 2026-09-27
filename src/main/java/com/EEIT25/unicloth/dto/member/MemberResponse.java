@@ -27,6 +27,9 @@ public record MemberResponse(
         String status,
         LocalDateTime createdAt
 ) {
+    /**
+     * @param member 要轉換的會員（不會帶出密碼）
+     */
     public static MemberResponse from(Member member){
         return new MemberResponse(
                 member.getId(),

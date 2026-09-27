@@ -16,12 +16,21 @@ public record CategoryResponse(
         String name,
         List<CategoryResponse> children
 ) {
-    /** 不帶子分類 */
+    /**
+     * 不帶子分類
+     *
+     * @param category 要轉換的分類
+     */
     public static CategoryResponse from(Category category) {
         return new CategoryResponse(category.getCode(), category.getName(), List.of());
     }
 
-    /** 帶子分類 */
+    /**
+     * 帶子分類
+     *
+     * @param category 要轉換的分類
+     * @param children 已經轉好的子分類（呼叫端自己查、自己轉）
+     */
     public static CategoryResponse from(Category category, List<CategoryResponse> children) {
         return new CategoryResponse(category.getCode(), category.getName(), children);
     }

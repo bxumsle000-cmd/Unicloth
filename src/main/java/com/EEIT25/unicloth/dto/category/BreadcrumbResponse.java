@@ -12,6 +12,9 @@ public record BreadcrumbResponse(
         String code,
         String name
 ) {
+    /**
+     * @param category 麵包屑上的其中一層分類
+     */
     public static BreadcrumbResponse from(Category category) {
         return new BreadcrumbResponse(category.getCode(), category.getName());
     }

@@ -18,9 +18,13 @@ public interface WishlistItemRepository extends JpaRepository<WishlistItem, Long
             """)
     List<WishlistItem> findWishlistWithProducts(@Param("memberId") Long memberId);
 
-    // 商品頁顯示「已追蹤 / 未追蹤」
+    // 加入前檢查是否已追蹤
     boolean existsByMemberIdAndProductId(Long memberId, Long productId);
 
+    // 商品頁顯示「已追蹤 / 未追蹤」（前端只有 slug）
+    boolean existsByMemberIdAndProductSlug(Long memberId, String slug);
+
     // 取消追蹤（delete 類方法要在 Service 加 @Transactional）
-    void deleteByMemberIdAndProductId(Long memberId, Long productId);
+    // 用 slug 刪，不管商品有沒有下架都刪得掉
+    void deleteByMemberIdAndProductSlug(Long memberId, String slug);
 }
