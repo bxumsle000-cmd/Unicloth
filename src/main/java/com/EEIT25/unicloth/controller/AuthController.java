@@ -5,6 +5,7 @@ import com.EEIT25.unicloth.dto.auth.LoginResponse;
 import com.EEIT25.unicloth.dto.auth.RegisterRequest;
 import com.EEIT25.unicloth.service.AuthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -21,12 +22,14 @@ public class AuthController {
 
     /** 註冊 */
     @PostMapping("/register")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void register(@RequestBody RegisterRequest request) {
         authService.register(request);
     }
 
     /** 登出 */
     @PostMapping("/logout")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void logout() {
     }
 

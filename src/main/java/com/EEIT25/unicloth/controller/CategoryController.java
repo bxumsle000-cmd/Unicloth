@@ -46,10 +46,10 @@ public class CategoryController {
      * ?page=0&size=20&colors=黑色&colors=白色&sizes=M&minPrice=500&maxPrice=1500
      */
     @GetMapping("/{code}/products")
-    public Page<ProductCardResponse> getProducts(@PathVariable String code,
+    public Page<ProductCardResponse> getProducts(
+        @PathVariable String code,
         @ParameterObject @ModelAttribute ProductFilterRequest filter,
-        @ParameterObject
-        @PageableDefault(size = 25, sort = "id", direction = Sort.Direction.DESC)Pageable pageable) {
+        @ParameterObject @PageableDefault(size = 25, sort = "id", direction = Sort.Direction.DESC)Pageable pageable) {
         return categoryService.getProducts(code, filter, pageable);
     }
 

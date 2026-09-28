@@ -5,6 +5,7 @@ import com.EEIT25.unicloth.dto.member.MemberResponse;
 import com.EEIT25.unicloth.dto.member.UpdateMemberRequest;
 import com.EEIT25.unicloth.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -24,6 +25,7 @@ public class MemberController {
     }
 
     @PatchMapping("/me/password")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void changePassword(@RequestBody ChangePasswordRequest request){
         memberService.changePassword(request);
     }
