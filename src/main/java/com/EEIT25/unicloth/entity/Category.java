@@ -35,4 +35,9 @@ public class Category {
     // 固定代碼（Uniqlo 分類代碼，例如 all_men-tops-t-shirts），前端與網址用它，不用 id
     @Column(length = 100)
     private String code;
+
+    // 分類小圖示相對路徑，例如 img/categories/icon-all_men-outer.jpg；目前只有第 2 層有，其他是 null
+    // 叫 iconUrl 不叫 imageUrl，是為了跟 Product.imageUrl（商品主圖）區分
+    @Column(name = "icon_url", length = 500)
+    private String iconUrl;
 }

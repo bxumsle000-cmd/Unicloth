@@ -81,10 +81,20 @@ public class DataSeeder implements CommandLineRunner {
                         c.setCode(code);
                         c.setName(name);
                         c.setParent(finalParent);
+                        c.setIconUrl(findCategoryIcon(code));
                         return categoryRepository.save(c);
                     });
         }
         return parent;
+    }
+
+    /**
+     * 分類小圖示放在 static/img/categories/icon-{code}.jpg；有這個檔案才回傳相對路徑，沒有回傳 null。
+     * 目前只有第 2 層（外套類、下身類…）有圖示，跟 V4__category_icon_url.sql 回填的結果一致。
+     */
+    private String findCategoryIcon(String code) {
+        String path = "img/categories/icon-" + code + ".jpg";
+        return new ClassPathResource("static/" + path).exists() ? path : null;
     }
 
     /** JSON → Product（不含 variants，variants 由 toVariant 另外建） */
