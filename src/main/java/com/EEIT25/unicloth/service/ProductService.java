@@ -1,5 +1,6 @@
 package com.EEIT25.unicloth.service;
 
+import com.EEIT25.unicloth.dto.category.ProductCardResponse;
 import com.EEIT25.unicloth.dto.product.ProductDetailResponse;
 import com.EEIT25.unicloth.dto.product.ProductDetailResponse.ColorOption;
 import com.EEIT25.unicloth.entity.Product;
@@ -8,6 +9,8 @@ import com.EEIT25.unicloth.exception.ApiException;
 import com.EEIT25.unicloth.repository.ProductRepository;
 import com.EEIT25.unicloth.repository.ProductVariantRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +22,7 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class ProductService {
+    private static final String ON_SALE = "on_sale";
 
     private final ProductRepository productRepository;
     private final ProductVariantRepository productVariantRepository;
@@ -43,6 +47,17 @@ public class ProductService {
         }
 
         return ProductDetailResponse.from(product,colors);
+    }
+
+    /** 用商品名稱搜尋（不分大小寫、分頁）；關鍵字是空的就回空頁，不會撈出全部商品 */
+    @Transactional
+    public Page<ProductCardResponse> getProductsBySearch(String keyword, Pageable pageable) {
+        String kw = keyword.trim();
+        if (kw.isEmpty()) {
+            return Page.empty(pageable);
+        }
+        return productRepository.findByStatusAndNameContainingIgnoreCase(ON_SALE, kw, pageable)
+                .map(ProductCardResponse::from);
     }
 }
 

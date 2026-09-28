@@ -9,7 +9,9 @@
         a { color: inherit; text-decoration: none; }
 
         /* 導覽選單 */
-        nav { display: flex; gap: 24px; padding: 12px 24px; border-bottom: 1px solid #ddd; }
+        nav { display: flex; align-items: center; justify-content: space-between; gap: 24px;
+              padding: 12px 24px; border-bottom: 1px solid #ddd; }
+        #menu { display: flex; gap: 24px; }
         .top { position: relative; }
         .top > span { font-weight: bold; cursor: pointer; }
         .top ul { display: none; position: absolute; top: 100%; left: 0; z-index: 10;
@@ -20,11 +22,17 @@
         .top li img { width: 40px; height: 40px; object-fit: cover; }
         .top li a:hover { background: #f2f2f2; }
 
+        /* 搜尋框 */
+        .search { display: flex; gap: 6px; }
+        .search input { width: 200px; padding: 6px 10px; border: 1px solid #999; border-radius: 4px; }
+        .search button { padding: 6px 14px; border: 1px solid #222; border-radius: 4px;
+                         background: #222; color: #fff; cursor: pointer; }
+
         main { padding: 16px 24px; }
         .breadcrumb a:hover { text-decoration: underline; }
-        .filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
-        .filters a { padding: 6px 14px; border: 1px solid #999; border-radius: 16px; }
-        .filters a.active { background: #222; color: #fff; border-color: #222; }
+        .filters { margin: 12px 0; }
+        .filters select { width: 100%; max-width: 480px; padding: 8px 10px; font-size: 15px;
+                          border: 1px solid #999; border-radius: 4px; background: #fff; cursor: pointer; }
 
         /* 商品卡片 */
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
@@ -43,7 +51,14 @@
 </head>
 <body>
 
-<nav id="menu"></nav>
+<nav>
+    <div id="menu"></div>
+    <!-- 沒寫 action：送出後留在 index.html，網址變成 ?keyword=外套 -->
+    <form class="search">
+        <input type="search" name="keyword" id="keyword" placeholder="搜尋商品名稱" required>
+        <button>搜尋</button>
+    </form>
+</nav>
 
 <main>
     <div class="breadcrumb" id="breadcrumb"></div>
@@ -55,9 +70,11 @@
 </main>
 
 <script>
-    // 網址長這樣：index.html?code=all_men-tops-t-shirts&page=0
+    // 網址長這樣：index.html?code=all_men-tops-t-shirts&page=0（分類）
+    //          或 index.html?keyword=外套&page=0（搜尋）
     const params = new URLSearchParams(location.search);
     const code = params.get('code');
+    const keyword = (params.get('keyword') || '').trim();
     const page = Number(params.get('page') || 0);
     const SIZE = 20;
 
@@ -71,6 +88,10 @@
 
     function link(c, p = 0) {
         return `?code=${encodeURIComponent(c)}&page=${p}`;
+    }
+
+    function searchLink(kw, p = 0) {
+        return `?keyword=${encodeURIComponent(kw)}&page=${p}`;
     }
 
     // 1. 導覽選單：GET /api/categories
@@ -103,21 +124,42 @@
             .map((c, i) => i === 0 ? c.name : `<a href="${link(c.code)}">${c.name}</a>`)  // 第 1 層沒有自己的頁面
             .join(' › ');
 
-        // 第 2 層：children 就是第 3 層按鈕
-        // 第 3 層：children 是空的 → 改拿上一層（第 2 層）的 children 當按鈕，並標出目前這個
+        // 第 2 層：children 就是第 3 層選項
+        // 第 3 層：children 是空的 → 改拿上一層（第 2 層）的 children 當選項，並選中目前這個
         let parent = detail;
         if (detail.children.length === 0 && breadcrumb.length >= 3) {
             parent = await getJson(`/api/categories/${encodeURIComponent(breadcrumb.at(-2).code)}`);
         }
-        const buttons = [`<a href="${link(parent.code)}" class="${parent.code === code ? 'active' : ''}">全部</a>`]
-            .concat(parent.children.map(c =>
-                `<a href="${link(c.code)}" class="${c.code === code ? 'active' : ''}">${c.name}</a>`));
-        document.getElementById('filters').innerHTML = buttons.join('');
+        // 「全部」= 第 2 層自己；其他選項 = 各個第 3 層
+        const options = [{ code: parent.code, name: '全部' }].concat(parent.children);
+        document.getElementById('filters').innerHTML = `
+            <select id="subCategory" aria-label="細分類">
+                ${options.map(c =>
+                    `<option value="${c.code}" ${c.code === code ? 'selected' : ''}>${c.name}</option>`).join('')}
+            </select>`;
+        // 選了就換頁（回到第 1 頁）
+        document.getElementById('subCategory').addEventListener('change', e => {
+            location.href = link(e.target.value);
+        });
     }
 
     // 3. 商品：GET /api/categories/{code}/products?page=0&size=20
     async function loadProducts() {
         const data = await getJson(`/api/categories/${encodeURIComponent(code)}/products?page=${page}&size=${SIZE}`);
+        renderProducts(data, p => link(code, p));
+    }
+
+    // 4. 搜尋：GET /api/products?keyword=外套&page=0&size=20
+    async function loadSearch() {
+        // 關鍵字是使用者打的，用 textContent 放，不用 innerHTML（避免被塞 HTML / script）
+        document.title = `搜尋：${keyword}`;
+        document.getElementById('title').textContent = `「${keyword}」的搜尋結果`;
+        const data = await getJson(`/api/products?keyword=${encodeURIComponent(keyword)}&page=${page}&size=${SIZE}`);
+        renderProducts(data, p => searchLink(keyword, p));
+    }
+
+    // 共用：商品卡片 + 分頁。pageLink(p) 回傳第 p 頁的網址，分類和搜尋各自傳自己的
+    function renderProducts(data, pageLink) {
         // via_dto 格式：{ content: [...], page: { size, number, totalElements, totalPages } }
         const info = data.page;
 
@@ -142,16 +184,18 @@
         }).join('');
 
         const pager = [];
-        if (info.number > 0) pager.push(`<a href="${link(code, info.number - 1)}">‹ 上一頁</a>`);
+        if (info.number > 0) pager.push(`<a href="${pageLink(info.number - 1)}">‹ 上一頁</a>`);
         pager.push(`<span>第 ${info.number + 1} / ${Math.max(info.totalPages, 1)} 頁</span>`);
-        if (info.number + 1 < info.totalPages) pager.push(`<a href="${link(code, info.number + 1)}">下一頁 ›</a>`);
+        if (info.number + 1 < info.totalPages) pager.push(`<a href="${pageLink(info.number + 1)}">下一頁 ›</a>`);
         document.getElementById('pager').innerHTML = pager.join('');
     }
 
     async function main() {
+        document.getElementById('keyword').value = keyword;   // 搜尋後框裡保留剛剛打的字
         try {
             await loadMenu();
             if (code) await Promise.all([loadDetail(), loadProducts()]);
+            else if (keyword) await loadSearch();
         } catch (e) {
             document.getElementById('title').innerHTML = `<span class="error">錯誤：${e.message}</span>`;
         }
