@@ -1,12 +1,12 @@
 """
-Uniqlo 三層分類爬蟲：性別 › 大類 › 細類
+Uniqlo 台灣官網商品爬蟲：照官網「分類」篩選器一路展開到最底層，保留官網完整分類（3 或 4 層）
 
-跟 uniqlo_scraper.py 的差別：
-  - 原本只抓到第 2 層（男裝 › 外套類）；這支照官網「分類」篩選器一路展開到最底層，
-    再整理成固定三層：取官網的「第一層、倒數第二層、最後一層」
-      官網 男裝 › T恤/背心/休閒 › T恤/背心 › 長袖  →  男裝 › T恤/背心 › 長袖
-      官網 男裝 › 下身類 › 卡其褲（沒有下一層）    →  男裝 › 下身類 › 卡其褲
-  - 輸出到 data/products.json（DataSeeder 讀的檔案），會覆蓋 uniqlo_scraper.py 產生的舊格式
+  官網 4 層  男裝 › T恤/背心/休閒 › T恤/背心 › 長袖
+  官網 3 層  男裝 › 下身類 › 卡其褲（第 3 層就沒有下一層了）
+
+輸出：
+  1. 圖片  → src/main/resources/static/img/products/{slug}/{colorKey}.jpg
+  2. JSON  → src/main/resources/data/products.json（DataSeeder 讀的檔案）
 
 用法（在專案根目錄執行）：
   python tools/scraper/uniqlo_leaf_scraper.py --tree               # 只印分類樹與每個細類的商品數，不抓商品
@@ -18,21 +18,53 @@ Uniqlo 三層分類爬蟲：性別 › 大類 › 細類
   列表 API（by-category）回傳的 conditionList 裡，code = "categoryDesc" 那一項就是官網「分類」篩選器，
   裡面分 topCategory / levelOneCategory / levelTwoCategory / levelThreeCategory 四層，
   找到目前分類在哪一層，它的下一層就是子分類。這樣可以從大類一路往下展開，不用手動寫代碼。
+
+資料來源（用瀏覽器 DevTools 觀察官網得到的 API）：
+  列表：POST https://d.uniqlo.com/tw/p/search/products/by-category
+  明細：GET  https://d.uniqlo.com/tw/p/product/detail?productCode=...
+  圖片：https://www.uniqlo.com/tw/hmall/test/{productCode}/sku/561/{COLxx}.jpg
 """
 
 import argparse
 import json
+import random
 import re
 import sys
+import time
+from pathlib import Path
 
-from uniqlo_scraper import (
-    COLOR_ZH, IMG_DIR, PROJECT_ROOT, session, polite_sleep,
-    fetch_product_detail, fetch_description, download_image, parse_color,
-)
+import requests
+from bs4 import BeautifulSoup
 
+# 專案根目錄：這個檔案在 tools/scraper/ 底下，往上兩層
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+IMG_DIR = PROJECT_ROOT / "src/main/resources/static/img/products"
 JSON_PATH = PROJECT_ROOT / "src/main/resources/data/products.json"
 API_LIST = "https://d.uniqlo.com/tw/p/search/products/by-category"
+API_DETAIL = "https://d.uniqlo.com/tw/p/product/detail"
+IMG_HOST = "https://www.uniqlo.com/tw"
 LEVEL_KEYS = ["topCategory", "levelOneCategory", "levelTwoCategory", "levelThreeCategory"]
+
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120 Safari/537.36",
+    "Origin": "https://www.uniqlo.com",
+    "Referer": "https://www.uniqlo.com/tw/zh_TW/",
+}
+
+session = requests.Session()
+session.headers.update(HEADERS)
+
+# Uniqlo 台灣站的顏色只有英文，這裡做常見顏色的對照；對不到就保留英文
+COLOR_ZH = {
+    "WHITE": "白色", "OFF WHITE": "米白色", "BLACK": "黑色", "GRAY": "灰色",
+    "DARK GRAY": "深灰色", "LIGHT GRAY": "淺灰色", "CHARCOAL": "炭灰色",
+    "NAVY": "藏青色", "BLUE": "藍色", "LIGHT BLUE": "淺藍色", "DARK BLUE": "深藍色",
+    "RED": "紅色", "WINE": "酒紅色", "PINK": "粉紅色", "PURPLE": "紫色", "LIGHT PURPLE": "淺紫色",
+    "GREEN": "綠色", "DARK GREEN": "深綠色", "OLIVE": "橄欖綠", "KHAKI": "卡其色",
+    "YELLOW": "黃色", "MUSTARD": "芥末黃", "ORANGE": "橘色", "DARK ORANGE": "深橘色", "LIGHT GREEN": "淺綠色", "DARK PURPLE": "深紫色",
+    "BROWN": "咖啡色", "DARK BROWN": "深咖啡色", "BEIGE": "米色", "NATURAL": "原色",
+    "CREAM": "奶油色", "IVORY": "象牙白", "SILVER": "銀色", "GOLD": "金色",
+}
 
 # 要爬的性別：(官網代碼, 中文, slug 前綴, 要收的大類代碼後綴)
 # 大類只收官網選單上「服裝種類」那一區；AIRism、HEATTECH、聯名、UT、亞麻、運動機能等「系列」不收。
@@ -77,6 +109,11 @@ ATTRIBUTE_CODES = {"all_kids-bottoms-short-anchor02"}
 
 # ------------------------------------------------------------------ API
 
+def polite_sleep():
+    """每個 request 之間停 1～2 秒，不要對網站造成負擔"""
+    time.sleep(random.uniform(1.0, 2.0))
+
+
 def fetch_list(category_code: str, page_size: int) -> dict:
     body = {
         "pageInfo": {"page": 1, "pageSize": page_size},
@@ -102,19 +139,63 @@ def fetch_children(code: str) -> list[dict]:
     return [{"code": x["code"], "name": x["name"]} for x in cond[LEVEL_KEYS[level + 1]] if x["code"] != code]
 
 
+def fetch_product_detail(product_code: str) -> dict:
+    params = {"productCode": product_code, "distribution": "EXPRESS", "type": "DETAIL"}
+    r = session.get(API_DETAIL, params=params, timeout=20)
+    r.raise_for_status()
+    data = r.json()
+    if not data.get("success"):
+        raise RuntimeError(f"明細 API 回傳失敗: {data.get('msg')}")
+    return data["resp"][0]
+
+
+def fetch_description(product_code: str) -> str | None:
+    """商品說明是一頁 HTML，抓下來去掉標籤只留文字"""
+    url = f"{IMG_HOST}/hmall/test/{product_code}/zh_TW/instruction.html"
+    try:
+        r = session.get(url, timeout=20)
+        if r.status_code != 200:
+            return None
+        text = BeautifulSoup(r.text, "html.parser").get_text(" ", strip=True)
+        text = re.sub(r"\s+", " ", text).strip()
+        return text[:500] or None
+    except requests.RequestException:
+        return None
+
+
+def download_image(product_code: str, color_no: str, dest: Path, fallback: str | None) -> bool:
+    """下載某個顏色的主圖；檔案已存在就跳過。抓不到時退而用商品主圖。"""
+    if dest.exists():
+        return True
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    candidates = [f"{IMG_HOST}/hmall/test/{product_code}/sku/561/{color_no}.jpg"]
+    if fallback:
+        candidates.append(IMG_HOST + fallback)
+    for url in candidates:
+        try:
+            r = session.get(url, timeout=30)
+            if r.status_code == 200 and r.headers.get("Content-Type", "").startswith("image"):
+                dest.write_bytes(r.content)
+                polite_sleep()
+                return True
+        except requests.RequestException:
+            pass
+    return False
+
+
 # ------------------------------------------------------------------ 分類樹
 
 def build_groups(gender_code: str, gender_name: str, subs: list[str]) -> list[dict]:
     """
-    展開一個性別的分類樹，回傳「細類群組」：每組 = 一個大類 + 它底下的細類。
-    大類 = 官網倒數第二層，細類 = 官網最後一層。
+    展開一個性別的分類樹，回傳「細類群組」：每組 = 細類的上層路徑 + 同一個上層底下的細類。
+    ancestors = 性別之後、細類之前的官網分類（1 或 2 層），細類 = 官網最後一層。
     """
     top_children = {c["code"]: c["name"] for c in fetch_children(gender_code)}
     groups = []
 
-    def add_group(parent: dict, leaves: list[dict]):
+    def add_group(ancestors: list[dict], leaves: list[dict]):
         kept = [l for l in leaves if l["name"] not in ATTRIBUTE_NAMES and l["code"] not in ATTRIBUTE_CODES]
-        groups.append({"parent": parent, "leaves": leaves, "kept": kept or leaves})
+        groups.append({"ancestors": ancestors, "leaves": leaves, "kept": kept or leaves})
 
     for sub in subs:
         l2 = {"code": f"{gender_code}-{sub}", "name": top_children[f"{gender_code}-{sub}"]}
@@ -124,11 +205,11 @@ def build_groups(gender_code: str, gender_name: str, subs: list[str]) -> list[di
                 continue
             l4s = fetch_children(l3["code"])
             if l4s:
-                add_group(l3, l4s)                          # 男裝 › T恤/背心 › 長袖
+                add_group([l2, l3], l4s)                    # 男裝 › T恤/背心/休閒 › T恤/背心 › 長袖
             else:
                 childless.append(l3)
         if childless:
-            add_group(l2, childless)                        # 男裝 › 下身類 › 卡其褲
+            add_group([l2], childless)                      # 男裝 › 下身類 › 卡其褲
 
     # 每個細類的完整商品清單：用來挑商品，也用來算 alsoIn
     for g in groups:
@@ -140,7 +221,7 @@ def build_groups(gender_code: str, gender_name: str, subs: list[str]) -> list[di
 def print_groups(gender_name: str, groups: list[dict]):
     print(f"\n===== {gender_name}")
     for g in groups:
-        print(f"  {g['parent']['name']}  ({g['parent']['code']})")
+        print(f"  {' › '.join(a['name'] for a in g['ancestors'])}  ({g['ancestors'][-1]['code']})")
         for leaf in g["leaves"]:
             mark = "收" if leaf in g["kept"] else "  "
             print(f"    [{mark}] {leaf['name']}  {len(leaf['items'])} 件")
@@ -148,9 +229,16 @@ def print_groups(gender_name: str, groups: list[dict]):
 
 # ------------------------------------------------------------------ 轉換成我們的格式
 
+def parse_color(style_text: str) -> str:
+    """'478571 / 30 NATURAL' 或 '57 OLIVE' → 'NATURAL' / 'OLIVE'"""
+    s = (style_text or "").split("/")[-1].strip()   # 有斜線就取最後一段
+    s = re.sub(r"^\d+\s+", "", s)                    # 去掉開頭的顏色代碼
+    return s.strip().upper()
+
+
 def build_product(item: dict, detail: dict, category_path: list[str], category_code: list[str],
                   also_in: list[str], prefix: str, stats: dict) -> dict | None:
-    """欄位跟 uniqlo_scraper.build_product 一樣，差別是分類改成三層的 categoryPath / categoryCode"""
+    """一件商品轉成 products.json 的格式，欄位對應資料庫 products / product_variants"""
     summary = detail["spuInfo"]["summary"]
     rows = detail["spuInfo"]["rows"]
     sku_stocks = detail.get("stockInfo", {}).get("skuStocks") or {}
@@ -210,8 +298,8 @@ def build_product(item: dict, detail: dict, category_path: list[str], category_c
     return {
         "slug": slug,
         "name": name,
-        "categoryPath": category_path,   # ["男裝", "T恤/背心", "長袖"]：性別 › 大類 › 細類
-        "categoryCode": category_code,   # ["all_men", "all_men-tops-t-shirts", "all_men-tops-t-shirts-anchor01"]
+        "categoryPath": category_path,   # ["男裝", "T恤/背心/休閒", "T恤/背心", "長袖"]：官網完整分類，3 或 4 層
+        "categoryCode": category_code,   # ["all_men", "all_men-tops", "all_men-tops-t-shirts", "all_men-tops-t-shirts-anchor01"]
         "alsoIn": also_in,               # 同一個大類底下，這件商品也出現在哪些細類（含沒收的材質、版型）
         "description": fetch_description(product_code),
         "price": int(price),
@@ -247,8 +335,8 @@ def crawl_gender(gender_code: str, gender_name: str, prefix: str, groups: list[d
                 slug = f"{prefix}-{item['code']}"
                 also_in = [l["name"] for l in g["leaves"]
                            if l is not leaf and any(x["code"] == item["code"] for x in l["items"])]
-                path = [gender_name, g["parent"]["name"], leaf["name"]]
-                codes = [gender_code, g["parent"]["code"], leaf["code"]]
+                path = [gender_name] + [a["name"] for a in g["ancestors"]] + [leaf["name"]]
+                codes = [gender_code] + [a["code"] for a in g["ancestors"]] + [leaf["code"]]
                 try:
                     detail = fetch_product_detail(item["productCode"])
                     polite_sleep()
