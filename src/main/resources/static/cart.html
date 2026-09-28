@@ -1,142 +1,163 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-Hant">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>購物車（測試用）</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="#F6F5F2">
+    <title>購物車 — KINU</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/kinu.css">
     <style>
-        body { font-family: sans-serif; margin: 0; color: #222; }
-        a { color: inherit; }
-
-        main { padding: 16px 24px; max-width: 900px; }
-        .back { display: inline-block; margin-bottom: 12px; }
-
-        .item { display: flex; gap: 16px; padding: 16px 0; border-bottom: 1px solid #ddd; }
-        .item img { width: 120px; height: 120px; object-fit: cover; background: #f2f2f2; }
-        .item .info { flex: 1; }
-        .item .name { font-weight: bold; }
-        .item .spec { color: #555; margin: 4px 0; }
-        .item .row { display: flex; align-items: center; gap: 12px; margin-top: 8px; }
-        .item input { width: 64px; padding: 4px; }
-        .item.off { opacity: .6; }
-
-        .price { font-weight: bold; }
-        .warn { color: #d00; font-size: 14px; }
-        .tag { font-size: 12px; color: #fff; background: #888; padding: 1px 6px; margin-left: 6px; }
-
-        .summary { margin-top: 20px; font-size: 18px; text-align: right; }
-        .error { color: #d00; }
+        /* ===== 購物車頁專用 ===== */
+        .cart { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 5%; align-items: start; margin-top: 34px; }
+        .cart-list { border-top: 1px solid var(--line); }
+        .cart-item { display: grid; grid-template-columns: 110px minmax(0, 1fr) auto; gap: 22px; padding: 24px 0; border-bottom: 1px solid var(--line); }
+        .cart-item .thumb { aspect-ratio: 3/4; background: var(--cream); display: block; overflow: hidden; }
+        .cart-item .thumb img { width: 100%; height: 100%; object-fit: cover; mix-blend-mode: multiply; }
+        .cart-item .name { font-size: 13px; letter-spacing: .04em; line-height: 1.6; text-decoration: none; }
+        .cart-item .name:hover { text-decoration: underline; }
+        .cart-item .meta { font-size: 11px; color: var(--muted); letter-spacing: .06em; margin: 6px 0 16px; }
+        .cart-item .warn { font-size: 10px; color: #9a3b2d; letter-spacing: .06em; margin-top: 10px; }
+        .cart-item .right { display: flex; flex-direction: column; align-items: flex-end; justify-content: space-between; gap: 12px; }
+        .cart-item .line-total { font-size: 13px; letter-spacing: .05em; }
+        .cart-item.off-sale .thumb img { filter: grayscale(1); opacity: .55; }
+        .summary { background: #fff; padding: 30px 28px; position: sticky; top: 20px; }
+        .summary h2 { font-size: 11px; letter-spacing: .22em; font-weight: 500; margin: 0 0 24px; }
+        .sum-row { display: flex; justify-content: space-between; font-size: 12px; letter-spacing: .05em; padding: 7px 0; }
+        .sum-row.total { border-top: 1px solid var(--line); margin-top: 14px; padding-top: 18px; font-size: 15px; }
+        .ship-note { font-size: 10px; color: var(--muted); letter-spacing: .06em; line-height: 1.8; margin: 8px 0 0; }
+        .ship-bar { height: 2px; background: var(--line); margin-top: 10px; }
+        .ship-bar i { display: block; height: 100%; background: #000; transition: width .3s; }
+        .summary .btn { width: 100%; margin-top: 24px; }
+        .summary .later { text-align: center; font-size: 10px; color: var(--muted); letter-spacing: .08em; margin-top: 10px; }
+        @media (max-width: 900px) {
+            .cart { grid-template-columns: 1fr; }
+            .summary { position: static; }
+        }
+        @media (max-width: 760px) {
+            .cart-item { grid-template-columns: 84px minmax(0, 1fr); gap: 14px; }
+            .cart-item .right { grid-column: 2; flex-direction: row; align-items: center; }
+        }
     </style>
 </head>
 <body>
+<div id="site-header"></div>
 
-<main>
-    <a class="back" href="javascript:history.back()">‹ 回上一頁</a>
-    <h2>購物車</h2>
-    <p class="error" id="error"></p>
-    <div id="list"></div>
-    <div class="summary" id="summary"></div>
+<main class="page">
+    <div class="page-eyebrow">SHOPPING BAG</div>
+    <h1 class="page-title" data-i18n="cart">購物車</h1>
+    <div class="page-sub" id="count"></div>
+    <div id="content"><div class="state">載入中…</div></div>
 </main>
 
+<div id="site-footer"></div>
+
+<script src="/js/kinu.js"></script>
 <script>
-    let items = [];   // API 回傳的 CartItemResponse 陣列
+    const FREE_SHIPPING = 2500;   // 公告列寫的「滿 NT$2,500 免運」
+    let items = [];
 
-    // 共用：打 API，失敗時把後端的 ErrorResponse.message 丟出來
-    // 新增 / 改數量 / 刪除成功時後端回 204（沒有 body），不能呼叫 res.json()
-    async function api(url, options = {}) {
-        const res = await fetch(url, {
-            ...options,
-            headers: { 'Content-Type': 'application/json', ...options.headers },
-        });
-        const body = res.status === 204 ? null : await res.json();
-        if (!res.ok) throw new Error(body?.message || res.status);
-        return body;
-    }
-
-    function showError(message) {
-        document.getElementById('error').textContent = message ?? '';
+    async function load() {
+        try {
+            items = await api('/api/cart');
+            render();
+        } catch (e) {
+            document.getElementById('content').innerHTML = `<div class="state">${esc(e.message)}</div>`;
+        }
     }
 
     function render() {
-        const list = document.getElementById('list');
+        const box = document.getElementById('content');
+        const totalQty = items.reduce((sum, it) => sum + it.qty, 0);
+        document.getElementById('count').textContent = items.length ? `共 ${totalQty} 件` : '';
+
         if (items.length === 0) {
-            list.innerHTML = '<p>購物車是空的</p>';
-            document.getElementById('summary').textContent = '';
+            box.innerHTML = '<div class="state">購物車目前是空的。<br><a href="/products.html?category=all_women">去逛逛本季新品</a></div>';
             return;
         }
 
-        list.innerHTML = items.map(it => {
-            // 下架的商品連不到商品頁，所以不做連結
-            const name = it.onSale
-                ? `<a href="product.html?slug=${encodeURIComponent(it.slug)}">${it.name}</a>`
-                : `${it.name}<span class="tag">已下架</span>`;
-            const overStock = it.qty > it.stock;
+        // 已下架、或數量超過庫存的品項，不算進金額，也不能結帳
+        const valid = items.filter(it => it.onSale && it.qty <= it.stock);
+        const subtotal = valid.reduce((sum, it) => sum + it.price * it.qty, 0);
+        const remain = Math.max(0, FREE_SHIPPING - subtotal);
+        const hasProblem = valid.length !== items.length;
 
-            return `
-                <div class="item ${it.onSale ? '' : 'off'}">
-                    <img src="${it.imageUrl ?? ''}" alt="${it.name}">
-                    <div class="info">
-                        <div class="name">${name}</div>
-                        <div class="spec">${it.color} / ${it.size}</div>
-                        <div class="price">NT$${it.price}</div>
-                        <div class="row">
-                            <label>數量
-                                <input type="number" min="1" max="${it.stock}" value="${it.qty}"
-                                       onchange="changeQty(${it.id}, this.value)">
-                            </label>
-                            <span>小計 NT$${it.price * it.qty}</span>
-                            <button onclick="removeItem(${it.id})">刪除</button>
-                        </div>
-                        ${overStock ? `<div class="warn">庫存只剩 ${it.stock} 件，請調整數量</div>` : ''}
-                    </div>
-                </div>`;
-        }).join('');
+        box.innerHTML = `
+            <div class="cart">
+                <div class="cart-list">${items.map(itemRow).join('')}</div>
+                <aside class="summary">
+                    <h2>訂單摘要</h2>
+                    <div class="sum-row"><span>商品小計</span><span>${money(subtotal)}</span></div>
+                    <div class="sum-row"><span>運費</span><span>${remain === 0 ? '免運' : '結帳時計算'}</span></div>
+                    <p class="ship-note">${remain === 0 ? '已達免運門檻' : `再買 ${money(remain)} 即可享免運`}</p>
+                    <div class="ship-bar"><i style="width:${Math.min(100, subtotal / FREE_SHIPPING * 100)}%"></i></div>
+                    <div class="sum-row total"><span>合計</span><span>${money(subtotal)}</span></div>
+                    ${hasProblem ? '<p class="ship-note" style="color:#9a3b2d">部分商品已下架或庫存不足，未計入金額。</p>' : ''}
+                    <button class="btn" disabled>前往結帳　→</button>
+                    <div class="later">結帳功能即將推出</div>
+                </aside>
+            </div>`;
 
-        // 後端沒有回總金額，前端自己加總；下架的不算
-        const buyable = items.filter(it => it.onSale);
-        const count = buyable.reduce((sum, it) => sum + it.qty, 0);
-        const total = buyable.reduce((sum, it) => sum + it.price * it.qty, 0);
-        document.getElementById('summary').innerHTML =
-            `共 ${count} 件　合計 <span class="price">NT$${total}</span>`;
+        box.querySelectorAll('[data-action]').forEach(btn => btn.addEventListener('click', onAction));
     }
 
-    // GET /api/cart
-    async function load() {
-        items = await api('/api/cart');
-        render();
+    function itemRow(it) {
+        const href = `/product.html?slug=${encodeURIComponent(it.slug)}&color=${encodeURIComponent(it.color)}`;
+        const img = it.imageUrl ? `<img src="${esc(imgSrc(it.imageUrl))}" alt="${esc(it.name)}">` : '';
+        let warn = '';
+        if (!it.onSale) warn = '此商品已下架，請移除';
+        else if (it.stock === 0) warn = '已售完，請移除';
+        else if (it.qty > it.stock) warn = `庫存只剩 ${it.stock} 件，請調整數量`;
+
+        return `
+            <div class="cart-item${it.onSale ? '' : ' off-sale'}">
+                ${it.onSale ? `<a class="thumb" href="${href}">${img}</a>` : `<div class="thumb">${img}</div>`}
+                <div>
+                    ${it.onSale ? `<a class="name" href="${href}">${esc(it.name)}</a>` : `<span class="name">${esc(it.name)}</span>`}
+                    <div class="meta">${esc(it.color)}　/　${esc(it.size)}　·　${money(it.price)}</div>
+                    ${it.onSale ? `
+                    <div class="qty">
+                        <button data-action="minus" data-id="${it.id}" ${it.qty <= 1 ? 'disabled' : ''} aria-label="減少">−</button>
+                        <span>${it.qty}</span>
+                        <button data-action="plus" data-id="${it.id}" ${it.qty >= it.stock ? 'disabled' : ''} aria-label="增加">＋</button>
+                    </div>` : ''}
+                    ${warn ? `<div class="warn">${warn}</div>` : ''}
+                </div>
+                <div class="right">
+                    <div class="line-total">${money(it.price * it.qty)}</div>
+                    <button class="link-btn" data-action="remove" data-id="${it.id}">移除</button>
+                </div>
+            </div>`;
     }
 
-    // PATCH /api/cart   body: { cartItemId, qty }
-    async function changeQty(cartItemId, value) {
-        showError();
-        const qty = Number(value);
+    async function onAction(e) {
+        const btn = e.currentTarget;
+        const id = Number(btn.dataset.id);
+        const item = items.find(it => it.id === id);
+        btn.disabled = true;
         try {
-            // 後端還沒有 @Min(1)，先在前端擋掉 0 和負數
-            if (!Number.isInteger(qty) || qty < 1) throw new Error('數量至少要 1');
-            await api('/api/cart', {
-                method: 'PATCH',
-                body: JSON.stringify({ cartItemId, qty }),
-            });
-        } catch (e) {
-            showError(e.message);
-        }
-        // 成功或失敗都重抓一次：後端回 204 沒有資料，要重抓才知道最新數量；
-        // 失敗時也要把輸入框還原成資料庫裡的數量
-        await load();
-    }
-
-    // DELETE /api/cart/{cartItemId}
-    async function removeItem(cartItemId) {
-        showError();
-        try {
-            await api(`/api/cart/${cartItemId}`, { method: 'DELETE' });
-            await load();
-        } catch (e) {
-            showError(e.message);
+            if (btn.dataset.action === 'remove') {
+                await api('/api/cart/' + id, { method: 'DELETE' });
+                items = items.filter(it => it.id !== id);
+                toast('已從購物車移除');
+            } else {
+                // 庫存不足時，按減號直接降到庫存上限
+                const next = btn.dataset.action === 'plus' ? item.qty + 1
+                    : Math.min(item.qty - 1, Math.max(1, item.stock));
+                await api('/api/cart', { method: 'PATCH', body: { cartItemId: id, qty: next } });
+                item.qty = next;
+            }
+            render();
+            refreshCounts();
+        } catch (err) {
+            toast(err.message, true);
+            load();     // 跟後端重新同步（例如庫存剛被別人買走）
         }
     }
 
-    load().catch(e => showError('錯誤：' + e.message));
+    load();
 </script>
 </body>
 </html>

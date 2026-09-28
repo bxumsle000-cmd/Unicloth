@@ -1,192 +1,215 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-Hant">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>商品頁（測試用）</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="#F6F5F2">
+    <title>商品 — KINU</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/kinu.css">
     <style>
-        body { font-family: sans-serif; margin: 0; color: #222; }
-        a { color: inherit; }
-
-        main { padding: 16px 24px; }
-        .back { display: inline-block; margin-bottom: 12px; }
-
-        .detail { display: flex; flex-wrap: wrap; gap: 32px; }
-        .detail img { width: 400px; max-width: 100%; aspect-ratio: 1; object-fit: cover; background: #f2f2f2; }
-        .info { flex: 1; min-width: 260px; }
-
-        .price { font-size: 22px; font-weight: bold; }
-        .price.sale { color: #d00; }
-        .orig { color: #888; text-decoration: line-through; margin-left: 8px; }
-        .desc { color: #555; white-space: pre-line; }
-
-        h4 { margin: 20px 0 8px; }
-        .options { display: flex; flex-wrap: wrap; gap: 8px; }
-        .options button { padding: 6px 14px; border: 1px solid #999; border-radius: 4px;
-                          background: #fff; cursor: pointer; }
-        .options button.active { background: #222; color: #fff; border-color: #222; }
-        .options button:disabled { color: #bbb; border-color: #ddd; text-decoration: line-through; cursor: not-allowed; }
-
-        .selected { margin-top: 16px; color: #555; }
-        .cart-row { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
-        .cart-row input { width: 64px; padding: 4px; }
-        .cart { padding: 10px 24px; }
-        #cartMsg { margin-top: 8px; }
-        .wish { margin-left: 8px; padding: 4px 12px; border: 1px solid #999; border-radius: 16px;
-                background: #fff; cursor: pointer; font-size: 14px; vertical-align: middle; }
-        .wish.on { color: #d00; border-color: #d00; }
-        .error { color: #d00; }
+        /* ===== 商品頁專用 ===== */
+        .detail { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 6%; align-items: start; }
+        .gallery { aspect-ratio: 3/4; background: var(--cream); overflow: hidden; position: sticky; top: 20px; }
+        .gallery img { width: 100%; height: 100%; object-fit: cover; mix-blend-mode: multiply; }
+        .info { padding-top: 6px; }
+        .info h1 { font-size: clamp(22px, 2.4vw, 30px); font-weight: 500; letter-spacing: .05em; line-height: 1.45; margin: 10px 0 14px; }
+        .info .price { font-size: 17px; }
+        .info .price del { font-size: 13px; }
+        .section { padding: 26px 0; border-bottom: 1px solid var(--line); }
+        .section:first-of-type { margin-top: 26px; border-top: 1px solid var(--line); }
+        .section-label { font-size: 10px; letter-spacing: .18em; color: var(--muted); margin-bottom: 14px; display: flex; justify-content: space-between; }
+        .section-label b { color: #000; font-weight: 500; letter-spacing: .06em; }
+        .swatches { display: flex; gap: 10px; flex-wrap: wrap; }
+        .swatch { width: 58px; aspect-ratio: 3/4; background: var(--cream); border: 1px solid transparent; padding: 2px; }
+        .swatch img { width: 100%; height: 100%; object-fit: cover; mix-blend-mode: multiply; display: block; }
+        .swatch.active { border-color: #000; }
+        .sizes { display: flex; gap: 8px; flex-wrap: wrap; }
+        .sizes .chip { min-width: 54px; justify-content: center; height: 38px; }
+        .stock-note { font-size: 10px; letter-spacing: .06em; color: #9a3b2d; margin-top: 12px; min-height: 14px; }
+        .buy { display: flex; gap: 12px; align-items: center; margin-top: 26px; flex-wrap: wrap; }
+        .buy .btn { flex: 1; min-width: 180px; }
+        .buy .heart { width: 48px; height: 48px; border: 1px solid var(--line); }
+        .buy .heart:hover { border-color: #000; }
+        .desc { font-size: 12px; line-height: 2.1; letter-spacing: .04em; color: #36322e; white-space: pre-line; }
+        .desc-toggle { display: flex; justify-content: space-between; width: 100%; font-size: 10px; letter-spacing: .18em; color: var(--muted); }
+        .desc-body { display: none; margin-top: 16px; }
+        .desc-body.open { display: block; }
+        @media (max-width: 760px) {
+            .detail { grid-template-columns: 1fr; gap: 26px; }
+            .gallery { position: static; }
+        }
     </style>
 </head>
 <body>
+<div id="site-header"></div>
 
-<main>
-    <a class="back" href="javascript:history.back()">‹ 回上一頁</a>
-    <a class="back" href="cart.html" style="float:right">購物車 ›</a>
-    <a class="back" href="wishlist.html" style="float:right; margin-right:16px">追蹤清單 ›</a>
-    <div id="page"></div>
+<main class="page">
+    <nav class="breadcrumb"><a href="/">首頁</a><span class="sep">/</span><span id="crumbName">商品</span></nav>
+    <div id="content"><div class="state">載入中…</div></div>
 </main>
 
+<div id="site-footer"></div>
+
+<script src="/js/kinu.js"></script>
 <script>
-    // 網址長這樣：product.html?slug=men-487511
-    const slug = new URLSearchParams(location.search).get('slug');
+    // /product.html?slug=men-487511 → /api/products/men-487511
+    const slug = param('slug');
+    let product = null;       // 後端回傳的商品詳情
+    let colorIndex = 0;       // 目前選的顏色（colorOptions 的第幾個）
+    let selectedSize = null;  // 目前選的尺寸（SizeOption：variantId, size, stock）
+    let qty = 1;
 
-    let product = null;        // API 回傳的 ProductDetailResponse
-    let colorIndex = 0;        // 目前選的顏色（colorOptions 陣列的位置）
-    let selectedSize = null;   // 目前選的 SizeOption
-    let inWishlist = false;    // 這件商品是否已追蹤
+    async function init() {
+        const box = document.getElementById('content');
+        if (!slug) {
+            box.innerHTML = '<div class="state">沒有指定商品。<br><a href="/">回首頁</a></div>';
+            return;
+        }
+        try {
+            const [detail, liked] = await Promise.all([
+                api('/api/products/' + encodeURIComponent(slug)),
+                api('/api/wishlist/' + encodeURIComponent(slug)).catch(() => false)
+            ]);
+            product = detail;
+            if (liked) wishlistSlugs.add(slug);
+        } catch (e) {
+            box.innerHTML = `<div class="state">${esc(e.message)}<br><a href="/">回首頁</a></div>`;
+            return;
+        }
 
-    // 共用：打 API，失敗時把後端的 ErrorResponse.message 丟出來
-    async function getJson(url) {
-        const res = await fetch(url);
-        const body = await res.json();
-        if (!res.ok) throw new Error(body.message || res.status);
-        return body;
-    }
+        document.title = product.name + ' — KINU';
+        document.getElementById('crumbName').textContent = product.name;
+        if (product.colorOptions.length === 0) {
+            box.innerHTML = `<div class="state">${esc(product.name)} 目前沒有可販售的款式。<br><a href="/">回首頁</a></div>`;
+            return;
+        }
 
-    // 畫整個商品區塊；選顏色、選尺寸後都重畫一次
-    function render() {
-        const p = product;
-        const color = p.colorOptions[colorIndex];
-        const onSale = p.origPrice != null && p.origPrice > p.price;
+        // 網址有 ?color=黑色 就預選那個顏色，否則選第一個有庫存的顏色
+        const wanted = param('color');
+        const byName = product.colorOptions.findIndex(c => c.color === wanted);
+        const inStock = product.colorOptions.findIndex(c => c.sizeOptions.some(s => s.stock > 0));
+        colorIndex = byName >= 0 ? byName : Math.max(0, inStock);
 
-        document.getElementById('page').innerHTML = `
+        const onSale = product.origPrice && product.origPrice > product.price;
+        box.innerHTML = `
             <div class="detail">
-                <img src="${color?.imageUrl ?? ''}" alt="${p.name}">
+                <div class="gallery"><img id="mainImg" alt="${esc(product.name)}"></div>
                 <div class="info">
-                    <h2>${p.name}
-                        <button class="wish ${inWishlist ? 'on' : ''}" onclick="toggleWishlist()">${inWishlist ? '♥ 已追蹤' : '♡ 追蹤'}</button>
-                    </h2>
-                    <div>
-                        <span class="price ${onSale ? 'sale' : ''}">NT$${p.price}</span>
-                        ${onSale ? `<span class="orig">NT$${p.origPrice}</span>` : ''}
-                    </div>
-                    ${p.description ? `<p class="desc">${p.description}</p>` : ''}
+                    <div class="page-eyebrow">KINU ${esc(product.slug.split('-')[0].toUpperCase())}</div>
+                    <h1>${esc(product.name)}</h1>
+                    <div class="price${onSale ? ' sale' : ''}">${money(product.price)}${onSale ? `<del>${money(product.origPrice)}</del>` : ''}</div>
 
-                    <h4>顏色：${color?.color ?? '無'}</h4>
-                    <div class="options">
-                        ${p.colorOptions.map((c, i) => `
-                            <button class="${i === colorIndex ? 'active' : ''}" onclick="selectColor(${i})">${c.color}</button>
-                        `).join('')}
+                    <div class="section">
+                        <div class="section-label">顏色 <b id="colorName"></b></div>
+                        <div class="swatches" id="swatches"></div>
                     </div>
-
-                    <h4>尺寸</h4>
-                    <div class="options">
-                        ${(color?.sizeOptions ?? []).map(s => `
-                            <button class="${s.variantId === selectedSize?.variantId ? 'active' : ''}"
-                                    ${s.stock <= 0 ? 'disabled' : ''}
-                                    onclick="selectSize(${s.variantId})">${s.size}</button>
-                        `).join('')}
+                    <div class="section">
+                        <div class="section-label">尺寸 <b id="sizeName"></b></div>
+                        <div class="sizes" id="sizes"></div>
+                        <div class="stock-note" id="stockNote"></div>
+                        <div class="section-label" style="margin:22px 0 10px">數量</div>
+                        <div class="qty">
+                            <button id="qtyMinus" aria-label="減少">−</button>
+                            <span id="qtyValue">1</span>
+                            <button id="qtyPlus" aria-label="增加">＋</button>
+                        </div>
+                        <div class="buy">
+                            <button class="btn" id="addToCart">加入購物車　→</button>
+                            <button class="heart${wishlistSlugs.has(slug) ? ' on' : ''}" id="heartBtn" aria-label="收藏">${HEART_SVG}</button>
+                        </div>
                     </div>
-
-                    <div class="selected">
-                        ${selectedSize
-                            ? `已選：${color.color} / ${selectedSize.size}（庫存 ${selectedSize.stock}，variantId ${selectedSize.variantId}）`
-                            : '請選擇尺寸'}
-                    </div>
-                    <div class="cart-row">
-                        <label>數量 <input id="qty" type="number" min="1" value="1"></label>
-                        <button class="cart" ${selectedSize ? '' : 'disabled'} onclick="addToCart()">加入購物車</button>
-                    </div>
-                    <div id="cartMsg"></div>
+                    ${product.description ? `
+                    <div class="section">
+                        <button class="desc-toggle" id="descToggle"><span>商品說明</span><span id="descArrow">＋</span></button>
+                        <div class="desc-body" id="descBody"><div class="desc">${esc(product.description)}</div></div>
+                    </div>` : ''}
                 </div>
             </div>`;
+
+        document.getElementById('qtyMinus').addEventListener('click', () => setQty(qty - 1));
+        document.getElementById('qtyPlus').addEventListener('click', () => setQty(qty + 1));
+        document.getElementById('addToCart').addEventListener('click', addToCart);
+        document.getElementById('heartBtn').addEventListener('click', e => toggleWishlist(slug, e.currentTarget));
+        const descToggle = document.getElementById('descToggle');
+        if (descToggle) descToggle.addEventListener('click', () => {
+            const open = document.getElementById('descBody').classList.toggle('open');
+            document.getElementById('descArrow').textContent = open ? '－' : '＋';
+        });
+
+        renderColor();
     }
 
-    // 換顏色：尺寸要重選，因為不同顏色是不同的 SKU
-    function selectColor(i) {
-        colorIndex = i;
-        selectedSize = null;
-        render();
+    /** 換顏色：大圖、色塊、尺寸按鈕都要跟著換 */
+    function renderColor() {
+        const color = product.colorOptions[colorIndex];
+        document.getElementById('mainImg').src = imgSrc(color.imageUrl);
+        document.getElementById('colorName').textContent = color.color;
+
+        const swatches = document.getElementById('swatches');
+        swatches.innerHTML = product.colorOptions.map((c, i) => `
+            <button class="swatch${i === colorIndex ? ' active' : ''}" data-i="${i}" title="${esc(c.color)}" aria-label="${esc(c.color)}">
+                <img src="${esc(imgSrc(c.imageUrl))}" alt="">
+            </button>`).join('');
+        swatches.querySelectorAll('.swatch').forEach(b => b.addEventListener('click', () => {
+            colorIndex = Number(b.dataset.i);
+            renderColor();
+        }));
+
+        // 換顏色後，盡量保留原本選的尺寸（新顏色有這個尺寸而且有貨）
+        const keep = selectedSize && color.sizeOptions.find(s => s.size === selectedSize.size && s.stock > 0);
+        selectedSize = keep || null;
+
+        const sizes = document.getElementById('sizes');
+        sizes.innerHTML = color.sizeOptions.map((s, i) => `
+            <button class="chip${selectedSize && s.variantId === selectedSize.variantId ? ' active' : ''}" data-i="${i}" ${s.stock > 0 ? '' : 'disabled title="缺貨"'}>${esc(s.size)}</button>`).join('');
+        sizes.querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => {
+            selectedSize = color.sizeOptions[Number(b.dataset.i)];
+            sizes.querySelectorAll('.chip').forEach(x => x.classList.toggle('active', x === b));
+            setQty(qty);
+        }));
+
+        setQty(qty);
     }
 
-    function selectSize(variantId) {
-        selectedSize = product.colorOptions[colorIndex].sizeOptions.find(s => s.variantId === variantId);
-        render();
+    /** 數量：最少 1，最多是這個尺寸的庫存 */
+    function setQty(n) {
+        const max = selectedSize ? selectedSize.stock : 99;
+        qty = Math.min(Math.max(1, n), Math.max(1, max));
+        document.getElementById('qtyValue').textContent = qty;
+        document.getElementById('qtyMinus').disabled = qty <= 1;
+        document.getElementById('qtyPlus').disabled = qty >= max;
+        document.getElementById('sizeName').textContent = selectedSize ? selectedSize.size : '';
+
+        const soldOut = product.colorOptions[colorIndex].sizeOptions.every(s => s.stock <= 0);
+        document.getElementById('stockNote').textContent =
+            soldOut ? '這個顏色目前全部缺貨'
+            : selectedSize && selectedSize.stock <= 5 ? `僅剩 ${selectedSize.stock} 件`
+            : '';
+        document.getElementById('addToCart').disabled = soldOut;
     }
 
-    // POST /api/cart   body: { variantId, qty }
-    // 成功時後端回 204（沒有 body），所以不能用 getJson（它會呼叫 res.json()）
     async function addToCart() {
-        const msg = document.getElementById('cartMsg');
-        const qty = Number(document.getElementById('qty').value);
+        if (!selectedSize) {
+            toast('請先選擇尺寸', true);
+            return;
+        }
+        const btn = document.getElementById('addToCart');
+        btn.disabled = true;
         try {
-            // 後端還沒有 @Min(1)，先在前端擋掉 0 和負數
-            if (!Number.isInteger(qty) || qty < 1) throw new Error('數量至少要 1');
-            const res = await fetch('/api/cart', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ variantId: selectedSize.variantId, qty }),
-            });
-            if (!res.ok) {
-                const body = await res.json();
-                throw new Error(body.message || res.status);
-            }
-            msg.innerHTML = '已加入購物車，<a href="cart.html">前往購物車</a>';
+            await api('/api/cart', { method: 'POST', body: { variantId: selectedSize.variantId, qty } });
+            toast(`已加入購物車：${product.colorOptions[colorIndex].color} / ${selectedSize.size} × ${qty}`);
+            refreshCounts();
         } catch (e) {
-            msg.innerHTML = `<span class="error">${e.message}</span>`;
+            toast(e.message, true);      // 例如「不能超過庫存數量」（購物車原本就有，加起來超過）
+        } finally {
+            btn.disabled = false;
         }
     }
 
-    // 追蹤 / 取消追蹤：POST 或 DELETE /api/wishlist/{slug}
-    // 成功時後端回 204（沒有 body），所以不能用 getJson
-    async function toggleWishlist() {
-        const msg = document.getElementById('cartMsg');
-        try {
-            const res = await fetch(`/api/wishlist/${encodeURIComponent(slug)}`, {
-                method: inWishlist ? 'DELETE' : 'POST',
-            });
-            if (!res.ok) {
-                const body = await res.json();
-                throw new Error(body.message || res.status);
-            }
-            inWishlist = !inWishlist;
-            render();
-        } catch (e) {
-            msg.innerHTML = `<span class="error">${e.message}</span>`;
-        }
-    }
-
-    // GET /api/wishlist/{slug}：回傳 true / false
-    async function loadWishlistState() {
-        inWishlist = await getJson(`/api/wishlist/${encodeURIComponent(slug)}`);
-    }
-
-    // GET /api/products/{slug}
-    async function main() {
-        try {
-            if (!slug) throw new Error('網址缺少 slug，例如 product.html?slug=men-487511');
-            [product] = await Promise.all([
-                getJson(`/api/products/${encodeURIComponent(slug)}`),
-                loadWishlistState(),
-            ]);
-            document.title = product.name;
-            render();
-        } catch (e) {
-            document.getElementById('page').innerHTML = `<span class="error">錯誤：${e.message}</span>`;
-        }
-    }
-    main();
+    init();
 </script>
 </body>
 </html>
