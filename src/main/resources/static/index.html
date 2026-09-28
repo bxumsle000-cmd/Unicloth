@@ -1,298 +1,154 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-Hant">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>分類頁（測試用）</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="#F6F5F2">
+    <title>KINU — Everyday, beautifully.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- 頁首、頁尾、語言選單等共用樣式 -->
+    <link rel="stylesheet" href="/css/kinu.css">
     <style>
-        body { font-family: sans-serif; margin: 0; color: #222; }
-        a { color: inherit; text-decoration: none; }
+        /* ===== 首頁專用：主視覺、跑馬標語、系列大圖、秋冬預告 ===== */
 
-        /* 導覽選單 */
-        nav { display: flex; align-items: center; justify-content: space-between; gap: 24px;
-              padding: 12px 24px; border-bottom: 1px solid #ddd; }
-        #menu { display: flex; gap: 24px; }
-        .top { position: relative; }
-        .top > span { font-weight: bold; cursor: pointer; }
-        .top ul { display: none; position: absolute; top: 100%; left: 0; z-index: 10;
-                  list-style: none; margin: 0; padding: 8px 0; min-width: 160px;
-                  background: #fff; border: 1px solid #ddd; }
-        .top:hover ul { display: block; }
-        .top li a { display: flex; align-items: center; gap: 10px; padding: 6px 16px; white-space: nowrap; }
-        .top li img { width: 40px; height: 40px; object-fit: cover; }
-        .top li a:hover { background: #f2f2f2; }
+        /* 主視覺 */
+        .hero { margin: 20px 3.7% 0; position: relative; min-height: 535px; height: min(59vw,650px); overflow: hidden; background: #d9d2c9; }
+        .hero-video { width: 100%; height: 100%; object-fit: cover; object-position: center 42%; position: absolute; inset: 0; filter: saturate(.73); }
+        .hero:after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg,rgba(25,22,19,.35),transparent 72%); pointer-events: none; }
+        .hero-copy { position: absolute; z-index: 1; left: 8%; top: 50%; transform: translateY(-43%); color: #fff; max-width: 440px; }
+        .eyebrow { font-size: 10px; letter-spacing: .23em; text-transform: uppercase; }
+        .hero h1 { font: 400 clamp(38px,5.3vw,72px)/1.18 var(--serif); letter-spacing: .03em; margin: 18px 0 15px; }
+        .hero p { font-size: 12px; letter-spacing: .07em; line-height: 2; margin: 0 0 27px; }
+        .pill { height: 45px; padding: 0 23px; background: #fff; color: #000; font-size: 10px; letter-spacing: .13em; display: inline-flex; align-items: center; gap: 18px; transition: .2s; text-decoration: none; }
+        .pill:hover { background: var(--cream); }
+        .pill span { font-size: 17px; }
+        .hero-dots { position: absolute; right: 5%; bottom: 26px; z-index: 2; color: #fff; font-size: 10px; letter-spacing: .15em; display: flex; align-items: center; gap: 8px; }
+        .hero-dots button { color: white; font-size: 22px; }
 
-        /* 搜尋框 */
-        .search { display: flex; gap: 6px; }
-        .search input { width: 200px; padding: 6px 10px; border: 1px solid #999; border-radius: 4px; }
-        .search button { padding: 6px 14px; border: 1px solid #222; border-radius: 4px;
-                         background: #222; color: #fff; cursor: pointer; }
+        /* 跑馬標語 */
+        .ticker { display: flex; align-items: center; justify-content: center; gap: 34px; padding: 23px 12px; color: #6f6963; font-size: 9px; letter-spacing: .18em; }
+        .ticker i { width: 3px; height: 3px; background: #a9a198; border-radius: 50%; }
 
-        main { padding: 16px 24px; }
-        .breadcrumb a:hover { text-decoration: underline; }
-        .filters { margin: 12px 0; }
-        .filters select { width: 100%; max-width: 480px; padding: 8px 10px; font-size: 15px;
-                          border: 1px solid #999; border-radius: 4px; background: #fff; cursor: pointer; }
+        @media (max-width: 760px) {
+            .hero { margin: 12px 3% 0; height: 590px; min-height: 0; }
+            .hero-video { object-position: 58% center; }
+            .hero:after { background: linear-gradient(0deg,rgba(0,0,0,.5),transparent 82%); }
+            .hero-copy { left: 7%; top: auto; bottom: 13%; transform: none; max-width: 300px; }
+            .hero h1 { font-size: 47px; }
+            .ticker { gap: 12px; font-size: 7px; letter-spacing: .08em; flex-wrap: wrap; }
+        }
 
-        /* 篩選列：每個 <details> 是一顆按鈕，點開是勾選面板 */
-        .filter-bar { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px; margin: 12px 0; }
-        .filter-bar details { position: relative; }
-        .filter-bar summary { list-style: none; padding: 6px 14px; border: 1px solid #999;
-                              border-radius: 16px; cursor: pointer; user-select: none; }
-        .filter-bar summary::-webkit-details-marker { display: none; }
-        .filter-bar summary::after { content: ' ▾'; }
-        .filter-bar details[open] summary::after { content: ' ▴'; }
-        .filter-bar summary.on { background: #222; color: #fff; border-color: #222; }   /* 有選東西 */
-        .filter-bar .panel { position: absolute; top: calc(100% + 4px); left: 0; z-index: 5;
-                             display: flex; flex-wrap: wrap; gap: 6px 14px; width: max-content; max-width: 420px;
-                             padding: 12px; background: #fff; border: 1px solid #ddd; }
-        .filter-bar .panel label { white-space: nowrap; cursor: pointer; }
-        .filter-bar .panel input[type=number] { width: 90px; padding: 4px 6px; }
-        .filter-bar button { padding: 6px 16px; border: 1px solid #222; border-radius: 16px;
-                             background: #222; color: #fff; cursor: pointer; }
-        .filter-bar .clear { padding: 6px 4px; color: #666; text-decoration: underline; }
+        /* 系列大圖 */
+        .look-feature { height: min(50vw,560px); min-height: 360px; position: relative; display: block; overflow: hidden; background: var(--stone); color: white; text-decoration: none; }
+        .look-feature img { width: 100%; height: 100%; object-fit: cover; filter: brightness(.78) saturate(.8); transition: transform .65s; }
+        .look-feature:hover img { transform: scale(1.025); }
+        @media (max-width: 760px) {
+            .look-feature { height: 390px; min-height: 0; }
+        }
 
-        /* 商品卡片 */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
-        .card { display: block; }
-        .card img { width: 100%; aspect-ratio: 1; object-fit: cover; background: #f2f2f2; }
-        .tag { font-size: 12px; color: #fff; padding: 1px 6px; margin-right: 4px; }
-        .tag.new { background: #1a73e8; }
-        .tag.hot { background: #e8711a; }
-        .price { font-weight: bold; }
-        .price.sale { color: #d00; }
-        .orig { color: #888; text-decoration: line-through; margin-left: 6px; font-size: 13px; }
-
-        .pager { display: flex; align-items: center; gap: 12px; margin: 24px 0; }
-        .error { color: #d00; }
+        /* ===== 滿版主視覺、系列大圖、秋冬預告 ===== */
+        .hero { margin: 0 !important; width: 100vw; max-width: 100%; height: min(68vw,760px); min-height: 540px; }
+        .look-feature { height: min(55vw,660px); min-height: 440px; width: 100%; margin: 0; }
+        .look-feature img { object-position: center 42%; }
+        .drop-section { margin: 0 0 72px; }
+        .campaign-final { position: relative; height: min(63vw,760px); min-height: 510px; overflow: hidden; color: #fff; }
+        .campaign-final img { width: 100%; height: 100%; object-fit: cover; filter: brightness(.65) saturate(.72); }
+        .campaign-copy { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        .campaign-copy > span { font-size: 10px; letter-spacing: .25em; }
+        .campaign-copy h2 { font-size: clamp(36px,5vw,66px); font-weight: 500; line-height: 1.25; letter-spacing: .08em; margin: 20px 0; }
+        .campaign-copy p { font-size: 16px; letter-spacing: .2em; margin: 0 0 10px; }
+        .campaign-copy strong { font-size: 12px; letter-spacing: .2em; font-weight: 400; }
+        @media (max-width: 760px) {
+            .hero { height: 78vh; min-height: 530px; }
+            .look-feature { height: 430px; min-height: 0; }
+            .drop-section { margin-bottom: 48px; }
+            .campaign-final { height: 68vh; min-height: 500px; }
+        }
+        .drop-section:first-child .look-feature { isolation: isolate; aspect-ratio: 2/1; height: auto; min-height: 0; }
+        .drop-section:first-child .look-feature::after { content: ""; position: absolute; z-index: 1; inset: 0; background: transparent; }
+        .drop-section:first-child .look-feature img { position: relative; z-index: 0; }
+        @media (max-width: 760px) {
+            .drop-section:first-child .look-feature { aspect-ratio: 2/1; height: auto; min-height: 0; }
+        }
+        .look-feature { aspect-ratio: 2/1; height: auto; min-height: 0; }
+        .look-feature img { filter: none; transition: none; }
+        .look-feature:hover img { transform: none; }
     </style>
 </head>
 <body>
-
-<nav>
-    <div id="menu"></div>
-    <!-- 沒寫 action：送出後留在 index.html，網址變成 ?keyword=外套 -->
-    <form class="search">
-        <input type="search" name="keyword" id="keyword" placeholder="搜尋商品名稱" required>
-        <button>搜尋</button>
-    </form>
-</nav>
+<!-- 公告列、頁首（含分類選單）由 js/kinu.js 產生 -->
+<div id="site-header"></div>
 
 <main>
-    <div class="breadcrumb" id="breadcrumb"></div>
-    <h2 id="title">請從上方選單選擇分類</h2>
-    <div class="filters" id="filters"></div>
-    <form class="filter-bar" id="filterBar" hidden></form>
-    <p id="total"></p>
-    <div class="grid" id="grid"></div>
-    <div class="pager" id="pager"></div>
+    <!-- 主視覺影片輪播 -->
+    <section class="hero">
+        <video class="hero-video" id="heroVideo" autoplay muted playsinline poster="img/campaign.jpg">
+            <source src="video/hero-01.mp4" type="video/mp4">
+        </video>
+        <div class="hero-copy">
+            <div class="eyebrow" data-i18n="heroeyebrow">THE ART OF EVERYDAY</div>
+            <h1 data-i18n="heroTitle">日常，<br>恰好的美。</h1>
+            <p data-i18n="heroText">留一點餘白，給生活更多可能。<br>以柔軟質地，陪你走過每一個日常。</p>
+            <a class="pill" href="#collections"><span data-i18n="shopnow">探索本季新品</span><span>→</span></a>
+        </div>
+        <div class="hero-dots">
+            <button onclick="changeSlide(-1)">‹</button>
+            <span id="slideCount">01　/　03</span>
+            <button onclick="changeSlide(1)">›</button>　<span id="slideDots">●　○　○</span>
+        </div>
+    </section>
+
+    <div class="ticker"><span>MADE FOR YOUR EVERYDAY</span><i></i><span>天然質地・自在生活</span><i></i><span>LESS, BUT BETTER</span></div>
+
+    <!-- 三個系列大圖：點下去進對應的分類商品列表 -->
+    <section class="collection-drops" id="collections">
+        <section class="drop-section">
+            <a class="look-feature" href="/products.html?category=all_women"><img src="img/look-01.png" alt="KINU 秋日女裝穿搭"></a>
+        </section>
+        <section class="drop-section">
+            <a class="look-feature" href="/products.html?category=all_men"><img src="img/look-02.png" alt="KINU 秋日男裝穿搭"></a>
+        </section>
+        <section class="drop-section">
+            <a class="look-feature" href="/products.html?category=all_kids"><img src="img/look-03.png" alt="KINU 秋冬衣著系列"></a>
+        </section>
+    </section>
+
+    <!-- 秋冬預告 -->
+    <section class="campaign-final">
+        <img src="img/campaign.jpg" alt="KINU 2026 秋冬系列形象照">
+        <div class="campaign-copy">
+            <span>COMING SOON</span>
+            <h2>KINU 2026<br>秋冬系列</h2>
+            <p>即將販售</p>
+            <strong>2026.10.15</strong>
+        </div>
+    </section>
 </main>
 
+<!-- 頁尾由 js/kinu.js 產生 -->
+<div id="site-footer"></div>
+
+<script src="/js/kinu.js"></script>
 <script>
-    // 網址長這樣：index.html?code=all_men-tops-t-shirts&page=0（分類）
-    //          或 index.html?keyword=外套&page=0（搜尋）
-    const params = new URLSearchParams(location.search);
-    const code = params.get('code');
-    const keyword = (params.get('keyword') || '').trim();
-    const page = Number(params.get('page') || 0);
-    const SIZE = 20;
+    // 主視覺影片輪播：‹ › 切換，影片播完自動換下一支
+    const heroSlides = ['video/hero-01.mp4', 'video/hero-02.mp4', 'video/hero-03.mp4'];
+    let heroSlide = 0;
 
-    // 分類頁的篩選條件，也放在網址上：&colors=黑色&colors=白色&sizes=M&minPrice=500&maxPrice=1500
-    // （放網址 → 換頁、重新整理、分享連結都還在）
-    const filter = {
-        colors: params.getAll('colors'),
-        sizes: params.getAll('sizes'),
-        minPrice: params.get('minPrice') || '',
-        maxPrice: params.get('maxPrice') || '',
-    };
-
-    // 目前的篩選條件 → 接在網址後面的字串，例如 "&colors=黑色&minPrice=500"；沒篩選就是 ""
-    function filterQuery() {
-        const q = new URLSearchParams();
-        filter.colors.forEach(c => q.append('colors', c));
-        filter.sizes.forEach(s => q.append('sizes', s));
-        if (filter.minPrice) q.set('minPrice', filter.minPrice);
-        if (filter.maxPrice) q.set('maxPrice', filter.maxPrice);
-        const s = q.toString();
-        return s ? '&' + s : '';
+    function changeSlide(step) {
+        const next = heroSlide + step;
+        if (next < 0 || next >= heroSlides.length) return;
+        heroSlide = next;
+        const video = document.getElementById('heroVideo');
+        video.src = heroSlides[heroSlide];
+        video.load();
+        video.play().catch(() => {});
+        document.getElementById('slideCount').textContent = '0' + (heroSlide + 1) + '　/　0' + heroSlides.length;
+        document.getElementById('slideDots').textContent = heroSlides.map((_, i) => i === heroSlide ? '●' : '○').join('　');
     }
 
-    // 顏色、尺寸的值要放進 HTML 屬性，先把 " < > & ' 換掉，避免破壞 HTML
-    function esc(s) {
-        return String(s).replace(/[&<>"']/g, ch =>
-            ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch]);
-    }
-
-    // 共用：打 API，失敗時把後端的 ErrorResponse.message 丟出來
-    async function getJson(url) {
-        const res = await fetch(url);
-        const body = await res.json();
-        if (!res.ok) throw new Error(body.message || res.status);
-        return body;
-    }
-
-    function link(c, p = 0) {
-        return `?code=${encodeURIComponent(c)}&page=${p}`;
-    }
-
-    function searchLink(kw, p = 0) {
-        return `?keyword=${encodeURIComponent(kw)}&page=${p}`;
-    }
-
-    // 1. 導覽選單：GET /api/categories
-    async function loadMenu() {
-        const menu = await getJson('/api/categories');
-        document.getElementById('menu').innerHTML = menu.map(top => `
-            <div class="top">
-                <span>${top.name}</span>
-                <ul>
-                    ${top.children.map(c => `
-                        <li><a href="${link(c.code)}">
-                            ${c.iconUrl ? `<img src="${c.iconUrl}" alt="">` : ''}
-                            <span>${c.name}</span>
-                        </a></li>`).join('')}
-                </ul>
-            </div>`).join('');
-    }
-
-    // 2. 麵包屑：GET /api/categories/{code}/breadcrumb
-    //    篩選按鈕：GET /api/categories/{code}
-    async function loadDetail() {
-        const [detail, breadcrumb] = await Promise.all([
-            getJson(`/api/categories/${encodeURIComponent(code)}`),
-            getJson(`/api/categories/${encodeURIComponent(code)}/breadcrumb`),
-        ]);
-        document.title = detail.name;
-        document.getElementById('title').textContent = detail.name;
-
-        document.getElementById('breadcrumb').innerHTML = breadcrumb
-            .map((c, i) => i === 0 ? c.name : `<a href="${link(c.code)}">${c.name}</a>`)  // 第 1 層沒有自己的頁面
-            .join(' › ');
-
-        // 分類有 3 或 4 層，不寫死層數：
-        // 有子分類 → 子分類就是選項；沒有（最底層）→ 改拿上一層的子分類（兄弟們）當選項，並選中目前這個
-        let parent = detail;
-        if (detail.children.length === 0 && breadcrumb.length >= 3) {
-            parent = await getJson(`/api/categories/${encodeURIComponent(breadcrumb.at(-2).code)}`);
-        }
-        // 「全部」= 上一層自己；其他選項 = 它底下的各個子分類
-        const options = [{ code: parent.code, name: '全部' }].concat(parent.children);
-        document.getElementById('filters').innerHTML = `
-            <select id="subCategory" aria-label="細分類">
-                ${options.map(c =>
-                    `<option value="${c.code}" ${c.code === code ? 'selected' : ''}>${c.name}</option>`).join('')}
-            </select>`;
-        // 選了就換頁（回到第 1 頁）；篩選條件不帶過去，因為換分類後可選的顏色 / 尺寸會不一樣
-        document.getElementById('subCategory').addEventListener('change', e => {
-            location.href = link(e.target.value);
-        });
-    }
-
-    // 3. 商品：GET /api/categories/{code}/products?page=0&size=20&colors=…
-    async function loadProducts() {
-        const data = await getJson(
-            `/api/categories/${encodeURIComponent(code)}/products?page=${page}&size=${SIZE}${filterQuery()}`);
-        renderProducts(data, p => link(code, p) + filterQuery());   // 換頁時篩選條件要跟著
-    }
-
-    // 3-1. 篩選列：GET /api/categories/{code}/filters → 顏色、尺寸的勾選框和價格輸入框
-    async function loadFilters() {
-        const opt = await getJson(`/api/categories/${encodeURIComponent(code)}/filters`);
-
-        // 一組勾選框（顏色或尺寸）。網址上已經選的要打勾；summary 顯示選了幾個
-        const checkboxGroup = (label, name, values, selected) => `
-            <details>
-                <summary class="${selected.length ? 'on' : ''}">${label}${selected.length ? `（${selected.length}）` : ''}</summary>
-                <div class="panel">
-                    ${values.map(v => `
-                        <label><input type="checkbox" name="${name}" value="${esc(v)}"
-                            ${selected.includes(v) ? 'checked' : ''}> ${esc(v)}</label>`).join('')}
-                </div>
-            </details>`;
-
-        const hasPrice = filter.minPrice || filter.maxPrice;
-        const bar = document.getElementById('filterBar');
-        bar.innerHTML = `
-            ${checkboxGroup('顏色', 'colors', opt.colors, filter.colors)}
-            ${checkboxGroup('尺寸', 'sizes', opt.sizes, filter.sizes)}
-            <details>
-                <summary class="${hasPrice ? 'on' : ''}">價格</summary>
-                <div class="panel">
-                    NT$ <input type="number" name="minPrice" min="0" step="1" placeholder="最低">
-                    ～ <input type="number" name="maxPrice" min="0" step="1" placeholder="最高">
-                </div>
-            </details>
-            <button>套用</button>
-            ${filterQuery() ? `<a class="clear" href="${link(code)}">清除篩選</a>` : ''}`;
-        // 網址上的值用 .value 放（不塞進 HTML 字串），使用者亂改網址也不會破壞頁面
-        bar.minPrice.value = filter.minPrice;
-        bar.maxPrice.value = filter.maxPrice;
-        bar.hidden = false;
-
-        // 按「套用」：把勾選和輸入的值組成網址，回到第 1 頁
-        bar.addEventListener('submit', e => {
-            e.preventDefault();
-            const form = new FormData(bar);
-            filter.colors = form.getAll('colors');
-            filter.sizes = form.getAll('sizes');
-            filter.minPrice = form.get('minPrice').trim();
-            filter.maxPrice = form.get('maxPrice').trim();
-            location.href = link(code) + filterQuery();
-        });
-    }
-
-    // 4. 搜尋：GET /api/products?keyword=外套&page=0&size=20
-    async function loadSearch() {
-        // 關鍵字是使用者打的，用 textContent 放，不用 innerHTML（避免被塞 HTML / script）
-        document.title = `搜尋：${keyword}`;
-        document.getElementById('title').textContent = `「${keyword}」的搜尋結果`;
-        const data = await getJson(`/api/products?keyword=${encodeURIComponent(keyword)}&page=${page}&size=${SIZE}`);
-        renderProducts(data, p => searchLink(keyword, p));
-    }
-
-    // 共用：商品卡片 + 分頁。pageLink(p) 回傳第 p 頁的網址，分類和搜尋各自傳自己的
-    function renderProducts(data, pageLink) {
-        // via_dto 格式：{ content: [...], page: { size, number, totalElements, totalPages } }
-        const info = data.page;
-
-        document.getElementById('total').textContent = `共 ${info.totalElements} 件商品`;
-
-        document.getElementById('grid').innerHTML = data.content.map(p => {
-            const onSale = p.origPrice != null && p.origPrice > p.price;
-            return `
-                <a class="card" href="product.html?slug=${encodeURIComponent(p.slug)}">
-                    <img src="${p.imageUrl ?? ''}" alt="${p.name}">
-                    <div>
-                        ${p.newArrival ? '<span class="tag new">新品</span>' : ''}
-                        ${p.hot ? '<span class="tag hot">熱門</span>' : ''}
-                    </div>
-                    <div>${p.name}</div>
-                    <div>
-                        <span class="price ${onSale ? 'sale' : ''}">NT$${p.price}</span>
-                        ${onSale ? `<span class="orig">NT$${p.origPrice}</span>` : ''}
-                    </div>
-                    <small style="color:#888">${p.slug}</small>
-                </a>`;
-        }).join('');
-
-        const pager = [];
-        if (info.number > 0) pager.push(`<a href="${pageLink(info.number - 1)}">‹ 上一頁</a>`);
-        pager.push(`<span>第 ${info.number + 1} / ${Math.max(info.totalPages, 1)} 頁</span>`);
-        if (info.number + 1 < info.totalPages) pager.push(`<a href="${pageLink(info.number + 1)}">下一頁 ›</a>`);
-        document.getElementById('pager').innerHTML = pager.join('');
-    }
-
-    async function main() {
-        document.getElementById('keyword').value = keyword;   // 搜尋後框裡保留剛剛打的字
-        try {
-            await loadMenu();
-            if (code) await Promise.all([loadDetail(), loadFilters(), loadProducts()]);
-            else if (keyword) await loadSearch();
-        } catch (e) {
-            document.getElementById('title').innerHTML = `<span class="error">錯誤：${e.message}</span>`;
-        }
-    }
-    main();
+    document.getElementById('heroVideo').addEventListener('ended', () => changeSlide(1));
 </script>
 </body>
 </html>
