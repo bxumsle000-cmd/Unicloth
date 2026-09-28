@@ -34,6 +34,24 @@
         .filters select { width: 100%; max-width: 480px; padding: 8px 10px; font-size: 15px;
                           border: 1px solid #999; border-radius: 4px; background: #fff; cursor: pointer; }
 
+        /* 篩選列：每個 <details> 是一顆按鈕，點開是勾選面板 */
+        .filter-bar { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px; margin: 12px 0; }
+        .filter-bar details { position: relative; }
+        .filter-bar summary { list-style: none; padding: 6px 14px; border: 1px solid #999;
+                              border-radius: 16px; cursor: pointer; user-select: none; }
+        .filter-bar summary::-webkit-details-marker { display: none; }
+        .filter-bar summary::after { content: ' ▾'; }
+        .filter-bar details[open] summary::after { content: ' ▴'; }
+        .filter-bar summary.on { background: #222; color: #fff; border-color: #222; }   /* 有選東西 */
+        .filter-bar .panel { position: absolute; top: calc(100% + 4px); left: 0; z-index: 5;
+                             display: flex; flex-wrap: wrap; gap: 6px 14px; width: max-content; max-width: 420px;
+                             padding: 12px; background: #fff; border: 1px solid #ddd; }
+        .filter-bar .panel label { white-space: nowrap; cursor: pointer; }
+        .filter-bar .panel input[type=number] { width: 90px; padding: 4px 6px; }
+        .filter-bar button { padding: 6px 16px; border: 1px solid #222; border-radius: 16px;
+                             background: #222; color: #fff; cursor: pointer; }
+        .filter-bar .clear { padding: 6px 4px; color: #666; text-decoration: underline; }
+
         /* 商品卡片 */
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
         .card { display: block; }
@@ -64,6 +82,7 @@
     <div class="breadcrumb" id="breadcrumb"></div>
     <h2 id="title">請從上方選單選擇分類</h2>
     <div class="filters" id="filters"></div>
+    <form class="filter-bar" id="filterBar" hidden></form>
     <p id="total"></p>
     <div class="grid" id="grid"></div>
     <div class="pager" id="pager"></div>
@@ -77,6 +96,32 @@
     const keyword = (params.get('keyword') || '').trim();
     const page = Number(params.get('page') || 0);
     const SIZE = 20;
+
+    // 分類頁的篩選條件，也放在網址上：&colors=黑色&colors=白色&sizes=M&minPrice=500&maxPrice=1500
+    // （放網址 → 換頁、重新整理、分享連結都還在）
+    const filter = {
+        colors: params.getAll('colors'),
+        sizes: params.getAll('sizes'),
+        minPrice: params.get('minPrice') || '',
+        maxPrice: params.get('maxPrice') || '',
+    };
+
+    // 目前的篩選條件 → 接在網址後面的字串，例如 "&colors=黑色&minPrice=500"；沒篩選就是 ""
+    function filterQuery() {
+        const q = new URLSearchParams();
+        filter.colors.forEach(c => q.append('colors', c));
+        filter.sizes.forEach(s => q.append('sizes', s));
+        if (filter.minPrice) q.set('minPrice', filter.minPrice);
+        if (filter.maxPrice) q.set('maxPrice', filter.maxPrice);
+        const s = q.toString();
+        return s ? '&' + s : '';
+    }
+
+    // 顏色、尺寸的值要放進 HTML 屬性，先把 " < > & ' 換掉，避免破壞 HTML
+    function esc(s) {
+        return String(s).replace(/[&<>"']/g, ch =>
+            ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch]);
+    }
 
     // 共用：打 API，失敗時把後端的 ErrorResponse.message 丟出來
     async function getJson(url) {
@@ -124,29 +169,76 @@
             .map((c, i) => i === 0 ? c.name : `<a href="${link(c.code)}">${c.name}</a>`)  // 第 1 層沒有自己的頁面
             .join(' › ');
 
-        // 第 2 層：children 就是第 3 層選項
-        // 第 3 層：children 是空的 → 改拿上一層（第 2 層）的 children 當選項，並選中目前這個
+        // 分類有 3 或 4 層，不寫死層數：
+        // 有子分類 → 子分類就是選項；沒有（最底層）→ 改拿上一層的子分類（兄弟們）當選項，並選中目前這個
         let parent = detail;
         if (detail.children.length === 0 && breadcrumb.length >= 3) {
             parent = await getJson(`/api/categories/${encodeURIComponent(breadcrumb.at(-2).code)}`);
         }
-        // 「全部」= 第 2 層自己；其他選項 = 各個第 3 層
+        // 「全部」= 上一層自己；其他選項 = 它底下的各個子分類
         const options = [{ code: parent.code, name: '全部' }].concat(parent.children);
         document.getElementById('filters').innerHTML = `
             <select id="subCategory" aria-label="細分類">
                 ${options.map(c =>
                     `<option value="${c.code}" ${c.code === code ? 'selected' : ''}>${c.name}</option>`).join('')}
             </select>`;
-        // 選了就換頁（回到第 1 頁）
+        // 選了就換頁（回到第 1 頁）；篩選條件不帶過去，因為換分類後可選的顏色 / 尺寸會不一樣
         document.getElementById('subCategory').addEventListener('change', e => {
             location.href = link(e.target.value);
         });
     }
 
-    // 3. 商品：GET /api/categories/{code}/products?page=0&size=20
+    // 3. 商品：GET /api/categories/{code}/products?page=0&size=20&colors=…
     async function loadProducts() {
-        const data = await getJson(`/api/categories/${encodeURIComponent(code)}/products?page=${page}&size=${SIZE}`);
-        renderProducts(data, p => link(code, p));
+        const data = await getJson(
+            `/api/categories/${encodeURIComponent(code)}/products?page=${page}&size=${SIZE}${filterQuery()}`);
+        renderProducts(data, p => link(code, p) + filterQuery());   // 換頁時篩選條件要跟著
+    }
+
+    // 3-1. 篩選列：GET /api/categories/{code}/filters → 顏色、尺寸的勾選框和價格輸入框
+    async function loadFilters() {
+        const opt = await getJson(`/api/categories/${encodeURIComponent(code)}/filters`);
+
+        // 一組勾選框（顏色或尺寸）。網址上已經選的要打勾；summary 顯示選了幾個
+        const checkboxGroup = (label, name, values, selected) => `
+            <details>
+                <summary class="${selected.length ? 'on' : ''}">${label}${selected.length ? `（${selected.length}）` : ''}</summary>
+                <div class="panel">
+                    ${values.map(v => `
+                        <label><input type="checkbox" name="${name}" value="${esc(v)}"
+                            ${selected.includes(v) ? 'checked' : ''}> ${esc(v)}</label>`).join('')}
+                </div>
+            </details>`;
+
+        const hasPrice = filter.minPrice || filter.maxPrice;
+        const bar = document.getElementById('filterBar');
+        bar.innerHTML = `
+            ${checkboxGroup('顏色', 'colors', opt.colors, filter.colors)}
+            ${checkboxGroup('尺寸', 'sizes', opt.sizes, filter.sizes)}
+            <details>
+                <summary class="${hasPrice ? 'on' : ''}">價格</summary>
+                <div class="panel">
+                    NT$ <input type="number" name="minPrice" min="0" step="1" placeholder="${opt.minPrice ?? ''}">
+                    ～ <input type="number" name="maxPrice" min="0" step="1" placeholder="${opt.maxPrice ?? ''}">
+                </div>
+            </details>
+            <button>套用</button>
+            ${filterQuery() ? `<a class="clear" href="${link(code)}">清除篩選</a>` : ''}`;
+        // 網址上的值用 .value 放（不塞進 HTML 字串），使用者亂改網址也不會破壞頁面
+        bar.minPrice.value = filter.minPrice;
+        bar.maxPrice.value = filter.maxPrice;
+        bar.hidden = false;
+
+        // 按「套用」：把勾選和輸入的值組成網址，回到第 1 頁
+        bar.addEventListener('submit', e => {
+            e.preventDefault();
+            const form = new FormData(bar);
+            filter.colors = form.getAll('colors');
+            filter.sizes = form.getAll('sizes');
+            filter.minPrice = form.get('minPrice').trim();
+            filter.maxPrice = form.get('maxPrice').trim();
+            location.href = link(code) + filterQuery();
+        });
     }
 
     // 4. 搜尋：GET /api/products?keyword=外套&page=0&size=20
@@ -194,7 +286,7 @@
         document.getElementById('keyword').value = keyword;   // 搜尋後框裡保留剛剛打的字
         try {
             await loadMenu();
-            if (code) await Promise.all([loadDetail(), loadProducts()]);
+            if (code) await Promise.all([loadDetail(), loadFilters(), loadProducts()]);
             else if (keyword) await loadSearch();
         } catch (e) {
             document.getElementById('title').innerHTML = `<span class="error">錯誤：${e.message}</span>`;

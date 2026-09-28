@@ -5,13 +5,11 @@
     "categoryPath": [
       "男裝",
       "外套類",
-      "連帽/布勞森外套",
       "連帽外套"
     ],
     "categoryCode": [
       "all_men",
       "all_men-outer",
-      "all_men-outer-casual",
       "all_men-outer-casual-anchor02"
     ],
     "alsoIn": [
@@ -415,13 +413,11 @@
     "categoryPath": [
       "男裝",
       "外套類",
-      "連帽/布勞森外套",
       "夾克/布勞森外套"
     ],
     "categoryCode": [
       "all_men",
       "all_men-outer",
-      "all_men-outer-casual",
       "all_men-outer-casual-anchor01"
     ],
     "alsoIn": [],
@@ -695,13 +691,11 @@
     "categoryPath": [
       "男裝",
       "外套類",
-      "連帽/布勞森外套",
       "工裝外套"
     ],
     "categoryCode": [
       "all_men",
       "all_men-outer",
-      "all_men-outer-casual",
       "all_men-outer-casual-anchor07"
     ],
     "alsoIn": [
@@ -769,13 +763,11 @@
     "categoryPath": [
       "男裝",
       "外套類",
-      "連帽/布勞森外套",
       "機能外套(防風/防潑水/BLOCKTECH防風雨)"
     ],
     "categoryCode": [
       "all_men",
       "all_men-outer",
-      "all_men-outer-casual",
       "all_men-outer-casual-anchor05"
     ],
     "alsoIn": [
@@ -1051,13 +1043,11 @@
     "categoryPath": [
       "男裝",
       "外套類",
-      "連帽/布勞森外套",
       "刷毛外套"
     ],
     "categoryCode": [
       "all_men",
       "all_men-outer",
-      "all_men-outer-casual",
       "all_men-outer-casual-anchor09"
     ],
     "alsoIn": [
@@ -1149,13 +1139,11 @@
     "categoryPath": [
       "男裝",
       "外套類",
-      "連帽/布勞森外套",
       "羽絨/PUFFTECH輕暖科技"
     ],
     "categoryCode": [
       "all_men",
       "all_men-outer",
-      "all_men-outer-casual",
       "all_men-outer-casual-anchor03"
     ],
     "alsoIn": [],
@@ -1557,13 +1545,11 @@
     "categoryPath": [
       "男裝",
       "外套類",
-      "大衣",
       "徹斯特大衣"
     ],
     "categoryCode": [
       "all_men",
       "all_men-outer",
-      "all_men-outer-coats",
       "all_men-outer-coats-anchor03"
     ],
     "alsoIn": [],
@@ -1645,13 +1631,11 @@
     "categoryPath": [
       "男裝",
       "外套類",
-      "大衣",
       "其他大衣"
     ],
     "categoryCode": [
       "all_men",
       "all_men-outer",
-      "all_men-outer-coats",
       "all_men-outer-coats-anchor04"
     ],
     "alsoIn": [],
@@ -1717,13 +1701,11 @@
     "categoryPath": [
       "男裝",
       "外套類",
-      "大衣",
       "巴爾瑪肯/單排釦大衣"
     ],
     "categoryCode": [
       "all_men",
       "all_men-outer",
-      "all_men-outer-coats",
       "all_men-outer-coats-anchor02"
     ],
     "alsoIn": [],
@@ -1805,13 +1787,11 @@
     "categoryPath": [
       "男裝",
       "外套類",
-      "大衣",
       "羽絨大衣"
     ],
     "categoryCode": [
       "all_men",
       "all_men-outer",
-      "all_men-outer-coats",
       "all_men-outer-coats-anchor01"
     ],
     "alsoIn": [],
@@ -1997,13 +1977,11 @@
     "categoryPath": [
       "男裝",
       "外套類",
-      "Miracle Air 西裝外套",
       "Miracle Air 超輕量西裝外套"
     ],
     "categoryCode": [
       "all_men",
       "all_men-outer",
-      "all_men-outer-jackets",
       "all_men-outer-jackets-anchor01"
     ],
     "alsoIn": [],
@@ -2189,13 +2167,11 @@
     "categoryPath": [
       "男裝",
       "外套類",
-      "Miracle Air 西裝外套",
       "其他/西裝外套"
     ],
     "categoryCode": [
       "all_men",
       "all_men-outer",
-      "all_men-outer-jackets",
       "all_men-outer-jackets-anchor02"
     ],
     "alsoIn": [],
@@ -2381,13 +2357,11 @@
     "categoryPath": [
       "男裝",
       "外套類",
-      "厚羽絨",
       "無縫羽絨"
     ],
     "categoryCode": [
       "all_men",
       "all_men-outer",
-      "all_men-outer-down",
       "all_men-outer-down-anchor01"
     ],
     "alsoIn": [
@@ -2663,13 +2637,11 @@
     "categoryPath": [
       "男裝",
       "外套類",
-      "厚羽絨",
       "輕量羽絨"
     ],
     "categoryCode": [
       "all_men",
       "all_men-outer",
-      "all_men-outer-down",
       "all_men-outer-down-anchor06"
     ],
     "alsoIn": [],
@@ -3007,13 +2979,11 @@
     "categoryPath": [
       "男裝",
       "外套類",
-      "厚羽絨",
       "Hybrid羽絨"
     ],
     "categoryCode": [
       "all_men",
       "all_men-outer",
-      "all_men-outer-down",
       "all_men-outer-down-anchor02"
     ],
     "alsoIn": [],
@@ -3175,14 +3145,12 @@
     "categoryPath": [
       "男裝",
       "外套類",
-      "厚羽絨",
       "連帽外套"
     ],
     "categoryCode": [
       "all_men",
       "all_men-outer",
-      "all_men-outer-down",
-      "all_men-outer-down-anchor03"
+      "all_men-outer-casual-anchor02"
     ],
     "alsoIn": [
       "Hybrid羽絨"
@@ -3457,13 +3425,11 @@
     "categoryPath": [
       "男裝",
       "T恤/背心/休閒",
-      "T恤/背心",
       "長袖"
     ],
     "categoryCode": [
       "all_men",
       "all_men-tops",
-      "all_men-tops-t-shirts",
       "all_men-tops-t-shirts-anchor01"
     ],
     "alsoIn": [],
@@ -3769,13 +3735,11 @@
     "categoryPath": [
       "男裝",
       "T恤/背心/休閒",
-      "T恤/背心",
       "短袖"
     ],
     "categoryCode": [
       "all_men",
       "all_men-tops",
-      "all_men-tops-t-shirts",
       "all_men-tops-t-shirts-anchor02"
     ],
     "alsoIn": [
@@ -4435,13 +4399,11 @@
     "categoryPath": [
       "男裝",
       "T恤/背心/休閒",
-      "T恤/背心",
       "背心"
     ],
     "categoryCode": [
       "all_men",
       "all_men-tops",
-      "all_men-tops-t-shirts",
       "all_men-tops-t-shirts-anchor03"
     ],
     "alsoIn": [
@@ -4845,13 +4807,11 @@
     "categoryPath": [
       "男裝",
       "T恤/背心/休閒",
-      "SWEAT 休閒帽T．大學T",
       "休閒上衣"
     ],
     "categoryCode": [
       "all_men",
       "all_men-tops",
-      "all_men-tops-sweat-collection",
       "all_men-tops-sweat-collection-anchor01"
     ],
     "alsoIn": [],
@@ -5149,13 +5109,11 @@
     "categoryPath": [
       "男裝",
       "T恤/背心/休閒",
-      "SWEAT 休閒帽T．大學T",
       "連帽款式"
     ],
     "categoryCode": [
       "all_men",
       "all_men-tops",
-      "all_men-tops-sweat-collection",
       "all_men-tops-sweat-collection-anchor02"
     ],
     "alsoIn": [
@@ -5623,13 +5581,11 @@
     "categoryPath": [
       "男裝",
       "T恤/背心/休閒",
-      "SWEAT 休閒帽T．大學T",
       "印花上衣"
     ],
     "categoryCode": [
       "all_men",
       "all_men-tops",
-      "all_men-tops-sweat-collection",
       "all_men-tops-sweat-collection-anchor05"
     ],
     "alsoIn": [],
@@ -5711,13 +5667,11 @@
     "categoryPath": [
       "男裝",
       "T恤/背心/休閒",
-      "SWEAT 休閒帽T．大學T",
       "運動／休閒棉褲"
     ],
     "categoryCode": [
       "all_men",
       "all_men-tops",
-      "all_men-tops-sweat-collection",
       "all_men-tops-sweat-collection-anchor03"
     ],
     "alsoIn": [],
@@ -6183,14 +6137,12 @@
     "categoryPath": [
       "男裝",
       "T恤/背心/休閒",
-      "SWEAT 休閒帽T．大學T",
       "外套"
     ],
     "categoryCode": [
       "all_men",
       "all_men-tops",
-      "all_men-tops-sweat-collection",
-      "all_men-tops-sweat-collection-anchor04"
+      "all_men-tops-fleece-anchor02"
     ],
     "alsoIn": [
       "連帽款式"
@@ -6593,13 +6545,11 @@
     "categoryPath": [
       "男裝",
       "T恤/背心/休閒",
-      "刷毛",
       "外套"
     ],
     "categoryCode": [
       "all_men",
       "all_men-tops",
-      "all_men-tops-fleece",
       "all_men-tops-fleece-anchor02"
     ],
     "alsoIn": [],
@@ -6937,13 +6887,11 @@
     "categoryPath": [
       "男裝",
       "T恤/背心/休閒",
-      "刷毛",
       "上衣"
     ],
     "categoryCode": [
       "all_men",
       "all_men-tops",
-      "all_men-tops-fleece",
       "all_men-tops-fleece-anchor01"
     ],
     "alsoIn": [],
@@ -7473,13 +7421,11 @@
     "categoryPath": [
       "男裝",
       "T恤/背心/休閒",
-      "刷毛",
       "褲裝"
     ],
     "categoryCode": [
       "all_men",
       "all_men-tops",
-      "all_men-tops-fleece",
       "all_men-tops-fleece-anchor03"
     ],
     "alsoIn": [],
@@ -7817,13 +7763,11 @@
     "categoryPath": [
       "男裝",
       "襯衫‧POLO衫",
-      "休閒襯衫",
       "長袖"
     ],
     "categoryCode": [
       "all_men",
       "all_men-shirts",
-      "all_men-shirts-casual-shirts",
       "all_men-shirts-casual-shirts-anchor06"
     ],
     "alsoIn": [],
@@ -7913,13 +7857,11 @@
     "categoryPath": [
       "男裝",
       "襯衫‧POLO衫",
-      "休閒襯衫",
       "短袖"
     ],
     "categoryCode": [
       "all_men",
       "all_men-shirts",
-      "all_men-shirts-casual-shirts",
       "all_men-shirts-casual-shirts-anchor01"
     ],
     "alsoIn": [
@@ -8387,14 +8329,12 @@
     "categoryPath": [
       "男裝",
       "襯衫‧POLO衫",
-      "商務襯衫",
       "短袖"
     ],
     "categoryCode": [
       "all_men",
       "all_men-shirts",
-      "all_men-shirts-dress-shirts",
-      "all_men-shirts-dress-shirts-anchor06"
+      "all_men-shirts-casual-shirts-anchor01"
     ],
     "alsoIn": [
       "DRY 抗皺"
@@ -8581,14 +8521,12 @@
     "categoryPath": [
       "男裝",
       "襯衫‧POLO衫",
-      "商務襯衫",
       "長袖"
     ],
     "categoryCode": [
       "all_men",
       "all_men-shirts",
-      "all_men-shirts-dress-shirts",
-      "all_men-shirts-dress-shirts-anchor07"
+      "all_men-shirts-casual-shirts-anchor06"
     ],
     "alsoIn": [
       "特級抗皺"
@@ -8775,13 +8713,11 @@
     "categoryPath": [
       "男裝",
       "襯衫‧POLO衫",
-      "POLO衫",
       "針織/其他"
     ],
     "categoryCode": [
       "all_men",
       "all_men-shirts",
-      "all_men-shirts-polo-shirts",
       "all_men-shirts-polo-shirts-anchor04"
     ],
     "alsoIn": [],
@@ -9023,13 +8959,11 @@
     "categoryPath": [
       "男裝",
       "針織衫/開襟外套",
-      "針織衫/開襟外套",
       "外套"
     ],
     "categoryCode": [
       "all_men",
       "all_men-knit",
-      "all_men-knit-lineup",
       "all_men-knit-lineup-anchor02"
     ],
     "alsoIn": [
@@ -9217,13 +9151,11 @@
     "categoryPath": [
       "男裝",
       "針織衫/開襟外套",
-      "針織衫/開襟外套",
       "長袖"
     ],
     "categoryCode": [
       "all_men",
       "all_men-knit",
-      "all_men-knit-lineup",
       "all_men-knit-lineup-anchor01"
     ],
     "alsoIn": [],
@@ -9337,13 +9269,11 @@
     "categoryPath": [
       "男裝",
       "針織衫/開襟外套",
-      "針織衫/開襟外套",
       "短袖"
     ],
     "categoryCode": [
       "all_men",
       "all_men-knit",
-      "all_men-knit-lineup",
       "all_men-knit-lineup-anchor10"
     ],
     "alsoIn": [
@@ -9643,13 +9573,11 @@
     "categoryPath": [
       "男裝",
       "下身類",
-      "繭型褲",
       "牛仔"
     ],
     "categoryCode": [
       "all_men",
       "all_men-bottoms",
-      "all_men-bottoms-barrelpants",
       "all_men-bottoms-barrelpants-anchor01"
     ],
     "alsoIn": [],
@@ -10003,13 +9931,11 @@
     "categoryPath": [
       "男裝",
       "下身類",
-      "繭型褲",
       "其他"
     ],
     "categoryCode": [
       "all_men",
       "all_men-bottoms",
-      "all_men-bottoms-barrelpants",
       "all_men-bottoms-barrelpants-anchor03"
     ],
     "alsoIn": [],
@@ -10219,14 +10145,12 @@
     "categoryPath": [
       "男裝",
       "下身類",
-      "寬褲",
       "牛仔"
     ],
     "categoryCode": [
       "all_men",
       "all_men-bottoms",
-      "all_men-bottoms-widepants",
-      "all_men-bottoms-widepants-anchor02"
+      "all_men-bottoms-barrelpants-anchor01"
     ],
     "alsoIn": [
       "繭型"
@@ -10525,13 +10449,11 @@
     "categoryPath": [
       "男裝",
       "下身類",
-      "寬褲",
       "打褶"
     ],
     "categoryCode": [
       "all_men",
       "all_men-bottoms",
-      "all_men-bottoms-widepants",
       "all_men-bottoms-widepants-anchor03"
     ],
     "alsoIn": [
@@ -10775,13 +10697,11 @@
     "categoryPath": [
       "男裝",
       "下身類",
-      "寬褲",
       "休閒"
     ],
     "categoryCode": [
       "all_men",
       "all_men-bottoms",
-      "all_men-bottoms-widepants",
       "all_men-bottoms-widepants-anchor05"
     ],
     "alsoIn": [],
@@ -10871,13 +10791,11 @@
     "categoryPath": [
       "男裝",
       "下身類",
-      "寬褲",
       "工裝/降落傘褲"
     ],
     "categoryCode": [
       "all_men",
       "all_men-bottoms",
-      "all_men-bottoms-widepants",
       "all_men-bottoms-widepants-anchor04"
     ],
     "alsoIn": [
@@ -11121,14 +11039,12 @@
     "categoryPath": [
       "男裝",
       "下身類",
-      "寬褲",
       "繭型"
     ],
     "categoryCode": [
       "all_men",
       "all_men-bottoms",
-      "all_men-bottoms-widepants",
-      "all_men-bottoms-widepants-anchor08"
+      "all_men-bottoms-jeans-anchor05"
     ],
     "alsoIn": [],
     "description": "※此商品網路獨家尺寸為XS.XXL.3XL。 版型與細節 - 下身版型：寬鬆 - 褲型：繭型剪裁​ ​ 後下擺加入打摺設計，呈現更立體的輪廓。 - 使用100%純棉的挺版斜紋布料。 - 腰部有抽繩，可調整腰圍。 - 側邊輪廓略帶圓弧感，展現寬版剪裁特色。 - 此頁面所展示的圖片顏色可能會包含未販售的商品顏色。",
@@ -11369,13 +11285,11 @@
     "categoryPath": [
       "男裝",
       "下身類",
-      "牛仔褲",
       "寬版剪裁"
     ],
     "categoryCode": [
       "all_men",
       "all_men-bottoms",
-      "all_men-bottoms-jeans",
       "all_men-bottoms-jeans-anchor01"
     ],
     "alsoIn": [],
@@ -11953,13 +11867,11 @@
     "categoryPath": [
       "男裝",
       "下身類",
-      "牛仔褲",
       "直筒/標準剪裁"
     ],
     "categoryCode": [
       "all_men",
       "all_men-bottoms",
-      "all_men-bottoms-jeans",
       "all_men-bottoms-jeans-anchor04"
     ],
     "alsoIn": [],
@@ -12201,13 +12113,11 @@
     "categoryPath": [
       "男裝",
       "下身類",
-      "牛仔褲",
       "合身剪裁"
     ],
     "categoryCode": [
       "all_men",
       "all_men-bottoms",
-      "all_men-bottoms-jeans",
       "all_men-bottoms-jeans-anchor02"
     ],
     "alsoIn": [],
@@ -12561,13 +12471,11 @@
     "categoryPath": [
       "男裝",
       "下身類",
-      "牛仔褲",
       "繭型"
     ],
     "categoryCode": [
       "all_men",
       "all_men-bottoms",
-      "all_men-bottoms-jeans",
       "all_men-bottoms-jeans-anchor05"
     ],
     "alsoIn": [],
@@ -13209,13 +13117,11 @@
     "categoryPath": [
       "男裝",
       "下身類",
-      "休閒褲",
       "SWEAT休閒"
     ],
     "categoryCode": [
       "all_men",
       "all_men-bottoms",
-      "all_men-bottoms-easy-pants",
       "all_men-bottoms-easy-pants-anchor02"
     ],
     "alsoIn": [],
@@ -13489,13 +13395,11 @@
     "categoryPath": [
       "男裝",
       "下身類",
-      "休閒褲",
       "工裝褲"
     ],
     "categoryCode": [
       "all_men",
       "all_men-bottoms",
-      "all_men-bottoms-easy-pants",
       "all_men-bottoms-easy-pants-anchor11"
     ],
     "alsoIn": [],
@@ -13793,13 +13697,11 @@
     "categoryPath": [
       "男裝",
       "下身類",
-      "休閒褲",
       "束口褲"
     ],
     "categoryCode": [
       "all_men",
       "all_men-bottoms",
-      "all_men-bottoms-easy-pants",
       "all_men-bottoms-easy-pants-anchor07"
     ],
     "alsoIn": [
@@ -14075,14 +13977,12 @@
     "categoryPath": [
       "男裝",
       "下身類",
-      "休閒褲",
       "其他"
     ],
     "categoryCode": [
       "all_men",
       "all_men-bottoms",
-      "all_men-bottoms-easy-pants",
-      "all_men-bottoms-easy-pants-anchor10"
+      "all_men-bottoms-barrelpants-anchor03"
     ],
     "alsoIn": [],
     "description": "採用不易起皺並經微磨毛加工、觸感舒適的平織材質。 - 腰鬆緊設計，搭配內側抽繩，可調整腰圍鬆緊度。 - 單側附後口袋，正面採拉鍊設計。右側口袋內也附零錢袋。 - 雙打褶設計使腰部周圍保有寬鬆感，並朝下襬適度收窄，呈現寬版錐形輪廓與高雅洗鍊印象。 - 本產品使用再生材質。請參閱商品材質欄位的使用比例。 - 此頁面所展示的圖片顏色可能會包含未販售的商品顏色。",
@@ -14227,13 +14127,11 @@
     "categoryPath": [
       "男裝",
       "下身類",
-      "短褲",
       "短褲(膝上)"
     ],
     "categoryCode": [
       "all_men",
       "all_men-bottoms",
-      "all_men-bottoms-short-pants",
       "all_men-bottoms-short-pants-anchor05"
     ],
     "alsoIn": [
@@ -14638,13 +14536,11 @@
     "categoryPath": [
       "男裝",
       "下身類",
-      "短褲",
       "寬版Jorts(膝下)"
     ],
     "categoryCode": [
       "all_men",
       "all_men-bottoms",
-      "all_men-bottoms-short-pants",
       "all_men-bottoms-short-pants-anchor09"
     ],
     "alsoIn": [],
@@ -14854,13 +14750,11 @@
     "categoryPath": [
       "男裝",
       "下身類",
-      "短褲",
       "五分褲"
     ],
     "categoryCode": [
       "all_men",
       "all_men-bottoms",
-      "all_men-bottoms-short-pants",
       "all_men-bottoms-short-pants-anchor01"
     ],
     "alsoIn": [],
@@ -15070,13 +14964,11 @@
     "categoryPath": [
       "男裝",
       "下身類",
-      "短褲",
       "機能/工裝"
     ],
     "categoryCode": [
       "all_men",
       "all_men-bottoms",
-      "all_men-bottoms-short-pants",
       "all_men-bottoms-short-pants-anchor03"
     ],
     "alsoIn": [
@@ -15376,13 +15268,11 @@
     "categoryPath": [
       "男裝",
       "下身類",
-      "短褲",
       "棉褲"
     ],
     "categoryCode": [
       "all_men",
       "all_men-bottoms",
-      "all_men-bottoms-short-pants",
       "all_men-bottoms-short-pants-anchor06"
     ],
     "alsoIn": [
@@ -15571,14 +15461,12 @@
     "categoryPath": [
       "男裝",
       "下身類",
-      "短褲",
       "工裝褲"
     ],
     "categoryCode": [
       "all_men",
       "all_men-bottoms",
-      "all_men-bottoms-short-pants",
-      "all_men-bottoms-short-pants-anchor04"
+      "all_men-bottoms-easy-pants-anchor11"
     ],
     "alsoIn": [
       "短褲(膝上)",
@@ -15822,13 +15710,11 @@
     "categoryPath": [
       "男裝",
       "下身類",
-      "Miracle Air 西裝褲．正裝褲",
       "西裝褲"
     ],
     "categoryCode": [
       "all_men",
       "all_men-bottoms",
-      "all_men-bottoms-miracle-air",
       "all_men-bottoms-miracle-air-anchor01"
     ],
     "alsoIn": [],
@@ -16230,13 +16116,11 @@
     "categoryPath": [
       "男裝",
       "下身類",
-      "Miracle Air 西裝褲．正裝褲",
       "SMART長褲"
     ],
     "categoryCode": [
       "all_men",
       "all_men-bottoms",
-      "all_men-bottoms-miracle-air",
       "all_men-bottoms-miracle-air-anchor03"
     ],
     "alsoIn": [],
@@ -16542,13 +16426,11 @@
     "categoryPath": [
       "男裝",
       "下身類",
-      "Miracle Air 西裝褲．正裝褲",
       "九分褲"
     ],
     "categoryCode": [
       "all_men",
       "all_men-bottoms",
-      "all_men-bottoms-miracle-air",
       "all_men-bottoms-miracle-air-anchor02"
     ],
     "alsoIn": [],
@@ -16790,13 +16672,11 @@
     "categoryPath": [
       "男裝",
       "下身類",
-      "保暖褲．刷毛褲",
       "彈性長褲"
     ],
     "categoryCode": [
       "all_men",
       "all_men-bottoms",
-      "all_men-bottoms-warmpants",
       "all_men-bottoms-warmpants-anchor01"
     ],
     "alsoIn": [],
@@ -17038,13 +16918,11 @@
     "categoryPath": [
       "男裝",
       "下身類",
-      "保暖褲．刷毛褲",
       "毛絨/刷毛長褲"
     ],
     "categoryCode": [
       "all_men",
       "all_men-bottoms",
-      "all_men-bottoms-warmpants",
       "all_men-bottoms-warmpants-anchor02"
     ],
     "alsoIn": [],
@@ -17820,13 +17698,11 @@
     "categoryPath": [
       "男裝",
       "內衣類",
-      "內褲",
       "AIRism涼感 四角褲"
     ],
     "categoryCode": [
       "all_men",
       "all_men-inner-wear",
-      "all_men-inner-wear-trunks-and-brief",
       "all_men-inner-wear-trunks-and-brief-anchor03"
     ],
     "alsoIn": [
@@ -17894,13 +17770,11 @@
     "categoryPath": [
       "男裝",
       "內衣類",
-      "內褲",
       "AIRism涼感 平口"
     ],
     "categoryCode": [
       "all_men",
       "all_men-inner-wear",
-      "all_men-inner-wear-trunks-and-brief",
       "all_men-inner-wear-trunks-and-brief-anchor01"
     ],
     "alsoIn": [],
@@ -18158,13 +18032,11 @@
     "categoryPath": [
       "男裝",
       "內衣類",
-      "內褲",
       "AIRism涼感 超無痕平口"
     ],
     "categoryCode": [
       "all_men",
       "all_men-inner-wear",
-      "all_men-inner-wear-trunks-and-brief",
       "all_men-inner-wear-trunks-and-brief-anchor04"
     ],
     "alsoIn": [],
@@ -18374,13 +18246,11 @@
     "categoryPath": [
       "男裝",
       "內衣類",
-      "內褲",
       "四角褲"
     ],
     "categoryCode": [
       "all_men",
       "all_men-inner-wear",
-      "all_men-inner-wear-trunks-and-brief",
       "all_men-inner-wear-trunks-and-brief-anchor06"
     ],
     "alsoIn": [
@@ -18496,13 +18366,11 @@
     "categoryPath": [
       "男裝",
       "內衣類",
-      "內褲",
       "平口"
     ],
     "categoryCode": [
       "all_men",
       "all_men-inner-wear",
-      "all_men-inner-wear-trunks-and-brief",
       "all_men-inner-wear-trunks-and-brief-anchor07"
     ],
     "alsoIn": [],
@@ -18712,13 +18580,11 @@
     "categoryPath": [
       "男裝",
       "內衣類",
-      "襪子",
       "長襪"
     ],
     "categoryCode": [
       "all_men",
       "all_men-inner-wear",
-      "all_men-inner-wear-socks",
       "all_men-inner-wear-socks-anchor03"
     ],
     "alsoIn": [
@@ -19938,13 +19804,11 @@
     "categoryPath": [
       "男裝",
       "內衣類",
-      "襪子",
       "中筒襪"
     ],
     "categoryCode": [
       "all_men",
       "all_men-inner-wear",
-      "all_men-inner-wear-socks",
       "all_men-inner-wear-socks-anchor04"
     ],
     "alsoIn": [
@@ -20028,13 +19892,11 @@
     "categoryPath": [
       "男裝",
       "內衣類",
-      "襪子",
       "腳踝襪"
     ],
     "categoryCode": [
       "all_men",
       "all_men-inner-wear",
-      "all_men-inner-wear-socks",
       "all_men-inner-wear-socks-anchor05"
     ],
     "alsoIn": [
@@ -20134,13 +19996,11 @@
     "categoryPath": [
       "男裝",
       "內衣類",
-      "襪子",
       "船型襪"
     ],
     "categoryCode": [
       "all_men",
       "all_men-inner-wear",
-      "all_men-inner-wear-socks",
       "all_men-inner-wear-socks-anchor06"
     ],
     "alsoIn": [
@@ -20256,13 +20116,11 @@
     "categoryPath": [
       "男裝",
       "內衣類",
-      "襪子",
       "簡約"
     ],
     "categoryCode": [
       "all_men",
       "all_men-inner-wear",
-      "all_men-inner-wear-socks",
       "all_men-inner-wear-socks-anchor09"
     ],
     "alsoIn": [
@@ -20330,13 +20188,11 @@
     "categoryPath": [
       "男裝",
       "內衣類",
-      "襪子",
       "休閒"
     ],
     "categoryCode": [
       "all_men",
       "all_men-inner-wear",
-      "all_men-inner-wear-socks",
       "all_men-inner-wear-socks-anchor10"
     ],
     "alsoIn": [
@@ -21557,13 +21413,11 @@
     "categoryPath": [
       "男裝",
       "內衣類",
-      "襪子",
       "運動"
     ],
     "categoryCode": [
       "all_men",
       "all_men-inner-wear",
-      "all_men-inner-wear-socks",
       "all_men-inner-wear-socks-anchor99"
     ],
     "alsoIn": [
@@ -22043,13 +21897,11 @@
     "categoryPath": [
       "男裝",
       "家居系列",
-      "家居褲",
       "短褲"
     ],
     "categoryCode": [
       "all_men",
       "all_men-room",
-      "all_men-room-lounge-pants",
       "all_men-room-lounge-pants-anchor01"
     ],
     "alsoIn": [],
@@ -22291,13 +22143,11 @@
     "categoryPath": [
       "男裝",
       "家居系列",
-      "家居褲",
       "九分褲"
     ],
     "categoryCode": [
       "all_men",
       "all_men-room",
-      "all_men-room-lounge-pants",
       "all_men-room-lounge-pants-anchor03"
     ],
     "alsoIn": [],
@@ -22539,13 +22389,11 @@
     "categoryPath": [
       "男裝",
       "家居系列",
-      "家居褲",
       "長褲"
     ],
     "categoryCode": [
       "all_men",
       "all_men-room",
-      "all_men-room-lounge-pants",
       "all_men-room-lounge-pants-anchor02"
     ],
     "alsoIn": [],
@@ -22899,13 +22747,11 @@
     "categoryPath": [
       "男裝",
       "配件(男女適用)",
-      "太陽眼鏡",
       "窄鏡框型"
     ],
     "categoryCode": [
       "all_men",
       "all_men-accessories",
-      "all_men-accessories-sunglasses",
       "all_men-accessories-sunglasses-anchor03"
     ],
     "alsoIn": [],
@@ -22931,13 +22777,11 @@
     "categoryPath": [
       "男裝",
       "配件(男女適用)",
-      "太陽眼鏡",
       "標準框型"
     ],
     "categoryCode": [
       "all_men",
       "all_men-accessories",
-      "all_men-accessories-sunglasses",
       "all_men-accessories-sunglasses-anchor01"
     ],
     "alsoIn": [],
@@ -22963,13 +22807,11 @@
     "categoryPath": [
       "男裝",
       "配件(男女適用)",
-      "太陽眼鏡",
       "寬框型"
     ],
     "categoryCode": [
       "all_men",
       "all_men-accessories",
-      "all_men-accessories-sunglasses",
       "all_men-accessories-sunglasses-anchor02"
     ],
     "alsoIn": [],
@@ -22995,13 +22837,11 @@
     "categoryPath": [
       "男裝",
       "配件(男女適用)",
-      "太陽眼鏡",
       "運動型"
     ],
     "categoryCode": [
       "all_men",
       "all_men-accessories",
-      "all_men-accessories-sunglasses",
       "all_men-accessories-sunglasses-anchor04"
     ],
     "alsoIn": [],
@@ -23245,13 +23085,11 @@
     "categoryPath": [
       "男裝",
       "外套類",
-      "連帽/布勞森外套",
       "連帽外套"
     ],
     "categoryCode": [
       "all_men",
       "all_men-outer",
-      "all_men-outer-casual",
       "all_men-outer-casual-anchor02"
     ],
     "alsoIn": [
@@ -23591,13 +23429,11 @@
     "categoryPath": [
       "男裝",
       "外套類",
-      "連帽/布勞森外套",
       "夾克/布勞森外套"
     ],
     "categoryCode": [
       "all_men",
       "all_men-outer",
-      "all_men-outer-casual",
       "all_men-outer-casual-anchor01"
     ],
     "alsoIn": [],
@@ -23783,13 +23619,11 @@
     "categoryPath": [
       "男裝",
       "外套類",
-      "連帽/布勞森外套",
       "工裝外套"
     ],
     "categoryCode": [
       "all_men",
       "all_men-outer",
-      "all_men-outer-casual",
       "all_men-outer-casual-anchor07"
     ],
     "alsoIn": [
@@ -23937,13 +23771,11 @@
     "categoryPath": [
       "男裝",
       "外套類",
-      "連帽/布勞森外套",
       "刷毛外套"
     ],
     "categoryCode": [
       "all_men",
       "all_men-outer",
-      "all_men-outer-casual",
       "all_men-outer-casual-anchor09"
     ],
     "alsoIn": [],
@@ -24537,13 +24369,11 @@
     "categoryPath": [
       "男裝",
       "外套類",
-      "連帽/布勞森外套",
       "羽絨/PUFFTECH輕暖科技"
     ],
     "categoryCode": [
       "all_men",
       "all_men-outer",
-      "all_men-outer-casual",
       "all_men-outer-casual-anchor03"
     ],
     "alsoIn": [],
@@ -24881,13 +24711,11 @@
     "categoryPath": [
       "男裝",
       "外套類",
-      "大衣",
       "其他大衣"
     ],
     "categoryCode": [
       "all_men",
       "all_men-outer",
-      "all_men-outer-coats",
       "all_men-outer-coats-anchor04"
     ],
     "alsoIn": [],
@@ -24969,13 +24797,11 @@
     "categoryPath": [
       "男裝",
       "外套類",
-      "Miracle Air 西裝外套",
       "Miracle Air 超輕量西裝外套"
     ],
     "categoryCode": [
       "all_men",
       "all_men-outer",
-      "all_men-outer-jackets",
       "all_men-outer-jackets-anchor01"
     ],
     "alsoIn": [],
@@ -25105,13 +24931,11 @@
     "categoryPath": [
       "男裝",
       "T恤/背心/休閒",
-      "T恤/背心",
       "長袖"
     ],
     "categoryCode": [
       "all_men",
       "all_men-tops",
-      "all_men-tops-t-shirts",
       "all_men-tops-t-shirts-anchor01"
     ],
     "alsoIn": [],
@@ -25201,13 +25025,11 @@
     "categoryPath": [
       "男裝",
       "T恤/背心/休閒",
-      "T恤/背心",
       "短袖"
     ],
     "categoryCode": [
       "all_men",
       "all_men-tops",
-      "all_men-tops-t-shirts",
       "all_men-tops-t-shirts-anchor02"
     ],
     "alsoIn": [
@@ -25611,13 +25433,11 @@
     "categoryPath": [
       "男裝",
       "T恤/背心/休閒",
-      "T恤/背心",
       "背心"
     ],
     "categoryCode": [
       "all_men",
       "all_men-tops",
-      "all_men-tops-t-shirts",
       "all_men-tops-t-shirts-anchor03"
     ],
     "alsoIn": [
@@ -26021,13 +25841,11 @@
     "categoryPath": [
       "男裝",
       "T恤/背心/休閒",
-      "SWEAT 休閒帽T．大學T",
       "休閒上衣"
     ],
     "categoryCode": [
       "all_men",
       "all_men-tops",
-      "all_men-tops-sweat-collection",
       "all_men-tops-sweat-collection-anchor01"
     ],
     "alsoIn": [],
@@ -26557,13 +26375,11 @@
     "categoryPath": [
       "男裝",
       "T恤/背心/休閒",
-      "SWEAT 休閒帽T．大學T",
       "連帽款式"
     ],
     "categoryCode": [
       "all_men",
       "all_men-tops",
-      "all_men-tops-sweat-collection",
       "all_men-tops-sweat-collection-anchor02"
     ],
     "alsoIn": [],
@@ -27029,13 +26845,11 @@
     "categoryPath": [
       "男裝",
       "T恤/背心/休閒",
-      "SWEAT 休閒帽T．大學T",
       "印花上衣"
     ],
     "categoryCode": [
       "all_men",
       "all_men-tops",
-      "all_men-tops-sweat-collection",
       "all_men-tops-sweat-collection-anchor05"
     ],
     "alsoIn": [],
@@ -27117,13 +26931,11 @@
     "categoryPath": [
       "男裝",
       "T恤/背心/休閒",
-      "SWEAT 休閒帽T．大學T",
       "運動／休閒棉褲"
     ],
     "categoryCode": [
       "all_men",
       "all_men-tops",
-      "all_men-tops-sweat-collection",
       "all_men-tops-sweat-collection-anchor03"
     ],
     "alsoIn": [],
@@ -27301,13 +27113,11 @@
     "categoryPath": [
       "女裝",
       "外套類",
-      "連帽/布勞森外套",
       "連帽外套"
     ],
     "categoryCode": [
       "all_women",
       "all_women-outer",
-      "all_women-outer-casual",
       "all_women-outer-casual-anchor03"
     ],
     "alsoIn": [
@@ -27663,13 +27473,11 @@
     "categoryPath": [
       "女裝",
       "外套類",
-      "連帽/布勞森外套",
       "夾克/布勞森外套"
     ],
     "categoryCode": [
       "all_women",
       "all_women-outer",
-      "all_women-outer-casual",
       "all_women-outer-casual-anchor04"
     ],
     "alsoIn": [
@@ -27801,13 +27609,11 @@
     "categoryPath": [
       "女裝",
       "外套類",
-      "連帽/布勞森外套",
       "工裝/襯衫式外套"
     ],
     "categoryCode": [
       "all_women",
       "all_women-outer",
-      "all_women-outer-casual",
       "all_women-outer-casual-anchor08"
     ],
     "alsoIn": [
@@ -27995,13 +27801,11 @@
     "categoryPath": [
       "女裝",
       "外套類",
-      "連帽/布勞森外套",
       "刷毛外套"
     ],
     "categoryCode": [
       "all_women",
       "all_women-outer",
-      "all_women-outer-casual",
       "all_women-outer-casual-anchor07"
     ],
     "alsoIn": [
@@ -28189,13 +27993,11 @@
     "categoryPath": [
       "女裝",
       "外套類",
-      "連帽/布勞森外套",
       "羽絨/PUFFTECH輕暖科技"
     ],
     "categoryCode": [
       "all_women",
       "all_women-outer",
-      "all_women-outer-casual",
       "all_women-outer-casual-anchor01"
     ],
     "alsoIn": [],
@@ -28549,13 +28351,11 @@
     "categoryPath": [
       "女裝",
       "外套類",
-      "連帽/布勞森外套",
       "機能外套(防風．防潑水外套)"
     ],
     "categoryCode": [
       "all_women",
       "all_women-outer",
-      "all_women-outer-casual",
       "all_women-outer-casual-anchor06"
     ],
     "alsoIn": [
@@ -28799,13 +28599,11 @@
     "categoryPath": [
       "女裝",
       "外套類",
-      "連帽/布勞森外套",
       "針織外套"
     ],
     "categoryCode": [
       "all_women",
       "all_women-outer",
-      "all_women-outer-casual",
       "all_women-outer-casual-anchor02"
     ],
     "alsoIn": [],
@@ -29327,13 +29125,11 @@
     "categoryPath": [
       "女裝",
       "外套類",
-      "連帽/布勞森外套",
       "背心"
     ],
     "categoryCode": [
       "all_women",
       "all_women-outer",
-      "all_women-outer-casual",
       "all_women-outer-casual-anchor09"
     ],
     "alsoIn": [],
@@ -29519,13 +29315,11 @@
     "categoryPath": [
       "女裝",
       "外套類",
-      "大衣/風衣",
       "風衣/長大衣"
     ],
     "categoryCode": [
       "all_women",
       "all_women-outer",
-      "all_women-outer-coats",
       "all_women-outer-coats-anchor06"
     ],
     "alsoIn": [],
@@ -29607,13 +29401,11 @@
     "categoryPath": [
       "女裝",
       "外套類",
-      "大衣/風衣",
       "短大衣"
     ],
     "categoryCode": [
       "all_women",
       "all_women-outer",
-      "all_women-outer-coats",
       "all_women-outer-coats-anchor03"
     ],
     "alsoIn": [
@@ -29801,13 +29593,11 @@
     "categoryPath": [
       "女裝",
       "外套類",
-      "大衣/風衣",
       "雙面織紋大衣"
     ],
     "categoryCode": [
       "all_women",
       "all_women-outer",
-      "all_women-outer-coats",
       "all_women-outer-coats-anchor01"
     ],
     "alsoIn": [
@@ -29859,13 +29649,11 @@
     "categoryPath": [
       "女裝",
       "外套類",
-      "大衣/風衣",
       "牛角釦大衣"
     ],
     "categoryCode": [
       "all_women",
       "all_women-outer",
-      "all_women-outer-coats",
       "all_women-outer-coats-anchor04"
     ],
     "alsoIn": [],
@@ -29931,13 +29719,11 @@
     "categoryPath": [
       "女裝",
       "外套類",
-      "大衣/風衣",
       "Hybrid/羽絨大衣"
     ],
     "categoryCode": [
       "all_women",
       "all_women-outer",
-      "all_women-outer-coats",
       "all_women-outer-coats-anchor05"
     ],
     "alsoIn": [
@@ -30125,13 +29911,11 @@
     "categoryPath": [
       "女裝",
       "外套類",
-      "Miracle Air 西裝/微正裝外套",
       "Miracle Air 超輕量西裝外套"
     ],
     "categoryCode": [
       "all_women",
       "all_women-outer",
-      "all_women-outer-jackets",
       "all_women-outer-jackets-anchor01"
     ],
     "alsoIn": [],
@@ -30317,13 +30101,11 @@
     "categoryPath": [
       "女裝",
       "外套類",
-      "Miracle Air 西裝/微正裝外套",
       "其他/西裝外套"
     ],
     "categoryCode": [
       "all_women",
       "all_women-outer",
-      "all_women-outer-jackets",
       "all_women-outer-jackets-anchor02"
     ],
     "alsoIn": [],
@@ -30453,13 +30235,11 @@
     "categoryPath": [
       "女裝",
       "外套類",
-      "厚羽絨",
       "無縫羽絨"
     ],
     "categoryCode": [
       "all_women",
       "all_women-outer",
-      "all_women-outer-down",
       "all_women-outer-down-anchor01"
     ],
     "alsoIn": [
@@ -30647,13 +30427,11 @@
     "categoryPath": [
       "女裝",
       "外套類",
-      "厚羽絨",
       "Hybrid羽絨"
     ],
     "categoryCode": [
       "all_women",
       "all_women-outer",
-      "all_women-outer-down",
       "all_women-outer-down-anchor02"
     ],
     "alsoIn": [
@@ -30897,14 +30675,12 @@
     "categoryPath": [
       "女裝",
       "外套類",
-      "厚羽絨",
       "連帽外套"
     ],
     "categoryCode": [
       "all_women",
       "all_women-outer",
-      "all_women-outer-down",
-      "all_women-outer-down-anchor08"
+      "all_women-outer-casual-anchor03"
     ],
     "alsoIn": [
       "無縫羽絨"
@@ -30979,13 +30755,11 @@
     "categoryPath": [
       "女裝",
       "外套類",
-      "厚羽絨",
       "羽絨短版外套"
     ],
     "categoryCode": [
       "all_women",
       "all_women-outer",
-      "all_women-outer-down",
       "all_women-outer-down-anchor03"
     ],
     "alsoIn": [],
@@ -31227,13 +31001,11 @@
     "categoryPath": [
       "女裝",
       "T恤/背心/休閒",
-      "T恤/背心",
       "長袖"
     ],
     "categoryCode": [
       "all_women",
       "all_women-tops",
-      "all_women-tops-t-shirts",
       "all_women-tops-t-shirts-anchor01"
     ],
     "alsoIn": [],
@@ -31587,13 +31359,11 @@
     "categoryPath": [
       "女裝",
       "T恤/背心/休閒",
-      "T恤/背心",
       "短袖"
     ],
     "categoryCode": [
       "all_women",
       "all_women-tops",
-      "all_women-tops-t-shirts",
       "all_women-tops-t-shirts-anchor02"
     ],
     "alsoIn": [
@@ -31949,13 +31719,11 @@
     "categoryPath": [
       "女裝",
       "T恤/背心/休閒",
-      "T恤/背心",
       "無袖上衣/背心"
     ],
     "categoryCode": [
       "all_women",
       "all_women-tops",
-      "all_women-tops-t-shirts",
       "all_women-tops-t-shirts-anchor10"
     ],
     "alsoIn": [],
@@ -32141,13 +31909,11 @@
     "categoryPath": [
       "女裝",
       "T恤/背心/休閒",
-      "T恤/背心",
       "開襟外套"
     ],
     "categoryCode": [
       "all_women",
       "all_women-tops",
-      "all_women-tops-t-shirts",
       "all_women-tops-t-shirts-anchor12"
     ],
     "alsoIn": [
@@ -32335,13 +32101,11 @@
     "categoryPath": [
       "女裝",
       "T恤/背心/休閒",
-      "SWEAT 休閒帽T．大學T",
       "休閒上衣"
     ],
     "categoryCode": [
       "all_women",
       "all_women-tops",
-      "all_women-tops-sweat",
       "all_women-tops-sweat-collection-anchor01"
     ],
     "alsoIn": [],
@@ -32639,13 +32403,11 @@
     "categoryPath": [
       "女裝",
       "T恤/背心/休閒",
-      "SWEAT 休閒帽T．大學T",
       "印花上衣"
     ],
     "categoryCode": [
       "all_women",
       "all_women-tops",
-      "all_women-tops-sweat",
       "all_women-tops-sweat-collection-anchor05"
     ],
     "alsoIn": [],
@@ -32719,14 +32481,12 @@
     "categoryPath": [
       "女裝",
       "T恤/背心/休閒",
-      "SWEAT 休閒帽T．大學T",
       "褲裝"
     ],
     "categoryCode": [
       "all_women",
       "all_women-tops",
-      "all_women-tops-sweat",
-      "all_women-tops-sweat-collection-anchor02"
+      "all_women-tops-fleece-anchor04"
     ],
     "alsoIn": [],
     "description": "※此商品網路獨家尺寸為XS.XXL.3XL。 版型與細節 - 透膚感：無 - 下身版型：略為寬鬆 - 褲型：直筒剪裁 - 口袋：有 腰部鬆緊帶設計，穿著舒適且方便穿脫。可利用內側抽繩調整尺寸。 - 附側口袋。無論外出或居家都方便使用。 - 採用柔軟親膚材質，穿著舒適自在。 - 腰部抓皺設計與適度寬鬆版型，為穿搭增添造型亮點。 - 本產品使用再生材質。請參閱商品材質欄位的使用比例。 - 此頁面所展示的圖片顏色可能會包含未販售的商品顏色。",
@@ -33023,14 +32783,12 @@
     "categoryPath": [
       "女裝",
       "T恤/背心/休閒",
-      "SWEAT 休閒帽T．大學T",
       "外套"
     ],
     "categoryCode": [
       "all_women",
       "all_women-tops",
-      "all_women-tops-sweat",
-      "all_women-tops-sweat-collection-anchor03"
+      "all_women-tops-fleece-anchor02"
     ],
     "alsoIn": [
       "男裝/男女適穿"
@@ -33497,13 +33255,11 @@
     "categoryPath": [
       "女裝",
       "T恤/背心/休閒",
-      "刷毛",
       "外套"
     ],
     "categoryCode": [
       "all_women",
       "all_women-tops",
-      "all_women-tops-fleece",
       "all_women-tops-fleece-anchor02"
     ],
     "alsoIn": [],
@@ -33713,13 +33469,11 @@
     "categoryPath": [
       "女裝",
       "T恤/背心/休閒",
-      "刷毛",
       "上衣"
     ],
     "categoryCode": [
       "all_women",
       "all_women-tops",
-      "all_women-tops-fleece",
       "all_women-tops-fleece-anchor01"
     ],
     "alsoIn": [],
@@ -34241,13 +33995,11 @@
     "categoryPath": [
       "女裝",
       "T恤/背心/休閒",
-      "刷毛",
       "褲裝"
     ],
     "categoryCode": [
       "all_women",
       "all_women-tops",
-      "all_women-tops-fleece",
       "all_women-tops-fleece-anchor04"
     ],
     "alsoIn": [],
@@ -34489,13 +34241,11 @@
     "categoryPath": [
       "女裝",
       "休閒襯衫．設計上衣．POLO衫",
-      "休閒襯衫．設計上衣",
       "無袖"
     ],
     "categoryCode": [
       "all_women",
       "all_women-shirts",
-      "all_women-shirts-shirts-and-blouses",
       "all_women-shirts-shirts-and-blouses-anchor07"
     ],
     "alsoIn": [
@@ -34851,14 +34601,12 @@
     "categoryPath": [
       "女裝",
       "休閒襯衫．設計上衣．POLO衫",
-      "休閒襯衫．設計上衣",
       "短袖"
     ],
     "categoryCode": [
       "all_women",
       "all_women-shirts",
-      "all_women-shirts-shirts-and-blouses",
-      "all_women-shirts-shirts-and-blouses-anchor06"
+      "all_women-shirts-polo-shirts-anchor01"
     ],
     "alsoIn": [
       "牛津"
@@ -35045,13 +34793,11 @@
     "categoryPath": [
       "女裝",
       "休閒襯衫．設計上衣．POLO衫",
-      "休閒襯衫．設計上衣",
       "七分袖"
     ],
     "categoryCode": [
       "all_women",
       "all_women-shirts",
-      "all_women-shirts-shirts-and-blouses",
       "all_women-shirts-shirts-and-blouses-anchor05"
     ],
     "alsoIn": [
@@ -35239,14 +34985,12 @@
     "categoryPath": [
       "女裝",
       "休閒襯衫．設計上衣．POLO衫",
-      "休閒襯衫．設計上衣",
       "長袖"
     ],
     "categoryCode": [
       "all_women",
       "all_women-shirts",
-      "all_women-shirts-shirts-and-blouses",
-      "all_women-shirts-shirts-and-blouses-anchor04"
+      "all_women-shirts-polo-shirts-anchor02"
     ],
     "alsoIn": [
       "棉質"
@@ -35433,13 +35177,11 @@
     "categoryPath": [
       "女裝",
       "休閒襯衫．設計上衣．POLO衫",
-      "POLO衫",
       "短袖"
     ],
     "categoryCode": [
       "all_women",
       "all_women-shirts",
-      "all_women-shirts-polo-shirts",
       "all_women-shirts-polo-shirts-anchor01"
     ],
     "alsoIn": [
@@ -35795,13 +35537,11 @@
     "categoryPath": [
       "女裝",
       "休閒襯衫．設計上衣．POLO衫",
-      "POLO衫",
       "長袖"
     ],
     "categoryCode": [
       "all_women",
       "all_women-shirts",
-      "all_women-shirts-polo-shirts",
       "all_women-shirts-polo-shirts-anchor02"
     ],
     "alsoIn": [
@@ -36101,13 +35841,11 @@
     "categoryPath": [
       "女裝",
       "休閒襯衫．設計上衣．POLO衫",
-      "POLO衫",
       "針織"
     ],
     "categoryCode": [
       "all_women",
       "all_women-shirts",
-      "all_women-shirts-polo-shirts",
       "all_women-shirts-polo-shirts-anchor04"
     ],
     "alsoIn": [
@@ -36351,13 +36089,11 @@
     "categoryPath": [
       "女裝",
       "休閒襯衫．設計上衣．POLO衫",
-      "POLO衫",
       "設計款"
     ],
     "categoryCode": [
       "all_women",
       "all_women-shirts",
-      "all_women-shirts-polo-shirts",
       "all_women-shirts-polo-shirts-anchor03"
     ],
     "alsoIn": [
@@ -36473,13 +36209,11 @@
     "categoryPath": [
       "女裝",
       "針織衫/開襟外套",
-      "針織衫/開襟外套",
       "開襟外套"
     ],
     "categoryCode": [
       "all_women",
       "all_women-knit",
-      "all_women-knit-lineup",
       "all_women-knit-lineup-anchor01"
     ],
     "alsoIn": [
@@ -36643,13 +36377,11 @@
     "categoryPath": [
       "女裝",
       "針織衫/開襟外套",
-      "針織衫/開襟外套",
       "長袖"
     ],
     "categoryCode": [
       "all_women",
       "all_women-knit",
-      "all_women-knit-lineup",
       "all_women-knit-lineup-anchor02"
     ],
     "alsoIn": [
@@ -37789,13 +37521,11 @@
     "categoryPath": [
       "女裝",
       "針織衫/開襟外套",
-      "針織衫/開襟外套",
       "POLO衫"
     ],
     "categoryCode": [
       "all_women",
       "all_women-knit",
-      "all_women-knit-lineup",
       "all_women-knit-lineup-anchor12"
     ],
     "alsoIn": [
@@ -37929,13 +37659,11 @@
     "categoryPath": [
       "女裝",
       "針織衫/開襟外套",
-      "針織衫/開襟外套",
       "短袖/無袖"
     ],
     "categoryCode": [
       "all_women",
       "all_women-knit",
-      "all_women-knit-lineup",
       "all_women-knit-lineup-anchor11"
     ],
     "alsoIn": [
@@ -38291,13 +38019,11 @@
     "categoryPath": [
       "女裝",
       "針織衫/開襟外套",
-      "針織衫/開襟外套",
       "褲裝/裙裝"
     ],
     "categoryCode": [
       "all_women",
       "all_women-knit",
-      "all_women-knit-lineup",
       "all_women-knit-lineup-anchor09"
     ],
     "alsoIn": [
@@ -38461,13 +38187,11 @@
     "categoryPath": [
       "女裝",
       "下身類",
-      "繭型褲",
       "牛仔"
     ],
     "categoryCode": [
       "all_women",
       "all_women-bottoms",
-      "all_women-bottoms-barrelpants",
       "all_women-bottoms-barrelpants-anchor02"
     ],
     "alsoIn": [
@@ -38823,14 +38547,12 @@
     "categoryPath": [
       "女裝",
       "下身類",
-      "繭型褲",
       "其他"
     ],
     "categoryCode": [
       "all_women",
       "all_women-bottoms",
-      "all_women-bottoms-barrelpants",
-      "all_women-bottoms-barrelpants-anchor04"
+      "all_women-bottoms-ankle-pants-anchor03"
     ],
     "alsoIn": [],
     "description": "※此商品網路獨家尺寸為55cm.76cm.79cm.。 採用滑順的聚酯纖維材質，呈現俐落休閒感。保養簡便，適合日常使用。 - 兩道立體剪裁設計搭配背面貼式口袋，呈現休閒印象。 - 外側線條帶有圓弧感，並朝褲腳逐漸收窄的繭型輪廓。 - 此頁面所展示的圖片顏色可能會包含未販售的商品顏色。",
@@ -38991,14 +38713,12 @@
     "categoryPath": [
       "女裝",
       "下身類",
-      "寬褲",
       "牛仔"
     ],
     "categoryCode": [
       "all_women",
       "all_women-bottoms",
-      "all_women-bottoms-widepants",
-      "all_women-bottoms-widepants-anchor02"
+      "all_women-bottoms-barrelpants-anchor02"
     ],
     "alsoIn": [
       "繭型"
@@ -39353,13 +39073,11 @@
     "categoryPath": [
       "女裝",
       "下身類",
-      "寬褲",
       "休閒"
     ],
     "categoryCode": [
       "all_women",
       "all_women-bottoms",
-      "all_women-bottoms-widepants",
       "all_women-bottoms-widepants-anchor05"
     ],
     "alsoIn": [],
@@ -39545,13 +39263,11 @@
     "categoryPath": [
       "女裝",
       "下身類",
-      "寬褲",
       "繭型"
     ],
     "categoryCode": [
       "all_women",
       "all_women-bottoms",
-      "all_women-bottoms-widepants",
       "all_women-bottoms-widepants-anchor07"
     ],
     "alsoIn": [],
@@ -39905,13 +39621,11 @@
     "categoryPath": [
       "女裝",
       "下身類",
-      "寬褲",
       "微正裝"
     ],
     "categoryCode": [
       "all_women",
       "all_women-bottoms",
-      "all_women-bottoms-widepants",
       "all_women-bottoms-widepants-anchor03"
     ],
     "alsoIn": [],
@@ -40041,14 +39755,12 @@
     "categoryPath": [
       "女裝",
       "下身類",
-      "寬褲",
       "其他"
     ],
     "categoryCode": [
       "all_women",
       "all_women-bottoms",
-      "all_women-bottoms-widepants",
-      "all_women-bottoms-widepants-anchor01"
+      "all_women-bottoms-ankle-pants-anchor03"
     ],
     "alsoIn": [],
     "description": "※此商品網路獨家尺寸為XS.XXL.3XL。 版型與細節 - 透膚感：無 - 下身版型：寬鬆 - 褲型：繭型剪裁 採用100%純棉材質，輕盈且親膚舒適。 - 腰鬆緊設計，穿著舒適，可利用內側抽繩輕鬆調整腰圍。 - 兩側附口袋設計。 - 加入份量感打褶設計，朝褲管呈現弧形線條。 - *因材質特性較易產生皺摺，如有需要可熨燙改善。 - 此頁面所展示的圖片顏色可能會包含未販售的商品顏色。",
@@ -40345,13 +40057,11 @@
     "categoryPath": [
       "女裝",
       "下身類",
-      "牛仔褲",
       "寬鬆剪裁"
     ],
     "categoryCode": [
       "all_women",
       "all_women-bottoms",
-      "all_women-bottoms-jeans",
       "all_women-bottoms-jeans-anchor01"
     ],
     "alsoIn": [],
@@ -40593,13 +40303,11 @@
     "categoryPath": [
       "女裝",
       "下身類",
-      "牛仔褲",
       "直筒/標準剪裁"
     ],
     "categoryCode": [
       "all_women",
       "all_women-bottoms",
-      "all_women-bottoms-jeans",
       "all_women-bottoms-jeans-anchor04"
     ],
     "alsoIn": [],
@@ -40825,13 +40533,11 @@
     "categoryPath": [
       "女裝",
       "下身類",
-      "牛仔褲",
       "合身剪裁"
     ],
     "categoryCode": [
       "all_women",
       "all_women-bottoms",
-      "all_women-bottoms-jeans",
       "all_women-bottoms-jeans-anchor06"
     ],
     "alsoIn": [],
@@ -41161,13 +40867,11 @@
     "categoryPath": [
       "女裝",
       "下身類",
-      "牛仔褲",
       "繭型褲"
     ],
     "categoryCode": [
       "all_women",
       "all_women-bottoms",
-      "all_women-bottoms-jeans",
       "all_women-bottoms-jeans-anchor05"
     ],
     "alsoIn": [],
@@ -41289,13 +40993,11 @@
     "categoryPath": [
       "女裝",
       "下身類",
-      "牛仔褲",
       "喇叭褲"
     ],
     "categoryCode": [
       "all_women",
       "all_women-bottoms",
-      "all_women-bottoms-jeans",
       "all_women-bottoms-jeans-anchor07"
     ],
     "alsoIn": [
@@ -41627,13 +41329,11 @@
     "categoryPath": [
       "女裝",
       "下身類",
-      "休閒褲",
       "SWEAT休閒"
     ],
     "categoryCode": [
       "all_women",
       "all_women-bottoms",
-      "all_women-bottoms-easy-pants",
       "all_women-bottoms-easy-pants-anchor03"
     ],
     "alsoIn": [],
@@ -41931,13 +41631,11 @@
     "categoryPath": [
       "女裝",
       "下身類",
-      "休閒褲",
       "束口褲"
     ],
     "categoryCode": [
       "all_women",
       "all_women-bottoms",
-      "all_women-bottoms-easy-pants",
       "all_women-bottoms-easy-pants-anchor08"
     ],
     "alsoIn": [
@@ -42181,13 +41879,11 @@
     "categoryPath": [
       "女裝",
       "下身類",
-      "休閒褲",
       "褲裙"
     ],
     "categoryCode": [
       "all_women",
       "all_women-bottoms",
-      "all_women-bottoms-easy-pants",
       "all_women-bottoms-easy-pants-anchor09"
     ],
     "alsoIn": [],
@@ -42541,14 +42237,12 @@
     "categoryPath": [
       "女裝",
       "下身類",
-      "休閒褲",
       "其他"
     ],
     "categoryCode": [
       "all_women",
       "all_women-bottoms",
-      "all_women-bottoms-easy-pants",
-      "all_women-bottoms-easy-pants-anchor99"
+      "all_women-bottoms-ankle-pants-anchor03"
     ],
     "alsoIn": [],
     "description": "※此商品網路獨家尺寸為XS.XXL.3XL。 版型與細節 - 透膚感：無 - 下身版型：略為寬鬆 - 褲型：直筒剪裁 - 褲襠高度：一般 腰鬆緊設計，穿著輕鬆舒適。 - 腰部內側附抽繩，可自由調整鬆緊。 - 採用具備上下左右延展性的2WAY彈性材質。 - 洗後保養簡便*。*洗後請整理好形狀再晾乾。 - 寬版直筒剪裁，穿著舒適自在。 - 本產品使用再生材質。請參閱商品材質欄位的使用比例。 - 此頁面所展示的圖片顏色可能會包含未販售的商品顏色。",
@@ -42677,13 +42371,11 @@
     "categoryPath": [
       "女裝",
       "下身類",
-      "微正裝褲",
       "SMART 長褲"
     ],
     "categoryCode": [
       "all_women",
       "all_women-bottoms",
-      "all_women-bottoms-ankle-pants",
       "all_women-bottoms-ankle-pants-anchor04"
     ],
     "alsoIn": [],
@@ -42925,13 +42617,11 @@
     "categoryPath": [
       "女裝",
       "下身類",
-      "微正裝褲",
       "九分褲"
     ],
     "categoryCode": [
       "all_women",
       "all_women-bottoms",
-      "all_women-bottoms-ankle-pants",
       "all_women-bottoms-ankle-pants-anchor01"
     ],
     "alsoIn": [],
@@ -43077,13 +42767,11 @@
     "categoryPath": [
       "女裝",
       "下身類",
-      "微正裝褲",
       "其他"
     ],
     "categoryCode": [
       "all_women",
       "all_women-bottoms",
-      "all_women-bottoms-ankle-pants",
       "all_women-bottoms-ankle-pants-anchor03"
     ],
     "alsoIn": [],
@@ -43325,13 +43013,11 @@
     "categoryPath": [
       "女裝",
       "下身類",
-      "短褲/褲裙",
       "Culottes 膝下寬褲"
     ],
     "categoryCode": [
       "all_women",
       "all_women-bottoms",
-      "all_women-bottoms-short-pants",
       "all_women-bottoms-short-pants-anchor07"
     ],
     "alsoIn": [],
@@ -43765,13 +43451,11 @@
     "categoryPath": [
       "女裝",
       "下身類",
-      "短褲/褲裙",
       "短褲"
     ],
     "categoryCode": [
       "all_women",
       "all_women-bottoms",
-      "all_women-bottoms-short-pants",
       "all_women-bottoms-short-pants-anchor02"
     ],
     "alsoIn": [],
@@ -44013,14 +43697,12 @@
     "categoryPath": [
       "女裝",
       "下身類",
-      "短褲/褲裙",
       "褲裙"
     ],
     "categoryCode": [
       "all_women",
       "all_women-bottoms",
-      "all_women-bottoms-short-pants",
-      "all_women-bottoms-short-pants-anchor05"
+      "all_women-bottoms-easy-pants-anchor09"
     ],
     "alsoIn": [
       "百慕達/打褶"
@@ -44263,13 +43945,11 @@
     "categoryPath": [
       "女裝",
       "下身類",
-      "短褲/褲裙",
       "運動褲"
     ],
     "categoryCode": [
       "all_women",
       "all_women-bottoms",
-      "all_women-bottoms-short-pants",
       "all_women-bottoms-short-pants-anchor03"
     ],
     "alsoIn": [
@@ -44417,13 +44097,11 @@
     "categoryPath": [
       "女裝",
       "下身類",
-      "保暖褲．刷毛褲",
       "彈性長褲"
     ],
     "categoryCode": [
       "all_women",
       "all_women-bottoms",
-      "all_women-bottoms-warmpants",
       "all_women-bottoms-warmpants-anchor01"
     ],
     "alsoIn": [],
@@ -44665,13 +44343,11 @@
     "categoryPath": [
       "女裝",
       "下身類",
-      "保暖褲．刷毛褲",
       "毛絨長褲"
     ],
     "categoryCode": [
       "all_women",
       "all_women-bottoms",
-      "all_women-bottoms-warmpants",
       "all_women-bottoms-warmpants-anchor02"
     ],
     "alsoIn": [],
@@ -45119,13 +44795,11 @@
     "categoryPath": [
       "女裝",
       "洋裝/裙子",
-      "裙子",
       "裙子"
     ],
     "categoryCode": [
       "all_women",
       "all_women-dresses-and-skirts",
-      "all_women-dresses-and-skirts-skirts",
       "all_women-dresses-and-skirts-skirts-anchor01"
     ],
     "alsoIn": [],
@@ -45335,13 +45009,11 @@
     "categoryPath": [
       "女裝",
       "洋裝/裙子",
-      "裙子",
       "褲裙/寬褲裙"
     ],
     "categoryCode": [
       "all_women",
       "all_women-dresses-and-skirts",
-      "all_women-dresses-and-skirts-skirts",
       "all_women-dresses-and-skirts-skirts-anchor02"
     ],
     "alsoIn": [],
@@ -45583,13 +45255,11 @@
     "categoryPath": [
       "女裝",
       "洋裝/裙子",
-      "洋裝",
       "長袖"
     ],
     "categoryCode": [
       "all_women",
       "all_women-dresses-and-skirts",
-      "all_women-dresses-and-skirts-dresses",
       "all_women-dresses-and-skirts-dresses-anchor02"
     ],
     "alsoIn": [],
@@ -45703,13 +45373,11 @@
     "categoryPath": [
       "女裝",
       "洋裝/裙子",
-      "洋裝",
       "短袖"
     ],
     "categoryCode": [
       "all_women",
       "all_women-dresses-and-skirts",
-      "all_women-dresses-and-skirts-dresses",
       "all_women-dresses-and-skirts-dresses-anchor05"
     ],
     "alsoIn": [
@@ -45969,13 +45637,11 @@
     "categoryPath": [
       "女裝",
       "洋裝/裙子",
-      "洋裝",
       "無袖"
     ],
     "categoryCode": [
       "all_women",
       "all_women-dresses-and-skirts",
-      "all_women-dresses-and-skirts-dresses",
       "all_women-dresses-and-skirts-dresses-anchor01"
     ],
     "alsoIn": [],
@@ -46089,13 +45755,11 @@
     "categoryPath": [
       "女裝",
       "洋裝/裙子",
-      "洋裝",
       "機能"
     ],
     "categoryCode": [
       "all_women",
       "all_women-dresses-and-skirts",
-      "all_women-dresses-and-skirts-dresses",
       "all_women-dresses-and-skirts-dresses-anchor04"
     ],
     "alsoIn": [
@@ -46355,13 +46019,11 @@
     "categoryPath": [
       "女裝",
       "洋裝/裙子",
-      "洋裝",
       "BRATOP洋裝"
     ],
     "categoryCode": [
       "all_women",
       "all_women-dresses-and-skirts",
-      "all_women-dresses-and-skirts-dresses",
       "all_women-dresses-and-skirts-dresses-anchor07"
     ],
     "alsoIn": [
@@ -46493,13 +46155,11 @@
     "categoryPath": [
       "女裝",
       "內衣類",
-      "BRATOP 罩杯式上衣",
       "短版/設計款"
     ],
     "categoryCode": [
       "all_women",
       "all_women-inner-wear",
-      "all_women-inner-wear-bratop",
       "all_women-inner-wear-bratop-anchor01"
     ],
     "alsoIn": [
@@ -46687,13 +46347,11 @@
     "categoryPath": [
       "女裝",
       "內衣類",
-      "BRATOP 罩杯式上衣",
       "細肩帶"
     ],
     "categoryCode": [
       "all_women",
       "all_women-inner-wear",
-      "all_women-inner-wear-bratop",
       "all_women-inner-wear-bratop-anchor08"
     ],
     "alsoIn": [
@@ -46969,13 +46627,11 @@
     "categoryPath": [
       "女裝",
       "內衣類",
-      "BRATOP 罩杯式上衣",
       "坦克背心"
     ],
     "categoryCode": [
       "all_women",
       "all_women-inner-wear",
-      "all_women-inner-wear-bratop",
       "all_women-inner-wear-bratop-anchor09"
     ],
     "alsoIn": [
@@ -47251,13 +46907,11 @@
     "categoryPath": [
       "女裝",
       "內衣類",
-      "BRATOP 罩杯式上衣",
       "短袖"
     ],
     "categoryCode": [
       "all_women",
       "all_women-inner-wear",
-      "all_women-inner-wear-bratop",
       "all_women-inner-wear-bratop-anchor05"
     ],
     "alsoIn": [
@@ -47501,13 +47155,11 @@
     "categoryPath": [
       "女裝",
       "內衣類",
-      "BRATOP 罩杯式上衣",
       "洋裝"
     ],
     "categoryCode": [
       "all_women",
       "all_women-inner-wear",
-      "all_women-inner-wear-bratop",
       "all_women-inner-wear-bratop-anchor06"
     ],
     "alsoIn": [],
@@ -47637,13 +47289,11 @@
     "categoryPath": [
       "女裝",
       "內衣類",
-      "無鋼圈美型胸罩",
       "3D包覆"
     ],
     "categoryCode": [
       "all_women",
       "all_women-inner-wear",
-      "all_women-inner-wear-wireless-bra",
       "all_women-inner-wear-wireless-bra-anchor01"
     ],
     "alsoIn": [],
@@ -48141,13 +47791,11 @@
     "categoryPath": [
       "女裝",
       "內衣類",
-      "無鋼圈美型胸罩",
       "舒適"
     ],
     "categoryCode": [
       "all_women",
       "all_women-inner-wear",
-      "all_women-inner-wear-wireless-bra",
       "all_women-inner-wear-wireless-bra-anchor02"
     ],
     "alsoIn": [],
@@ -48389,13 +48037,11 @@
     "categoryPath": [
       "女裝",
       "內衣類",
-      "無鋼圈美型胸罩",
       "運動/平口"
     ],
     "categoryCode": [
       "all_women",
       "all_women-inner-wear",
-      "all_women-inner-wear-wireless-bra",
       "all_women-inner-wear-wireless-bra-anchor04"
     ],
     "alsoIn": [],
@@ -48541,13 +48187,11 @@
     "categoryPath": [
       "女裝",
       "內衣類",
-      "無鋼圈美型胸罩",
       "前開式胸罩"
     ],
     "categoryCode": [
       "all_women",
       "all_women-inner-wear",
-      "all_women-inner-wear-wireless-bra",
       "all_women-inner-wear-wireless-bra-anchor05"
     ],
     "alsoIn": [],
@@ -48661,13 +48305,11 @@
     "categoryPath": [
       "女裝",
       "內衣類",
-      "超無痕/內褲",
       "塑型褲/襯褲"
     ],
     "categoryCode": [
       "all_women",
       "all_women-inner-wear",
-      "all_women-inner-wear-shorts",
       "all_women-inner-wear-shorts-anchor03"
     ],
     "alsoIn": [],
@@ -48797,13 +48439,11 @@
     "categoryPath": [
       "女裝",
       "內衣類",
-      "超無痕/內褲",
       "生理褲"
     ],
     "categoryCode": [
       "all_women",
       "all_women-inner-wear",
-      "all_women-inner-wear-shorts",
       "all_women-inner-wear-shorts-anchor04"
     ],
     "alsoIn": [],
@@ -48885,13 +48525,11 @@
     "categoryPath": [
       "女裝",
       "內衣類",
-      "超無痕/內褲",
       "高腰"
     ],
     "categoryCode": [
       "all_women",
       "all_women-inner-wear",
-      "all_women-inner-wear-shorts",
       "all_women-inner-wear-shorts-anchor06"
     ],
     "alsoIn": [
@@ -49359,13 +48997,11 @@
     "categoryPath": [
       "女裝",
       "內衣類",
-      "超無痕/內褲",
       "中腰"
     ],
     "categoryCode": [
       "all_women",
       "all_women-inner-wear",
-      "all_women-inner-wear-shorts",
       "all_women-inner-wear-shorts-anchor07"
     ],
     "alsoIn": [
@@ -49529,13 +49165,11 @@
     "categoryPath": [
       "女裝",
       "內衣類",
-      "超無痕/內褲",
       "低腰"
     ],
     "categoryCode": [
       "all_women",
       "all_women-inner-wear",
-      "all_women-inner-wear-shorts",
       "all_women-inner-wear-shorts-anchor08"
     ],
     "alsoIn": [
@@ -50003,13 +49637,11 @@
     "categoryPath": [
       "女裝",
       "內衣類",
-      "超無痕/內褲",
       "平口"
     ],
     "categoryCode": [
       "all_women",
       "all_women-inner-wear",
-      "all_women-inner-wear-shorts",
       "all_women-inner-wear-shorts-anchor09"
     ],
     "alsoIn": [],
@@ -50219,13 +49851,11 @@
     "categoryPath": [
       "女裝",
       "內衣類",
-      "襪子",
       "襪子"
     ],
     "categoryCode": [
       "all_women",
       "all_women-inner-wear",
-      "all_women-inner-wear-socks",
       "all_women-inner-wear-socks-anchor01"
     ],
     "alsoIn": [
@@ -50277,13 +49907,11 @@
     "categoryPath": [
       "女裝",
       "內衣類",
-      "襪子",
       "中筒襪"
     ],
     "categoryCode": [
       "all_women",
       "all_women-inner-wear",
-      "all_women-inner-wear-socks",
       "all_women-inner-wear-socks-anchor09"
     ],
     "alsoIn": [],
@@ -50333,13 +49961,11 @@
     "categoryPath": [
       "女裝",
       "內衣類",
-      "襪子",
       "腳踝襪/短襪"
     ],
     "categoryCode": [
       "all_women",
       "all_women-inner-wear",
-      "all_women-inner-wear-socks",
       "all_women-inner-wear-socks-anchor03"
     ],
     "alsoIn": [
@@ -50391,13 +50017,11 @@
     "categoryPath": [
       "女裝",
       "內衣類",
-      "襪子",
       "船型襪"
     ],
     "categoryCode": [
       "all_women",
       "all_women-inner-wear",
-      "all_women-inner-wear-socks",
       "all_women-inner-wear-socks-anchor02"
     ],
     "alsoIn": [],
@@ -50431,13 +50055,11 @@
     "categoryPath": [
       "女裝",
       "內衣類",
-      "襪子",
       "運動襪"
     ],
     "categoryCode": [
       "all_women",
       "all_women-inner-wear",
-      "all_women-inner-wear-socks",
       "all_women-inner-wear-socks-anchor08"
     ],
     "alsoIn": [
@@ -50473,13 +50095,11 @@
     "categoryPath": [
       "女裝",
       "內衣類",
-      "襪子",
       "單色襪"
     ],
     "categoryCode": [
       "all_women",
       "all_women-inner-wear",
-      "all_women-inner-wear-socks",
       "all_women-inner-wear-socks-anchor99"
     ],
     "alsoIn": [
@@ -52071,13 +51691,11 @@
     "categoryPath": [
       "女裝",
       "家居系列",
-      "睡衣",
       "睡衣"
     ],
     "categoryCode": [
       "all_women",
       "all_women-room",
-      "all_women-room-lounge-wear",
       "all_women-room-lounge-wear-anchor01"
     ],
     "alsoIn": [],
@@ -52159,13 +51777,11 @@
     "categoryPath": [
       "童裝",
       "外套類",
-      "連帽/布勞森外套",
       "夾克/布勞森外套"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-outer",
-      "all_kids-outer-casual",
       "all_kids-outer-casual-anchor02"
     ],
     "alsoIn": [],
@@ -52375,13 +51991,11 @@
     "categoryPath": [
       "童裝",
       "外套類",
-      "連帽/布勞森外套",
       "連帽外套"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-outer",
-      "all_kids-outer-casual",
       "all_kids-outer-casual-anchor01"
     ],
     "alsoIn": [],
@@ -52543,13 +52157,11 @@
     "categoryPath": [
       "童裝",
       "外套類",
-      "連帽/布勞森外套",
       "開襟外套"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-outer",
-      "all_kids-outer-casual",
       "all_kids-outer-casual-anchor06"
     ],
     "alsoIn": [],
@@ -52727,13 +52339,11 @@
     "categoryPath": [
       "童裝",
       "外套類",
-      "連帽/布勞森外套",
       "背心"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-outer",
-      "all_kids-outer-casual",
       "all_kids-outer-casual-anchor05"
     ],
     "alsoIn": [
@@ -52897,13 +52507,11 @@
     "categoryPath": [
       "童裝",
       "外套類",
-      "連帽/布勞森外套",
       "PUFFTECH輕暖科技"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-outer",
-      "all_kids-outer-casual",
       "all_kids-outer-casual-anchor03"
     ],
     "alsoIn": [
@@ -53067,13 +52675,11 @@
     "categoryPath": [
       "童裝",
       "外套類",
-      "連帽/布勞森外套",
       "刷毛外套"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-outer",
-      "all_kids-outer-casual",
       "all_kids-outer-casual-anchor07"
     ],
     "alsoIn": [
@@ -53285,13 +52891,11 @@
     "categoryPath": [
       "童裝",
       "上衣/休閒SWEAT/刷毛",
-      "T恤(男童/女童)",
       "長袖"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-tops",
-      "all_kids-tops-t-shirts",
       "all_kids-tops-t-shirts-anchor02"
     ],
     "alsoIn": [
@@ -53599,13 +53203,11 @@
     "categoryPath": [
       "童裝",
       "上衣/休閒SWEAT/刷毛",
-      "T恤(男童/女童)",
       "短袖"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-tops",
-      "all_kids-tops-t-shirts",
       "all_kids-tops-t-shirts-anchor01"
     ],
     "alsoIn": [
@@ -53721,13 +53323,11 @@
     "categoryPath": [
       "童裝",
       "上衣/休閒SWEAT/刷毛",
-      "T恤(男童/女童)",
       "女童設計上衣"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-tops",
-      "all_kids-tops-t-shirts",
       "all_kids-tops-t-shirts-anchor08"
     ],
     "alsoIn": [
@@ -53891,13 +53491,11 @@
     "categoryPath": [
       "童裝",
       "上衣/休閒SWEAT/刷毛",
-      "休閒SWEAT系列",
       "休閒上衣"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-tops",
-      "all_kids-tops-sweat",
       "all_kids-tops-sweat-anchor01"
     ],
     "alsoIn": [],
@@ -53963,13 +53561,11 @@
     "categoryPath": [
       "童裝",
       "上衣/休閒SWEAT/刷毛",
-      "休閒SWEAT系列",
       "連帽款式"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-tops",
-      "all_kids-tops-sweat",
       "all_kids-tops-sweat-anchor02"
     ],
     "alsoIn": [
@@ -54133,13 +53729,11 @@
     "categoryPath": [
       "童裝",
       "上衣/休閒SWEAT/刷毛",
-      "休閒SWEAT系列",
       "褲裝"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-tops",
-      "all_kids-tops-sweat",
       "all_kids-tops-sweat-anchor03"
     ],
     "alsoIn": [],
@@ -54349,14 +53943,12 @@
     "categoryPath": [
       "童裝",
       "上衣/休閒SWEAT/刷毛",
-      "休閒SWEAT系列",
       "外套"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-tops",
-      "all_kids-tops-sweat",
-      "all_kids-tops-sweat-anchor04"
+      "all_kids-tops-fleece-anchor01"
     ],
     "alsoIn": [
       "連帽款式"
@@ -54567,13 +54159,11 @@
     "categoryPath": [
       "童裝",
       "上衣/休閒SWEAT/刷毛",
-      "童裝刷毛",
       "外套"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-tops",
-      "all_kids-tops-fleece",
       "all_kids-tops-fleece-anchor01"
     ],
     "alsoIn": [],
@@ -54927,13 +54517,11 @@
     "categoryPath": [
       "童裝",
       "針織衫/開襟外套",
-      "針織衫/開襟外套",
       "針織衫/毛衣"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-knit",
-      "all_kids-knit-lineup",
       "all_kids-knit-lineup-anchor02"
     ],
     "alsoIn": [],
@@ -55015,13 +54603,11 @@
     "categoryPath": [
       "童裝",
       "下身類",
-      "短褲/褲裙",
       "短褲"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-bottoms",
-      "all_kids-bottoms-short",
       "all_kids-bottoms-short-anchor03"
     ],
     "alsoIn": [],
@@ -55183,13 +54769,11 @@
     "categoryPath": [
       "童裝",
       "下身類",
-      "短褲/褲裙",
       "褲裙"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-bottoms",
-      "all_kids-bottoms-short",
       "all_kids-bottoms-short-anchor04"
     ],
     "alsoIn": [
@@ -55353,13 +54937,11 @@
     "categoryPath": [
       "童裝",
       "下身類",
-      "長褲",
       "束口褲"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-bottoms",
-      "all_kids-bottoms-longpants",
       "all_kids-bottoms-longpants-anchor03"
     ],
     "alsoIn": [
@@ -55571,13 +55153,11 @@
     "categoryPath": [
       "童裝",
       "下身類",
-      "長褲",
       "牛仔褲"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-bottoms",
-      "all_kids-bottoms-longpants",
       "all_kids-bottoms-longpants-anchor06"
     ],
     "alsoIn": [],
@@ -55691,13 +55271,11 @@
     "categoryPath": [
       "童裝",
       "下身類",
-      "長褲",
       "運動/休閒褲"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-bottoms",
-      "all_kids-bottoms-longpants",
       "all_kids-bottoms-longpants-anchor02"
     ],
     "alsoIn": [],
@@ -55859,13 +55437,11 @@
     "categoryPath": [
       "童裝",
       "下身類",
-      "長褲",
       "暖褲"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-bottoms",
-      "all_kids-bottoms-longpants",
       "all_kids-bottoms-longpants-anchor05"
     ],
     "alsoIn": [
@@ -56439,13 +56015,11 @@
     "categoryPath": [
       "童裝",
       "男/女童內衣褲",
-      "男/女童內褲",
       "男童"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-inner-wear",
-      "all_kids-inner-wear-brief-and-shorts",
       "all_kids-inner-wear-brief-and-shorts-anchor01"
     ],
     "alsoIn": [],
@@ -56575,13 +56149,11 @@
     "categoryPath": [
       "童裝",
       "男/女童內衣褲",
-      "男/女童內褲",
       "女童"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-inner-wear",
-      "all_kids-inner-wear-brief-and-shorts",
       "all_kids-inner-wear-brief-and-shorts-anchor02"
     ],
     "alsoIn": [],
@@ -57105,13 +56677,11 @@
     "categoryPath": [
       "童裝",
       "家居服",
-      "家居服/睡衣",
       "長袖"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-room",
-      "all_kids-room-lounge-wear",
       "all_kids-room-lounge-wear-anchor02"
     ],
     "alsoIn": [],
@@ -57419,13 +56989,11 @@
     "categoryPath": [
       "童裝",
       "外套類",
-      "連帽/布勞森外套",
       "夾克/布勞森外套"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-outer",
-      "all_kids-outer-casual",
       "all_kids-outer-casual-anchor02"
     ],
     "alsoIn": [],
@@ -57475,13 +57043,11 @@
     "categoryPath": [
       "童裝",
       "外套類",
-      "連帽/布勞森外套",
       "連帽外套"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-outer",
-      "all_kids-outer-casual",
       "all_kids-outer-casual-anchor01"
     ],
     "alsoIn": [],
@@ -57547,13 +57113,11 @@
     "categoryPath": [
       "童裝",
       "外套類",
-      "連帽/布勞森外套",
       "背心"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-outer",
-      "all_kids-outer-casual",
       "all_kids-outer-casual-anchor05"
     ],
     "alsoIn": [
@@ -57797,13 +57361,11 @@
     "categoryPath": [
       "童裝",
       "外套類",
-      "連帽/布勞森外套",
       "PUFFTECH輕暖科技"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-outer",
-      "all_kids-outer-casual",
       "all_kids-outer-casual-anchor03"
     ],
     "alsoIn": [
@@ -57967,13 +57529,11 @@
     "categoryPath": [
       "童裝",
       "外套類",
-      "連帽/布勞森外套",
       "刷毛外套"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-outer",
-      "all_kids-outer-casual",
       "all_kids-outer-casual-anchor07"
     ],
     "alsoIn": [
@@ -58137,13 +57697,11 @@
     "categoryPath": [
       "童裝",
       "上衣/休閒SWEAT/刷毛",
-      "T恤(男童/女童)",
       "長袖"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-tops",
-      "all_kids-tops-t-shirts",
       "all_kids-tops-t-shirts-anchor02"
     ],
     "alsoIn": [
@@ -58259,13 +57817,11 @@
     "categoryPath": [
       "童裝",
       "上衣/休閒SWEAT/刷毛",
-      "T恤(男童/女童)",
       "短袖"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-tops",
-      "all_kids-tops-t-shirts",
       "all_kids-tops-t-shirts-anchor01"
     ],
     "alsoIn": [
@@ -58525,13 +58081,11 @@
     "categoryPath": [
       "童裝",
       "上衣/休閒SWEAT/刷毛",
-      "T恤(男童/女童)",
       "女童設計上衣"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-tops",
-      "all_kids-tops-t-shirts",
       "all_kids-tops-t-shirts-anchor08"
     ],
     "alsoIn": [
@@ -58695,13 +58249,11 @@
     "categoryPath": [
       "童裝",
       "上衣/休閒SWEAT/刷毛",
-      "休閒SWEAT系列",
       "休閒上衣"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-tops",
-      "all_kids-tops-sweat",
       "all_kids-tops-sweat-anchor01"
     ],
     "alsoIn": [],
@@ -58767,13 +58319,11 @@
     "categoryPath": [
       "童裝",
       "上衣/休閒SWEAT/刷毛",
-      "休閒SWEAT系列",
       "連帽款式"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-tops",
-      "all_kids-tops-sweat",
       "all_kids-tops-sweat-anchor02"
     ],
     "alsoIn": [
@@ -58889,13 +58439,11 @@
     "categoryPath": [
       "童裝",
       "上衣/休閒SWEAT/刷毛",
-      "休閒SWEAT系列",
       "褲裝"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-tops",
-      "all_kids-tops-sweat",
       "all_kids-tops-sweat-anchor03"
     ],
     "alsoIn": [],
@@ -59057,13 +58605,11 @@
     "categoryPath": [
       "童裝",
       "針織衫/開襟外套",
-      "針織衫/開襟外套",
       "針織衫/毛衣"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-knit",
-      "all_kids-knit-lineup",
       "all_kids-knit-lineup-anchor02"
     ],
     "alsoIn": [],
@@ -59145,13 +58691,11 @@
     "categoryPath": [
       "童裝",
       "下身類",
-      "短褲/褲裙",
       "短褲"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-bottoms",
-      "all_kids-bottoms-short",
       "all_kids-bottoms-short-anchor03"
     ],
     "alsoIn": [
@@ -59459,13 +59003,11 @@
     "categoryPath": [
       "童裝",
       "下身類",
-      "短褲/褲裙",
       "褲裙"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-bottoms",
-      "all_kids-bottoms-short",
       "all_kids-bottoms-short-anchor04"
     ],
     "alsoIn": [
@@ -59581,13 +59123,11 @@
     "categoryPath": [
       "童裝",
       "下身類",
-      "長褲",
       "束口褲"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-bottoms",
-      "all_kids-bottoms-longpants",
       "all_kids-bottoms-longpants-anchor03"
     ],
     "alsoIn": [],
@@ -59845,13 +59385,11 @@
     "categoryPath": [
       "童裝",
       "下身類",
-      "長褲",
       "牛仔褲"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-bottoms",
-      "all_kids-bottoms-longpants",
       "all_kids-bottoms-longpants-anchor06"
     ],
     "alsoIn": [],
@@ -59965,13 +59503,11 @@
     "categoryPath": [
       "童裝",
       "下身類",
-      "長褲",
       "運動/休閒褲"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-bottoms",
-      "all_kids-bottoms-longpants",
       "all_kids-bottoms-longpants-anchor02"
     ],
     "alsoIn": [
@@ -60087,13 +59623,11 @@
     "categoryPath": [
       "童裝",
       "下身類",
-      "長褲",
       "暖褲"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-bottoms",
-      "all_kids-bottoms-longpants",
       "all_kids-bottoms-longpants-anchor05"
     ],
     "alsoIn": [
@@ -60515,13 +60049,11 @@
     "categoryPath": [
       "童裝",
       "男/女童內衣褲",
-      "男/女童內褲",
       "男童"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-inner-wear",
-      "all_kids-inner-wear-brief-and-shorts",
       "all_kids-inner-wear-brief-and-shorts-anchor01"
     ],
     "alsoIn": [],
@@ -60595,13 +60127,11 @@
     "categoryPath": [
       "童裝",
       "男/女童內衣褲",
-      "男/女童內褲",
       "女童"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-inner-wear",
-      "all_kids-inner-wear-brief-and-shorts",
       "all_kids-inner-wear-brief-and-shorts-anchor02"
     ],
     "alsoIn": [],
@@ -60839,13 +60369,11 @@
     "categoryPath": [
       "童裝",
       "家居服",
-      "家居服/睡衣",
       "長袖"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-room",
-      "all_kids-room-lounge-wear",
       "all_kids-room-lounge-wear-anchor02"
     ],
     "alsoIn": [],
@@ -61043,13 +60571,11 @@
     "categoryPath": [
       "童裝",
       "外套類",
-      "連帽/布勞森外套",
       "連帽外套"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-outer",
-      "all_kids-outer-casual",
       "all_kids-outer-casual-anchor01"
     ],
     "alsoIn": [],
@@ -61115,13 +60641,11 @@
     "categoryPath": [
       "童裝",
       "上衣/休閒SWEAT/刷毛",
-      "T恤(男童/女童)",
       "長袖"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-tops",
-      "all_kids-tops-t-shirts",
       "all_kids-tops-t-shirts-anchor02"
     ],
     "alsoIn": [
@@ -61237,13 +60761,11 @@
     "categoryPath": [
       "童裝",
       "上衣/休閒SWEAT/刷毛",
-      "T恤(男童/女童)",
       "短袖"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-tops",
-      "all_kids-tops-t-shirts",
       "all_kids-tops-t-shirts-anchor01"
     ],
     "alsoIn": [
@@ -61359,13 +60881,11 @@
     "categoryPath": [
       "童裝",
       "上衣/休閒SWEAT/刷毛",
-      "T恤(男童/女童)",
       "女童設計上衣"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-tops",
-      "all_kids-tops-t-shirts",
       "all_kids-tops-t-shirts-anchor08"
     ],
     "alsoIn": [
@@ -61481,13 +61001,11 @@
     "categoryPath": [
       "童裝",
       "上衣/休閒SWEAT/刷毛",
-      "休閒SWEAT系列",
       "休閒上衣"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-tops",
-      "all_kids-tops-sweat",
       "all_kids-tops-sweat-anchor01"
     ],
     "alsoIn": [],
@@ -61553,13 +61071,11 @@
     "categoryPath": [
       "童裝",
       "上衣/休閒SWEAT/刷毛",
-      "休閒SWEAT系列",
       "連帽款式"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-tops",
-      "all_kids-tops-sweat",
       "all_kids-tops-sweat-anchor02"
     ],
     "alsoIn": [],
@@ -61625,13 +61141,11 @@
     "categoryPath": [
       "童裝",
       "上衣/休閒SWEAT/刷毛",
-      "休閒SWEAT系列",
       "褲裝"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-tops",
-      "all_kids-tops-sweat",
       "all_kids-tops-sweat-anchor03"
     ],
     "alsoIn": [],
@@ -61697,13 +61211,11 @@
     "categoryPath": [
       "童裝",
       "下身類",
-      "短褲/褲裙",
       "短褲"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-bottoms",
-      "all_kids-bottoms-short",
       "all_kids-bottoms-short-anchor03"
     ],
     "alsoIn": [
@@ -61891,13 +61403,11 @@
     "categoryPath": [
       "童裝",
       "下身類",
-      "短褲/褲裙",
       "褲裙"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-bottoms",
-      "all_kids-bottoms-short",
       "all_kids-bottoms-short-anchor04"
     ],
     "alsoIn": [
@@ -62013,13 +61523,11 @@
     "categoryPath": [
       "童裝",
       "下身類",
-      "長褲",
       "束口褲"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-bottoms",
-      "all_kids-bottoms-longpants",
       "all_kids-bottoms-longpants-anchor03"
     ],
     "alsoIn": [],
@@ -62085,13 +61593,11 @@
     "categoryPath": [
       "童裝",
       "下身類",
-      "長褲",
       "牛仔褲"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-bottoms",
-      "all_kids-bottoms-longpants",
       "all_kids-bottoms-longpants-anchor06"
     ],
     "alsoIn": [
@@ -62207,13 +61713,11 @@
     "categoryPath": [
       "童裝",
       "下身類",
-      "長褲",
       "運動/休閒褲"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-bottoms",
-      "all_kids-bottoms-longpants",
       "all_kids-bottoms-longpants-anchor02"
     ],
     "alsoIn": [],
@@ -62279,13 +61783,11 @@
     "categoryPath": [
       "童裝",
       "下身類",
-      "長褲",
       "暖褲"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-bottoms",
-      "all_kids-bottoms-longpants",
       "all_kids-bottoms-longpants-anchor05"
     ],
     "alsoIn": [],
@@ -62635,13 +62137,11 @@
     "categoryPath": [
       "童裝",
       "男/女童內衣褲",
-      "男/女童內褲",
       "男童"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-inner-wear",
-      "all_kids-inner-wear-brief-and-shorts",
       "all_kids-inner-wear-brief-and-shorts-anchor01"
     ],
     "alsoIn": [],
@@ -62771,13 +62271,11 @@
     "categoryPath": [
       "童裝",
       "男/女童內衣褲",
-      "男/女童內褲",
       "女童"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-inner-wear",
-      "all_kids-inner-wear-brief-and-shorts",
       "all_kids-inner-wear-brief-and-shorts-anchor02"
     ],
     "alsoIn": [],
@@ -63103,13 +62601,11 @@
     "categoryPath": [
       "童裝",
       "家居服",
-      "家居服/睡衣",
       "長袖"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-room",
-      "all_kids-room-lounge-wear",
       "all_kids-room-lounge-wear-anchor02"
     ],
     "alsoIn": [],
@@ -63237,13 +62733,11 @@
     "categoryPath": [
       "童裝",
       "外套類",
-      "連帽/布勞森外套",
       "連帽外套"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-outer",
-      "all_kids-outer-casual",
       "all_kids-outer-casual-anchor01"
     ],
     "alsoIn": [],
@@ -63453,13 +62947,11 @@
     "categoryPath": [
       "童裝",
       "上衣/休閒SWEAT/刷毛",
-      "T恤(男童/女童)",
       "長袖"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-tops",
-      "all_kids-tops-t-shirts",
       "all_kids-tops-t-shirts-anchor02"
     ],
     "alsoIn": [
@@ -63591,13 +63083,11 @@
     "categoryPath": [
       "童裝",
       "上衣/休閒SWEAT/刷毛",
-      "T恤(男童/女童)",
       "短袖"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-tops",
-      "all_kids-tops-t-shirts",
       "all_kids-tops-t-shirts-anchor01"
     ],
     "alsoIn": [
@@ -63665,13 +63155,11 @@
     "categoryPath": [
       "童裝",
       "上衣/休閒SWEAT/刷毛",
-      "T恤(男童/女童)",
       "女童設計上衣"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-tops",
-      "all_kids-tops-t-shirts",
       "all_kids-tops-t-shirts-anchor08"
     ],
     "alsoIn": [
@@ -63787,13 +63275,11 @@
     "categoryPath": [
       "童裝",
       "上衣/休閒SWEAT/刷毛",
-      "休閒SWEAT系列",
       "休閒上衣"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-tops",
-      "all_kids-tops-sweat",
       "all_kids-tops-sweat-anchor01"
     ],
     "alsoIn": [],
@@ -63859,13 +63345,11 @@
     "categoryPath": [
       "童裝",
       "上衣/休閒SWEAT/刷毛",
-      "休閒SWEAT系列",
       "連帽款式"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-tops",
-      "all_kids-tops-sweat",
       "all_kids-tops-sweat-anchor02"
     ],
     "alsoIn": [],
@@ -63931,13 +63415,11 @@
     "categoryPath": [
       "童裝",
       "上衣/休閒SWEAT/刷毛",
-      "休閒SWEAT系列",
       "褲裝"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-tops",
-      "all_kids-tops-sweat",
       "all_kids-tops-sweat-anchor03"
     ],
     "alsoIn": [],
@@ -64003,13 +63485,11 @@
     "categoryPath": [
       "童裝",
       "下身類",
-      "短褲/褲裙",
       "短褲"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-bottoms",
-      "all_kids-bottoms-short",
       "all_kids-bottoms-short-anchor03"
     ],
     "alsoIn": [
@@ -64173,13 +63653,11 @@
     "categoryPath": [
       "童裝",
       "下身類",
-      "短褲/褲裙",
       "褲裙"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-bottoms",
-      "all_kids-bottoms-short",
       "all_kids-bottoms-short-anchor04"
     ],
     "alsoIn": [
@@ -64295,13 +63773,11 @@
     "categoryPath": [
       "童裝",
       "下身類",
-      "長褲",
       "牛仔褲"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-bottoms",
-      "all_kids-bottoms-longpants",
       "all_kids-bottoms-longpants-anchor06"
     ],
     "alsoIn": [],
@@ -64415,13 +63891,11 @@
     "categoryPath": [
       "童裝",
       "下身類",
-      "長褲",
       "運動/休閒褲"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-bottoms",
-      "all_kids-bottoms-longpants",
       "all_kids-bottoms-longpants-anchor02"
     ],
     "alsoIn": [],
@@ -64755,13 +64229,11 @@
     "categoryPath": [
       "童裝",
       "男/女童內衣褲",
-      "男/女童內褲",
       "男童"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-inner-wear",
-      "all_kids-inner-wear-brief-and-shorts",
       "all_kids-inner-wear-brief-and-shorts-anchor01"
     ],
     "alsoIn": [],
@@ -64891,13 +64363,11 @@
     "categoryPath": [
       "童裝",
       "男/女童內衣褲",
-      "男/女童內褲",
       "女童"
     ],
     "categoryCode": [
       "all_kids",
       "all_kids-inner-wear",
-      "all_kids-inner-wear-brief-and-shorts",
       "all_kids-inner-wear-brief-and-shorts-anchor02"
     ],
     "alsoIn": [],

@@ -18,16 +18,20 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 分類篩選相關服務<br>
- * 分類三層：性別（男裝）› 大類（T恤/背心）› 細類（長袖），商品只掛在第 3 層。<br>
+ * 分類照官網，3 或 4 層：性別（男裝）› 大類（T恤/背心/休閒）›（T恤/背心）› 細類（長袖），商品只掛在最底層。<br>
  * - {@link #getMenu()}：導覽選單，第 1 層 + 各自的第 2 層<br>
  * - {@link #getCategory(String)}：分類頁上方的下一層篩選按鈕<br>
  * - {@link #getBreadcrumb(String)}：分類頁上方的麵包屑<br>
- * - {@link #getProducts(String, ProductFilterRequest, Pageable)}：第 2 層或第 3 層分類的商品，可篩選顏色 / 尺寸 / 價格，分頁<br>
+ * - {@link #getProducts(String, ProductFilterRequest, Pageable)}：任一層分類底下的所有商品，可篩選顏色 / 尺寸 / 價格，分頁<br>
  * - {@link #getFilterOptions(String)}：分類頁的篩選選項（顏色、尺寸、價格範圍）
  */
 @Service
@@ -80,7 +84,7 @@ public class CategoryService {
 
     /**
      * 某分類的商品（分頁），可加篩選條件。<br>
-     * 傳第 2 層 code → 底下所有第 3 層的商品；傳第 3 層 code → 只有那一層的商品。<br>
+     * 傳哪一層的 code 都可以，會包含它底下所有子孫分類的商品（第 2 層 → 底下第 3、4 層全部）。<br>
      * filter 裡沒填的條件就不篩（全部沒填 = 不篩）。
      */
     @Transactional
@@ -105,7 +109,7 @@ public class CategoryService {
 
     /**
      * 分類頁的篩選選項：這個分類底下上架中的商品，實際有哪些顏色、尺寸、價格範圍。<br>
-     * 範圍跟 {@link #getProducts(String, ProductFilterRequest, Pageable)} 一樣（第 2 層 = 底下所有第 3 層）。
+     * 範圍跟 {@link #getProducts(String, ProductFilterRequest, Pageable)} 一樣（自己 + 底下所有子孫分類）。
      */
     @Transactional
     public FilterOptionsResponse getFilterOptions(String code) {
@@ -119,16 +123,27 @@ public class CategoryService {
     }
 
     /**
-     * code → 商品實際掛的第 3 層分類 id。<br>
-     * 商品只掛在第 3 層：有子分類（第 2 層）就用子分類的 id，沒有（第 3 層）就用自己的 id
+     * code → 自己 + 底下所有子孫分類的 id（不管幾層）。<br>
+     * 商品掛在最底層，但有的分支 3 層、有的 4 層，所以整棵子樹都收，商品掛在哪一層都查得到。<br>
+     * 分類只有幾百筆，一次全撈進記憶體再往下找，比一層查一次資料庫快。
      */
     private List<Long> findLeafCategoryIds(String code) {
         Category category = categoryRepository.findByCode(code)
                 .orElseThrow(() -> ApiException.notFound("找不到分類：" + code));
 
-        List<Category> children = categoryRepository.findByParentOrderByIdAsc(category);
-        return children.isEmpty()
-                ? List.of(category.getId())
-                : children.stream().map(Category::getId).toList();
+        // parent id → 它的子分類們，之後往下找就不用再查資料庫
+        Map<Long, List<Category>> childrenByParentId = categoryRepository.findAll().stream()
+                .filter(c -> c.getParent() != null)
+                .collect(Collectors.groupingBy(c -> c.getParent().getId()));
+
+        // 從自己開始，拿出一個 → 記下 id → 把它的子分類放回待處理清單，直到清單空了
+        List<Long> ids = new ArrayList<>();
+        Deque<Category> pending = new ArrayDeque<>(List.of(category));
+        while (!pending.isEmpty()) {
+            Category c = pending.pop();
+            ids.add(c.getId());
+            pending.addAll(childrenByParentId.getOrDefault(c.getId(), List.of()));
+        }
+        return ids;
     }
 }

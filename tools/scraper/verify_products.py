@@ -24,7 +24,7 @@ STATIC_DIR = PROJECT_ROOT / "src/main/resources/static"
 
 
 def category_label(p: dict) -> str:
-    """舊格式 mainCategory / subCategory，新格式（uniqlo_leaf_scraper）categoryPath 三層"""
+    """舊格式 mainCategory / subCategory，新格式（uniqlo_leaf_scraper）categoryPath 三或四層"""
     if "categoryPath" in p:
         return " / ".join(p["categoryPath"])
     return f"{p.get('mainCategory')} / {p.get('subCategory')}"
@@ -57,8 +57,10 @@ def main() -> int:
         if "categoryPath" in p:
             for field in ("categoryPath", "categoryCode"):
                 value = p.get(field) or []
-                if len(value) != 3 or not all(value):
-                    problems.append(f"{slug}：{field} 應該是三個非空值（{value}）")
+                if len(value) not in (3, 4) or not all(value):
+                    problems.append(f"{slug}：{field} 應該是三或四個非空值（{value}）")
+            if len(p.get("categoryPath") or []) != len(p.get("categoryCode") or []):
+                problems.append(f"{slug}：categoryPath 與 categoryCode 長度不同")
         if not isinstance(p.get("price"), int) or p["price"] <= 0:
             problems.append(f"{slug}：price 不是正整數（{p.get('price')}）")
         if p.get("origPrice") is not None and p["origPrice"] <= p["price"]:
