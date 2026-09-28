@@ -28,11 +28,11 @@ import java.util.stream.Collectors;
 /**
  * 分類篩選相關服務<br>
  * 分類照官網，3 或 4 層：性別（男裝）› 大類（T恤/背心/休閒）›（T恤/背心）› 細類（長袖），商品只掛在最底層。<br>
- * - {@link #getMenu()}：導覽選單，第 1 層 + 各自的第 2 層<br>
- * - {@link #getCategory(String)}：分類頁上方的下一層篩選按鈕<br>
- * - {@link #getBreadcrumb(String)}：分類頁上方的麵包屑<br>
- * - {@link #getProducts(String, ProductFilterRequest, Pageable)}：任一層分類底下的所有商品，可篩選顏色 / 尺寸 / 價格，分頁<br>
- * - {@link #getFilterOptions(String)}：分類頁的篩選選項（顏色、尺寸、價格範圍）
+ * - {@link #getMenu()}：導覽選單，第 1 層 + 各自的第 2 層<br><br>
+ * - {@link #getSubcategories(String)}：分類頁上方的下一層篩選按鈕<br><br>
+ * - {@link #getBreadcrumb(String)}：分類頁上方的麵包屑<br><br>
+ * - {@link #getProducts(String, ProductFilterRequest, Pageable)}：任一層分類底下的所有商品，可篩選顏色 / 尺寸 / 價格，分頁<br><br>
+ * - {@link #getFilterOptions(String)}：分類頁的篩選選項（顏色、尺寸）
  */
 @Service
 @RequiredArgsConstructor
@@ -58,7 +58,7 @@ public class CategoryService {
 
     /** 進入分類頁時，上方的下一層篩選按鈕 */
     @Transactional
-    public CategoryDetailResponse getCategory(String code) {
+    public CategoryDetailResponse getSubcategories(String code) {
         Category category = categoryRepository.findByCode(code)
                 .orElseThrow(() -> ApiException.notFound("找不到分類：" + code));
 
@@ -92,7 +92,7 @@ public class CategoryService {
         List<Long> categoryIds = findLeafCategoryIds(code);
 
         boolean allColors = filter.colors() == null || filter.colors().isEmpty();   // 沒選顏色 = 全部顏色都可以
-        boolean allSizes = filter.sizes() == null || filter.sizes().isEmpty();
+        boolean allSizes = filter.sizes() == null || filter.sizes().isEmpty();      // 沒選size = 全部size都可以
         // IN 的清單不能是空的，沒選時放一個佔位值；all* = true 時查詢不會用到它
         List<String> colors = allColors ? List.of("") : filter.colors();
         List<String> sizes = allSizes ? List.of("") : filter.sizes();
@@ -108,7 +108,7 @@ public class CategoryService {
     }
 
     /**
-     * 分類頁的篩選選項：這個分類底下上架中的商品，實際有哪些顏色、尺寸、價格範圍。<br>
+     * 分類頁的篩選選項：這個分類底下上架中的商品，實際有哪些顏色、尺寸。<br>
      * 範圍跟 {@link #getProducts(String, ProductFilterRequest, Pageable)} 一樣（自己 + 底下所有子孫分類）。
      */
     @Transactional
@@ -117,9 +117,7 @@ public class CategoryService {
 
         return new FilterOptionsResponse(
                 variantRepository.findDistinctColors(categoryIds, ON_SALE),
-                variantRepository.findDistinctSizes(categoryIds, ON_SALE),
-                productRepository.findMinPrice(categoryIds, ON_SALE),
-                productRepository.findMaxPrice(categoryIds, ON_SALE));
+                variantRepository.findDistinctSizes(categoryIds, ON_SALE));
     }
 
     /**

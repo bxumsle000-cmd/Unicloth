@@ -52,7 +52,7 @@
     const slug = new URLSearchParams(location.search).get('slug');
 
     let product = null;        // API 回傳的 ProductDetailResponse
-    let colorIndex = 0;        // 目前選的顏色（colors 陣列的位置）
+    let colorIndex = 0;        // 目前選的顏色（colorOptions 陣列的位置）
     let selectedSize = null;   // 目前選的 SizeOption
     let inWishlist = false;    // 這件商品是否已追蹤
 
@@ -67,7 +67,7 @@
     // 畫整個商品區塊；選顏色、選尺寸後都重畫一次
     function render() {
         const p = product;
-        const color = p.colors[colorIndex];
+        const color = p.colorOptions[colorIndex];
         const onSale = p.origPrice != null && p.origPrice > p.price;
 
         document.getElementById('page').innerHTML = `
@@ -85,14 +85,14 @@
 
                     <h4>顏色：${color?.color ?? '無'}</h4>
                     <div class="options">
-                        ${p.colors.map((c, i) => `
+                        ${p.colorOptions.map((c, i) => `
                             <button class="${i === colorIndex ? 'active' : ''}" onclick="selectColor(${i})">${c.color}</button>
                         `).join('')}
                     </div>
 
                     <h4>尺寸</h4>
                     <div class="options">
-                        ${(color?.sizes ?? []).map(s => `
+                        ${(color?.sizeOptions ?? []).map(s => `
                             <button class="${s.variantId === selectedSize?.variantId ? 'active' : ''}"
                                     ${s.stock <= 0 ? 'disabled' : ''}
                                     onclick="selectSize(${s.variantId})">${s.size}</button>
@@ -121,7 +121,7 @@
     }
 
     function selectSize(variantId) {
-        selectedSize = product.colors[colorIndex].sizes.find(s => s.variantId === variantId);
+        selectedSize = product.colorOptions[colorIndex].sizeOptions.find(s => s.variantId === variantId);
         render();
     }
 

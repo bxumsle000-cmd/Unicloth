@@ -16,6 +16,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+/**
+ * 追蹤清單（愛心）相關服務，都是針對目前登入的會員<br>
+ * - {@link #getWishlist()}：我的追蹤清單<br>
+ * - {@link #add(String)}：追蹤商品<br>
+ * - {@link #remove(String)}：取消追蹤<br>
+ * - {@link #isInWishlist(String)}：某商品是否已追蹤
+ */
 @Service
 @RequiredArgsConstructor
 public class WishlistService {
@@ -33,6 +40,7 @@ public class WishlistService {
                 .toList();
     }
 
+    /** 追蹤商品（只能追蹤上架中的）；已經追蹤過就直接略過 */
     @Transactional
     public void add(String slug){
         Member member = memberRepository.findById(currentMember.getCurrentId())

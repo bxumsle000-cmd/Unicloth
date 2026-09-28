@@ -31,8 +31,8 @@ public class CategoryController {
 
     /** 分類頁上方的下一層篩選按鈕 */
     @GetMapping("/{code}")
-    public CategoryDetailResponse getCategory(@PathVariable String code) {
-        return categoryService.getCategory(code);
+    public CategoryDetailResponse getSubcategories(@PathVariable String code) {
+        return categoryService.getSubcategories(code);
     }
 
     /** 分類頁上方的麵包屑 */

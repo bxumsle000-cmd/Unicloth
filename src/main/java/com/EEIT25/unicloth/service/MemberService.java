@@ -26,6 +26,7 @@ public class MemberService {
     private final CurrentMember currentMember;
 
 
+    /** 取得目前登入會員的資料 */
     @Transactional
     public MemberResponse getMe(){
         Member member = memberRepository.findById(currentMember.getCurrentId())
@@ -33,6 +34,7 @@ public class MemberService {
         return MemberResponse.from(member);
     }
 
+    /** 修改會員資料（姓名、電話、地址）；在交易內改 entity，結束時會自動存回資料庫 */
     @Transactional
     public MemberResponse updateProfile(UpdateMemberRequest request){
         Member member = memberRepository.findById(currentMember.getCurrentId())
@@ -45,6 +47,7 @@ public class MemberService {
         return MemberResponse.from(member);
     }
 
+    /** 修改密碼：舊密碼要對，新密碼不能跟舊的一樣 */
     @Transactional
     public void changePassword(ChangePasswordRequest request){
         Member member = memberRepository.findById(currentMember.getCurrentId())

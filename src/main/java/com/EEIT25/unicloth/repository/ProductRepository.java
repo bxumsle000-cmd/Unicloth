@@ -46,14 +46,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("SELECT p FROM Product p WHERE p.slug = :slug AND p.status = 'on_sale'")
     Optional<Product> findOnSaleBySlug(String slug);
 
-    /** 這些分類底下、狀態符合的商品，最低售價；沒有商品時是 null */
-    @Query("SELECT MIN(p.price) FROM Product p WHERE p.category.id IN :categoryIds AND p.status = :status")
-    Integer findMinPrice(Collection<Long> categoryIds, String status);
-
-    /** 同上，最高售價；沒有商品時是 null */
-    @Query("SELECT MAX(p.price) FROM Product p WHERE p.category.id IN :categoryIds AND p.status = :status")
-    Integer findMaxPrice(Collection<Long> categoryIds, String status);
-
     /** 狀態符合、名稱包含關鍵字的商品（分頁），不分大小寫；LIKE 的 % _ 由 Spring 自動跳脫 */
     Page<Product> findByStatusAndNameContainingIgnoreCase(String status, String name, Pageable pageable);
 }

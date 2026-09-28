@@ -18,6 +18,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * 購物車相關服務，都是針對目前登入的會員<br>
+ * - {@link #getCartItems()}：我的購物車<br>
+ * - {@link #add(AddCartItemRequest)}：加入購物車<br>
+ * - {@link #changeQty(ChangeCartItemQtyRequest)}：修改數量<br>
+ * - {@link #remove(Long)}：移除購物車項目
+ */
 @Service
 @RequiredArgsConstructor
 public class CartItemService {
@@ -35,6 +42,10 @@ public class CartItemService {
                 .toList();
     }
 
+    /**
+     * 加入購物車（以 SKU 為單位）。<br>
+     * 購物車裡已經有同一個 SKU 就把數量加上去，沒有才新增一筆；商品要上架中，加完的總數不能超過庫存。
+     */
     @Transactional
     public void add(AddCartItemRequest request){
         Member member = memberRepository.findById(currentMember.getCurrentId())
@@ -66,6 +77,7 @@ public class CartItemService {
         }
     }
 
+    /** 把某個購物車項目的數量直接改成指定值（不是加減）；只能改自己的，不能超過庫存 */
     @Transactional
     public void changeQty(ChangeCartItemQtyRequest request){
         Member member = memberRepository.findById(currentMember.getCurrentId())
@@ -82,6 +94,7 @@ public class CartItemService {
         cartItem.setQty(request.qty());
     }
 
+    /** 移除購物車項目；只會刪到自己的，編號不存在也不會報錯 */
     @Transactional
     public void remove(Long cartItemId){
         Member member = memberRepository.findById(currentMember.getCurrentId())

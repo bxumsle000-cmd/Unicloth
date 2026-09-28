@@ -7,10 +7,16 @@ import com.EEIT25.unicloth.entity.ProductVariant;
 /**
  * 購物車上的一筆
  *
- * @param id     購物車這一筆的 id；改數量、刪除時前端要傳回來
- * @param slug   商品頁網址用
- * @param stock  這個 SKU 的庫存；前端可限制數量上限或顯示庫存不足
- * @param onSale 商品是否上架中；false 時前端顯示「已下架」、不能結帳
+ * @param id       購物車這一筆的 id；改數量、刪除時前端要傳回來
+ * @param slug     商品頁網址用
+ * @param imageUrl 這個 SKU（顏色）的圖片
+ * @param name     商品名稱
+ * @param color    顏色，例如 黑色
+ * @param size     尺寸，例如 M
+ * @param price    售價（單價）
+ * @param qty      數量
+ * @param stock    這個 SKU 的庫存；前端可限制數量上限或顯示庫存不足
+ * @param onSale   商品是否上架中；false 時前端顯示「已下架」、不能結帳
  */
 public record CartItemResponse(
         Long id,
@@ -25,6 +31,9 @@ public record CartItemResponse(
         boolean onSale
 ) {
 
+    /**
+     * @param cartItem 購物車的一筆（商品下架的也會傳進來，onSale 會是 false）
+     */
     public static CartItemResponse from(CartItem cartItem){
         ProductVariant productVariant = cartItem.getVariant();
         Product product = productVariant.getProduct();

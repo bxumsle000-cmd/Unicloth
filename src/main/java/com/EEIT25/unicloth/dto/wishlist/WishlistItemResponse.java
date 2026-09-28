@@ -6,7 +6,11 @@ import com.EEIT25.unicloth.entity.WishlistItem;
 /**
  * 追蹤清單上的一件商品
  *
- * @param onSale 是否上架中；false 時前端顯示「已下架」、不連到商品頁，但仍可取消追蹤
+ * @param slug     商品字串 id，點進商品頁用，例如 men-487511
+ * @param name     商品名稱
+ * @param price    售價
+ * @param imageUrl 縮圖（商品主圖），沒有時是 null
+ * @param onSale   是否上架中；false 時前端顯示「已下架」、不連到商品頁，但仍可取消追蹤
  */
 public record WishlistItemResponse(
         String slug,
