@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 
 /**
  * 會員持有的折價券
- * 資料庫有 UNIQUE(member_id, coupon_id)：同一張券每個會員只能領一次。
+ * 同一張券可以重複領取：每領一次就存一筆（各自有到期日、使用紀錄），不存數量。
  */
 @Entity
 @Table(name = "member_coupons")

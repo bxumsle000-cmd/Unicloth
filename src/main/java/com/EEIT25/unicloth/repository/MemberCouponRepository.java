@@ -1,11 +1,13 @@
 package com.EEIT25.unicloth.repository;
 
+import com.EEIT25.unicloth.entity.Member;
 import com.EEIT25.unicloth.entity.MemberCoupon;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,9 +33,10 @@ public interface MemberCouponRepository extends JpaRepository<MemberCoupon, Long
             """)
     List<MemberCoupon> findUsable(@Param("memberId") Long memberId, @Param("now") LocalDateTime now);
 
-    // 領券前檢查：同一張券每個會員只能領一次
-    boolean existsByMemberIdAndCouponId(Long memberId, Long couponId);
-
     // 結帳套用券時確認這張券真的是該會員的
     Optional<MemberCoupon> findByIdAndMemberId(Long id, Long memberId);
+
+    List<MemberCoupon> findByMember(Member member);
+
+    List<MemberCoupon> findByMemberOrderByExpireAtAsc(Member member);
 }
