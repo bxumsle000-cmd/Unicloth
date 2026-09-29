@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="#F6F5F2">
+    <title>我的折價券 — KINU</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/kinu.css">
+    <style>
+        /* ===== 折價券頁專用 ===== */
+        .coupon-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 30px; }
+        .coupon-tabs .chip.active { background: #000; color: #fff; border-color: #000; }
+        .coupon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-top: 24px; }
+        .coupon { display: grid; grid-template-columns: 110px minmax(0, 1fr); background: #fff; min-height: 128px; }
+        .coupon .benefit { background: #000; color: #fff; display: flex; align-items: center; justify-content: center; text-align: center; padding: 12px; font-size: 18px; letter-spacing: .04em; line-height: 1.3; }
+        .coupon .info { padding: 18px 20px; display: flex; flex-direction: column; gap: 6px; border-left: 1px dashed var(--line); }
+        .coupon .title { font-size: 13px; letter-spacing: .04em; line-height: 1.6; }
+        .coupon .rule, .coupon .date { font-size: 10px; color: var(--muted); letter-spacing: .06em; }
+        .coupon .foot { margin-top: auto; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+        .coupon .code { font-size: 10px; letter-spacing: .12em; color: var(--muted); }
+        .coupon .status { font-size: 10px; letter-spacing: .1em; }
+        .coupon.inactive .benefit { background: var(--stone); }
+        .coupon.inactive .title { color: var(--muted); }
+        @media (max-width: 760px) {
+            .coupon-grid { grid-template-columns: 1fr; }
+            .coupon { grid-template-columns: 92px minmax(0, 1fr); }
+        }
+    </style>
+</head>
+<body>
+<div id="site-header"></div>
+
+<main class="page">
+    <div class="page-eyebrow">COUPONS</div>
+    <h1 class="page-title">我的折價券</h1>
+    <div class="page-sub" id="count"></div>
+    <div class="coupon-tabs" id="tabs"></div>
+    <div id="content"><div class="state">載入中…</div></div>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="/js/kinu.js"></script>
+<script>
+    // status 是後端算好的：usable（可使用）/ used（已使用）/ expired（已過期）
+    const TABS = [
+        { key: 'usable', label: '可使用' },
+        { key: 'used', label: '已使用' },
+        { key: 'expired', label: '已過期' }
+    ];
+    const STATUS_TEXT = { usable: '可使用', used: '已使用', expired: '已過期' };
+    let coupons = [];
+    let tab = 'usable';             // 進頁面先看可使用的
+
+    function render() {
+        const usableCount = coupons.filter(c => c.status === 'usable').length;
+        document.getElementById('count').textContent = coupons.length ? `${usableCount} 張可使用　·　共 ${coupons.length} 張` : '';
+
+        document.getElementById('tabs').innerHTML = coupons.length === 0 ? '' : TABS.map(t => {
+            const n = coupons.filter(c => c.status === t.key).length;
+            return `<button class="chip${t.key === tab ? ' active' : ''}" data-tab="${t.key}">${t.label} ${n}</button>`;
+        }).join('');
+        document.querySelectorAll('[data-tab]').forEach(btn => btn.addEventListener('click', () => {
+            tab = btn.dataset.tab;
+            render();
+        }));
+
+        const box = document.getElementById('content');
+        if (coupons.length === 0) {
+            box.innerHTML = '<div class="state">目前還沒有折價券。<br><a href="/products.html?category=all_women">去逛逛</a></div>';
+            return;
+        }
+        const list = coupons.filter(c => c.status === tab);
+        box.innerHTML = list.length === 0
+            ? `<div class="state">目前沒有${STATUS_TEXT[tab]}的折價券</div>`
+            : `<div class="coupon-grid">${list.map(couponCard).join('')}</div>`;
+    }
+
+    function couponCard(c) {
+        const benefit = c.type === 'amount' ? money(c.value)
+            : c.type === 'percent' ? `${(100 - c.value) / 10} 折`
+            : '免運';
+        return `
+            <div class="coupon${c.status === 'usable' ? '' : ' inactive'}">
+                <div class="benefit">${benefit}</div>
+                <div class="info">
+                    <div class="title">${esc(c.title)}</div>
+                    <div class="rule">${couponRuleText(c)}</div>
+                    <div class="date">${fmtDate(c.expireAt)} 到期</div>
+                    <div class="foot">
+                        <span class="code">${esc(c.code)}</span>
+                        <span class="status">${STATUS_TEXT[c.status] || ''}</span>
+                    </div>
+                </div>
+            </div>`;
+    }
+
+    (async () => {
+        try {
+            coupons = await api('/api/coupon');
+            render();
+        } catch (e) {
+            document.getElementById('content').innerHTML = `<div class="state">${esc(e.message)}</div>`;
+        }
+    })();
+</script>
+</body>
+</html>

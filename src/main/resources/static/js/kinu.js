@@ -69,6 +69,22 @@ function toast(message, isError = false) {
     el._timer = setTimeout(() => el.classList.remove('show'), 2600);
 }
 
+/** 後端的 LocalDateTime：2026-10-29T23:18:36 → 2026/10/29 */
+function fmtDate(s) {
+    return s ? String(s).slice(0, 10).replace(/-/g, '/') : '';
+}
+
+/**
+ * 折價券的優惠內容，c 需要：type, value, minSubtotal
+ * amount → 折 NT$100；percent（value 10 = 9 折）→ 9 折；shipping → 免運
+ */
+function couponRuleText(c) {
+    const benefit = c.type === 'amount' ? `折 ${money(c.value)}`
+        : c.type === 'percent' ? `${(100 - c.value) / 10} 折`
+        : '免運';
+    return c.minSubtotal > 0 ? `滿 ${money(c.minSubtotal)} ${benefit}` : benefit;
+}
+
 const HEART_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>';
 
 
@@ -172,6 +188,7 @@ function renderHeader() {
                 <div class="weather text-action" id="weather">台北 27°</div>
                 <a class="text-action" href="/wishlist.html"><span data-i18n="favorites">收藏</span> <span class="text-count" id="wishlistCount">0</span></a>
                 <a class="text-action" href="/cart.html"><span data-i18n="cart">購物車</span> <span class="text-count" id="cartCount">0</span></a>
+                <a class="text-action" href="/coupons.html" data-i18n="coupons">折價券</a>
                 <button class="text-action" data-i18n="member" onclick="toast('會員功能即將推出')">會員</button>
                 <div class="language-control">
                     <button class="language-toggle" aria-label="選擇語言" onclick="toggleLanguageMenu()">
@@ -345,16 +362,16 @@ function toggleLanguageMenu() {
 
 function setLanguage(locale) {
     const labels = {
-        'zh-Hant': ['女裝', '男裝', '兒童', '搜尋', '收藏', '購物車', '會員'],
-        en: ['WOMEN', 'MEN', 'KIDS', 'Search', 'Wishlist', 'Cart', 'Account'],
-        ja: ['ウィメンズ', 'メンズ', 'キッズ', '検索', 'お気に入り', 'カート', '会員'],
-        ko: ['여성', '남성', '키즈', '검색', '위시리스트', '장바구니', '회원'],
-        ar: ['نسائي', 'رجالي', 'أطفال', 'بحث', 'المفضلة', 'السلة', 'حسابي'],
-        es: ['MUJER', 'HOMBRE', 'NIÑOS', 'Buscar', 'Favoritos', 'Bolsa', 'Cuenta']
-    }[locale] || ['女裝', '男裝', '兒童', '搜尋', '收藏', '購物車', '會員'];
+        'zh-Hant': ['女裝', '男裝', '兒童', '搜尋', '收藏', '購物車', '折價券', '會員'],
+        en: ['WOMEN', 'MEN', 'KIDS', 'Search', 'Wishlist', 'Cart', 'Coupons', 'Account'],
+        ja: ['ウィメンズ', 'メンズ', 'キッズ', '検索', 'お気に入り', 'カート', 'クーポン', '会員'],
+        ko: ['여성', '남성', '키즈', '검색', '위시리스트', '장바구니', '쿠폰', '회원'],
+        ar: ['نسائي', 'رجالي', 'أطفال', 'بحث', 'المفضلة', 'السلة', 'القسائم', 'حسابي'],
+        es: ['MUJER', 'HOMBRE', 'NIÑOS', 'Buscar', 'Favoritos', 'Bolsa', 'Cupones', 'Cuenta']
+    }[locale] || ['女裝', '男裝', '兒童', '搜尋', '收藏', '購物車', '折價券', '會員'];
     setLanguageBase(locale);
     document.getElementById('languageMenu').classList.remove('open');
-    const keys = ['women', 'men', 'kids', 'search', 'favorites', 'cart', 'member'];
+    const keys = ['women', 'men', 'kids', 'search', 'favorites', 'cart', 'coupons', 'member'];
     keys.forEach((key, i) => document.querySelectorAll(`[data-i18n="${key}"]`).forEach(el => el.textContent = labels[i]));
     document.getElementById('headerSearch').placeholder = ({ en: 'Search items', ja: '商品を検索', ko: '상품 검색', ar: 'ابحث عن منتج', es: 'Buscar productos' })[locale] || '搜尋商品';
     // 記住選擇，換頁後維持同一個語言（瀏覽器不允許時就算了）

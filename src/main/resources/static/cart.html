@@ -32,6 +32,16 @@
         .ship-bar i { display: block; height: 100%; background: #000; transition: width .3s; }
         .summary .btn { width: 100%; margin-top: 24px; }
         .summary .later { text-align: center; font-size: 10px; color: var(--muted); letter-spacing: .08em; margin-top: 10px; }
+        .sum-row[hidden] { display: none; }     /* .sum-row 的 display:flex 會蓋掉 hidden，要補這行 */
+        .coupon-box { border-top: 1px solid var(--line); margin-top: 14px; padding-top: 14px; }
+        .coupon-box .sum-row .link-btn { padding: 0; }
+        .coupon-opt { display: grid; grid-template-columns: 16px minmax(0, 1fr) auto; gap: 10px; align-items: start; padding: 9px 0; font-size: 12px; letter-spacing: .04em; cursor: pointer; }
+        .coupon-opt input { margin: 2px 0 0; accent-color: #000; }
+        .coupon-opt .cond { font-size: 10px; color: var(--muted); letter-spacing: .06em; margin-top: 3px; }
+        .coupon-opt .off { font-size: 12px; white-space: nowrap; }
+        .coupon-opt.disabled { color: #b9b2aa; cursor: not-allowed; }
+        .coupon-opt.disabled .off { font-size: 10px; color: var(--muted); }
+        .coupon-empty { font-size: 10px; color: var(--muted); letter-spacing: .06em; padding: 4px 0; }
         @media (max-width: 900px) {
             .cart { grid-template-columns: 1fr; }
             .summary { position: static; }
@@ -58,6 +68,9 @@
 <script>
     const FREE_SHIPPING = 2500;   // 公告列寫的「滿 NT$2,500 免運」
     let items = [];
+    let coupons = [];               // 這次小計下，未使用、未過期的券（含未達低消的）
+    let selectedCouponId = null;    // 選中的券（MemberCoupon.id），null = 不使用
+    let couponRequest = 0;          // 快速連按改數量時，只採用最後一次的查詢結果
 
     async function load() {
         try {
@@ -93,7 +106,12 @@
                     <div class="sum-row"><span>運費</span><span>${remain === 0 ? '免運' : '結帳時計算'}</span></div>
                     <p class="ship-note">${remain === 0 ? '已達免運門檻' : `再買 ${money(remain)} 即可享免運`}</p>
                     <div class="ship-bar"><i style="width:${Math.min(100, subtotal / FREE_SHIPPING * 100)}%"></i></div>
-                    <div class="sum-row total"><span>合計</span><span>${money(subtotal)}</span></div>
+                    <div class="coupon-box">
+                        <div class="sum-row"><span>折價券</span><a class="link-btn" href="/coupons.html">我的折價券</a></div>
+                        <div id="couponList"><div class="coupon-empty">載入中…</div></div>
+                    </div>
+                    <div class="sum-row" id="discountRow" hidden><span>折價券折抵</span><span id="discountAmount"></span></div>
+                    <div class="sum-row total"><span>合計</span><span id="totalAmount">${money(subtotal)}</span></div>
                     ${hasProblem ? '<p class="ship-note" style="color:#9a3b2d">部分商品已下架或庫存不足，未計入金額。</p>' : ''}
                     <button class="btn" disabled>前往結帳　→</button>
                     <div class="later">結帳功能即將推出</div>
@@ -101,6 +119,76 @@
             </div>`;
 
         box.querySelectorAll('[data-action]').forEach(btn => btn.addEventListener('click', onAction));
+        loadCoupons(subtotal);
+    }
+
+    // ---------- 折價券 ----------
+
+    // 小計一變（改數量、移除）就重新問後端：哪些券達到低消、各能折多少
+    async function loadCoupons(subtotal) {
+        const req = ++couponRequest;
+        try {
+            const list = subtotal > 0 ? await api('/api/coupon/usable?subtotal=' + subtotal) : [];
+            if (req !== couponRequest) return;      // 已經有更新的查詢，這次的結果不要了
+            coupons = list;
+        } catch (e) {
+            if (req !== couponRequest) return;
+            coupons = [];
+            document.getElementById('couponList').innerHTML = `<div class="coupon-empty">${esc(e.message)}</div>`;
+            return updateTotal(subtotal);
+        }
+
+        // 原本選的券用掉了、過期了，或小計變少沒達到低消 → 取消選取
+        const selected = coupons.find(c => c.id === selectedCouponId);
+        if (!selected || !selected.meetsMinSubtotal) selectedCouponId = null;
+
+        renderCoupons(subtotal);
+    }
+
+    function renderCoupons(subtotal) {
+        const el = document.getElementById('couponList');
+        if (coupons.length === 0) {
+            el.innerHTML = '<div class="coupon-empty">目前沒有可使用的折價券</div>';
+            return updateTotal(subtotal);
+        }
+
+        el.innerHTML = couponOption({ id: '', title: '不使用折價券', meetsMinSubtotal: true }, subtotal)
+            + coupons.map(c => couponOption(c, subtotal)).join('');
+        el.querySelectorAll('input[name="coupon"]').forEach(radio => radio.addEventListener('change', () => {
+            selectedCouponId = radio.value ? Number(radio.value) : null;
+            updateTotal(subtotal);
+        }));
+        updateTotal(subtotal);
+    }
+
+    function couponOption(c, subtotal) {
+        const isNone = c.id === '';
+        const checked = isNone ? selectedCouponId === null : c.id === selectedCouponId;
+        let right = '';
+        if (!isNone) {
+            // 未達低消：還是列出來但不能選，提示再買多少
+            right = !c.meetsMinSubtotal ? `再買 ${money(c.minSubtotal - subtotal)} 可使用`
+                : c.type === 'shipping' ? '免運'
+                : `−${money(c.discount)}`;
+        }
+        return `
+            <label class="coupon-opt${c.meetsMinSubtotal ? '' : ' disabled'}">
+                <input type="radio" name="coupon" value="${c.id}" ${checked ? 'checked' : ''} ${c.meetsMinSubtotal ? '' : 'disabled'}>
+                <span>
+                    ${esc(c.title)}
+                    ${isNone ? '' : `<div class="cond">${couponRuleText(c)}　·　${fmtDate(c.expireAt)} 到期</div>`}
+                </span>
+                <span class="off">${right}</span>
+            </label>`;
+    }
+
+    // 合計 = 小計 − 折抵；運費在結帳時才算，這裡先不加
+    function updateTotal(subtotal) {
+        const coupon = coupons.find(c => c.id === selectedCouponId);
+        const discount = coupon ? coupon.discount : 0;
+        document.getElementById('discountRow').hidden = discount === 0;
+        document.getElementById('discountAmount').textContent = '−' + money(discount);
+        document.getElementById('totalAmount').textContent = money(subtotal - discount);
     }
 
     function itemRow(it) {
