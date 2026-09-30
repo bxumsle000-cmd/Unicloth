@@ -1,5 +1,6 @@
 package com.EEIT25.unicloth.entity;
 
+import com.EEIT25.unicloth.enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,16 +37,21 @@ public class Order {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    // pending / shipped / ... / cancelled
+    // 存成大寫字串，例如 PENDING
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
-    private String status = "pending";
+    private OrderStatus status = OrderStatus.PENDING;
 
     @Column(name = "receiver_name", nullable = false)
     private String receiverName;
 
     @Column(name = "receiver_phone", nullable = false)
     private String receiverPhone;
+
+    // 舊訂單沒有這欄，所以 DB 允許 NULL
+    @Column(name = "receiver_email")
+    private String receiverEmail;
 
     // home / cvs
     @Column(name = "shipping_method", nullable = false)

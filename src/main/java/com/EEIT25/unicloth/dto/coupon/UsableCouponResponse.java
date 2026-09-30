@@ -30,7 +30,7 @@ public record UsableCouponResponse(
         int discount
 ) {
 
-    // 運費規則：商品小計滿 2500 免運，否則 50（同 OrderService）
+    // 運費規則：商品小計滿 2500 免運，否則 50（同 CheckoutService）
     private static final int FREE_SHIPPING_THRESHOLD = 2500;
     private static final int SHIPPING_FEE = 50;
 

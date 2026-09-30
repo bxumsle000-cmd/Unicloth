@@ -34,7 +34,7 @@ public interface CartItemRepository extends JpaRepository<CartItem, Long> {
     // 結帳完成後清空購物車（delete 類方法要在 Service 加 @Transactional）
     void deleteByMemberId(Long memberId);
 
-    // ==================== 以下提供給訂單模組（OrderService 結帳）使用 ====================
+    // ==================== 以下提供給訂單模組（CheckoutService 結帳）使用 ====================
 
     // 結帳只買勾選的項目：同時比對 memberId，別人的購物車項目撈不到
     @Query("""

@@ -1,6 +1,7 @@
 package com.EEIT25.unicloth.repository;
 
 import com.EEIT25.unicloth.entity.Order;
+import com.EEIT25.unicloth.enums.OrderStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -20,6 +21,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     // 訂單詳情：同時比對 memberId，避免會員看到別人的訂單
     Optional<Order> findByIdAndMemberId(Long id, Long memberId);
 
-    // 後台依狀態篩選（pending / shipped / ... / cancelled）
-    List<Order> findByStatusOrderByCreatedAtDesc(String status);
+    // 後台依狀態篩選
+    List<Order> findByStatusOrderByCreatedAtDesc(OrderStatus status);
 }

@@ -31,7 +31,7 @@ public interface ProductVariantRepository extends JpaRepository<ProductVariant, 
             """)
     List<String> findDistinctSizes(Collection<Long> categoryIds, String status);
 
-    // ==================== 以下提供給訂單模組（OrderService 結帳）使用 ====================
+    // ==================== 以下提供給訂單模組（CheckoutService 結帳）使用 ====================
 
     /** 庫存夠才扣；回傳更新了幾筆（0 = 庫存不足或 SKU 不存在） */
     @Modifying

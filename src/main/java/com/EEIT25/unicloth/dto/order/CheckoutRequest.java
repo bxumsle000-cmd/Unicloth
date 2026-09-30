@@ -1,5 +1,6 @@
 package com.EEIT25.unicloth.dto.order;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
@@ -12,6 +13,7 @@ import java.util.List;
  *
  * @param receiverName    收件人
  * @param receiverPhone   收件人手機
+ * @param receiverEmail   收件人 Email（訂單通知用）
  * @param shippingMethod  home（宅配）/ cvs（超商取貨）
  * @param shippingAddress 宅配地址或超商門市名
  * @param paymentMethod   credit / atm / cod
@@ -22,6 +24,7 @@ import java.util.List;
 public record CheckoutRequest(
         @NotBlank @Size(max = 50) String receiverName,
         @NotBlank @Size(max = 20) String receiverPhone,
+        @Email @Size(max = 255) String receiverEmail,
         @NotBlank @Pattern(regexp = "home|cvs", message = "只能是 home 或 cvs") String shippingMethod,
         @NotBlank @Size(max = 255) String shippingAddress,
         @NotBlank @Pattern(regexp = "credit|atm|cod", message = "只能是 credit、atm 或 cod") String paymentMethod,

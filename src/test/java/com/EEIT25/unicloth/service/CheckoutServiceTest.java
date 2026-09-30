@@ -1,6 +1,7 @@
 package com.EEIT25.unicloth.service;
 
 import com.EEIT25.unicloth.dto.order.CheckoutRequest;
+import com.EEIT25.unicloth.dto.order.CheckoutResponse;
 import com.EEIT25.unicloth.entity.CartItem;
 import com.EEIT25.unicloth.entity.Coupon;
 import com.EEIT25.unicloth.entity.Member;
@@ -8,6 +9,7 @@ import com.EEIT25.unicloth.entity.MemberCoupon;
 import com.EEIT25.unicloth.entity.Order;
 import com.EEIT25.unicloth.entity.OrderItem;
 import com.EEIT25.unicloth.entity.ProductVariant;
+import com.EEIT25.unicloth.enums.OrderStatus;
 import com.EEIT25.unicloth.exception.ApiException;
 import com.EEIT25.unicloth.repository.CartItemRepository;
 import com.EEIT25.unicloth.repository.CouponRepository;
@@ -40,9 +42,9 @@ import static org.mockito.Mockito.when;
  */
 @SpringBootTest
 @Transactional
-class OrderServiceTest {
+class CheckoutServiceTest {
 
-    @Autowired OrderService orderService;
+    @Autowired CheckoutService checkoutService;
     @Autowired OrderRepository orderRepository;
     @Autowired OrderItemRepository orderItemRepository;
     @Autowired CartItemRepository cartItemRepository;
@@ -82,7 +84,7 @@ class OrderServiceTest {
     }
 
     private CheckoutRequest request(List<Long> cartItemIdList, Long memberCouponId) {
-        return new CheckoutRequest("王小明", "0912345678", "home", "台北市信義區某路 1 號",
+        return new CheckoutRequest("王小明", "0912345678", "test@example.com", "home", "台北市信義區某路 1 號",
                 "cod", null, memberCouponId, cartItemIdList);
     }
 
@@ -110,7 +112,7 @@ class OrderServiceTest {
         em.clear();
     }
 
-    /** 測試會員最新的一張訂單（checkout 不回傳東西，所以從資料庫查） */
+    /** 測試會員最新的一張訂單（從資料庫查，確認真的有存進去） */
     private Order latestOrder() {
         List<Order> orderList = orderRepository.findByMemberIdOrderByCreatedAtDesc(member.getId());
         assertEquals(1, orderList.size());
@@ -123,10 +125,21 @@ class OrderServiceTest {
         int price = variant.getProduct().getPrice();
         Long cartItemId = addToCart(variant, 2);
 
-        orderService.checkout(request(List.of(cartItemId), null));
+        CheckoutResponse response = checkoutService.checkout(request(List.of(cartItemId), null));
         flushAndClear();
 
         Order order = latestOrder();
+
+        // 回傳的摘要要跟存進資料庫的訂單一致
+        assertEquals(order.getOrderNo(), response.orderNo());
+        assertNotNull(response.createdAt());
+        assertEquals("王小明", response.receiverName());
+        assertEquals("0912345678", response.receiverPhone());
+        assertEquals("home", response.shippingMethod());
+        assertEquals("cod", response.paymentMethod());
+        assertEquals("台北市信義區某路 1 號", response.shippingAddress());
+        assertEquals(order.getTotal(), response.total());
+
         int subtotal = price * 2;
         int shippingFee = subtotal >= 2500 ? 0 : 50;
         assertEquals(subtotal, order.getSubtotal());
@@ -134,7 +147,7 @@ class OrderServiceTest {
         assertEquals(shippingFee, order.getShippingFee());
         assertEquals(subtotal + shippingFee, order.getTotal());
         assertTrue(order.getOrderNo().matches("UC\\d{8}-\\d{4}"), "訂單編號格式：" + order.getOrderNo());
-        assertEquals("pending", order.getStatus());
+        assertEquals(OrderStatus.PENDING, order.getStatus());
 
         List<OrderItem> orderItemList = orderItemRepository.findByOrderId(order.getId());
         assertEquals(1, orderItemList.size());
@@ -155,7 +168,7 @@ class OrderServiceTest {
                 .orElseThrow(() -> new IllegalStateException("找不到單價低於 2500 的商品，無法測試"));
         Long cartItemId = addToCart(cheap, 1);
 
-        orderService.checkout(request(List.of(cartItemId), null));
+        checkoutService.checkout(request(List.of(cartItemId), null));
         flushAndClear();
 
         Order order = latestOrder();
@@ -175,7 +188,7 @@ class OrderServiceTest {
         int qty = (2500 + price - 1) / price;   // 無條件進位
         Long cartItemId = addToCart(v, qty);
 
-        orderService.checkout(request(List.of(cartItemId), null));
+        checkoutService.checkout(request(List.of(cartItemId), null));
         flushAndClear();
 
         Order order = latestOrder();
@@ -188,7 +201,7 @@ class OrderServiceTest {
     void 沒有勾選任何商品_不能結帳() {
         addToCart(variant, 1);
 
-        ApiException e = assertThrows(ApiException.class, () -> orderService.checkout(request(List.of(), null)));
+        ApiException e = assertThrows(ApiException.class, () -> checkoutService.checkout(request(List.of(), null)));
         assertEquals(HttpStatus.BAD_REQUEST, e.getStatus());
     }
 
@@ -203,7 +216,7 @@ class OrderServiceTest {
         Long boughtId = addToCart(variant, 1);
         Long keptId = addToCart(other, 1);
 
-        orderService.checkout(request(List.of(boughtId), null));
+        checkoutService.checkout(request(List.of(boughtId), null));
         flushAndClear();
 
         // 訂單只有勾選的那一筆
@@ -235,7 +248,7 @@ class OrderServiceTest {
         Long myCartItemId = addToCart(variant, 1);
 
         ApiException e = assertThrows(ApiException.class,
-                () -> orderService.checkout(request(List.of(myCartItemId, othersCartItemId), null)));
+                () -> checkoutService.checkout(request(List.of(myCartItemId, othersCartItemId), null)));
         assertEquals(HttpStatus.BAD_REQUEST, e.getStatus());
     }
 
@@ -243,7 +256,7 @@ class OrderServiceTest {
     void 庫存不足_不能結帳() {
         Long cartItemId = addToCart(variant, variant.getStock() + 1);
 
-        ApiException e = assertThrows(ApiException.class, () -> orderService.checkout(request(List.of(cartItemId), null)));
+        ApiException e = assertThrows(ApiException.class, () -> checkoutService.checkout(request(List.of(cartItemId), null)));
         assertEquals(HttpStatus.CONFLICT, e.getStatus());
     }
 
@@ -253,7 +266,7 @@ class OrderServiceTest {
         int subtotal = variant.getProduct().getPrice() * 2;
         MemberCoupon mc = giveCoupon("amount", 100, 0);
 
-        orderService.checkout(request(List.of(cartItemId), mc.getId()));
+        checkoutService.checkout(request(List.of(cartItemId), mc.getId()));
         flushAndClear();
 
         Order order = latestOrder();
@@ -272,7 +285,7 @@ class OrderServiceTest {
         MemberCoupon mc = giveCoupon("amount", 100, 0);
         mc.setUsedAt(LocalDateTime.now());
 
-        ApiException e = assertThrows(ApiException.class, () -> orderService.checkout(request(List.of(cartItemId), mc.getId())));
+        ApiException e = assertThrows(ApiException.class, () -> checkoutService.checkout(request(List.of(cartItemId), mc.getId())));
         assertEquals(HttpStatus.CONFLICT, e.getStatus());
     }
 
@@ -281,7 +294,7 @@ class OrderServiceTest {
         Long cartItemId = addToCart(variant, 1);
         MemberCoupon mc = giveCoupon("amount", 100, 99_999_999);
 
-        ApiException e = assertThrows(ApiException.class, () -> orderService.checkout(request(List.of(cartItemId), mc.getId())));
+        ApiException e = assertThrows(ApiException.class, () -> checkoutService.checkout(request(List.of(cartItemId), mc.getId())));
         assertEquals(HttpStatus.BAD_REQUEST, e.getStatus());
     }
 }
