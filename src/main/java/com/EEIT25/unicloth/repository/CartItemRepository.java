@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,4 +33,16 @@ public interface CartItemRepository extends JpaRepository<CartItem, Long> {
 
     // 結帳完成後清空購物車（delete 類方法要在 Service 加 @Transactional）
     void deleteByMemberId(Long memberId);
+
+    // ==================== 以下提供給訂單模組（OrderService 結帳）使用 ====================
+
+    // 結帳只買勾選的項目：同時比對 memberId，別人的購物車項目撈不到
+    @Query("""
+            select c from CartItem c
+            join fetch c.variant v
+            join fetch v.product
+            where c.member.id = :memberId and c.id in :ids
+            order by c.createdAt
+            """)
+    List<CartItem> findSelectedWithProducts(@Param("memberId") Long memberId, @Param("ids") Collection<Long> ids);
 }

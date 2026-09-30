@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
  * @param id               會員持有這張券的 id（MemberCoupon.id）；結帳套用券時前端要傳回來
  * @param code             折扣碼
  * @param title            券名稱，例如 新會員 100 元折價券
- * @param type             amount / percent / shipping
- * @param value            amount → 折多少元；percent → 折幾 %（10 = 9 折）；shipping → 0
+ * @param type             amount / percent（沒有免運券）
+ * @param value            amount → 折多少元；percent → 折幾 %（10 = 9 折）
  * @param minSubtotal      最低消費
  * @param expireAt         到期時間
  * @param meetsMinSubtotal 這次的小計是否達到最低消費；false 時前端顯示但不能選
@@ -30,8 +30,8 @@ public record UsableCouponResponse(
         int discount
 ) {
 
-    // 運費規則：滿 1490 免運，否則 50（同 orders.shipping_fee）
-    private static final int FREE_SHIPPING_THRESHOLD = 1490;
+    // 運費規則：商品小計滿 2500 免運，否則 50（同 OrderService）
+    private static final int FREE_SHIPPING_THRESHOLD = 2500;
     private static final int SHIPPING_FEE = 50;
 
     /**

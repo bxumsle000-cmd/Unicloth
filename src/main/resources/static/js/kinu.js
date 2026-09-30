@@ -76,12 +76,11 @@ function fmtDate(s) {
 
 /**
  * 折價券的優惠內容，c 需要：type, value, minSubtotal
- * amount → 折 NT$100；percent（value 10 = 9 折）→ 9 折；shipping → 免運
+ * amount → 折 NT$100；percent（value 10 = 9 折）→ 9 折
  */
 function couponRuleText(c) {
     const benefit = c.type === 'amount' ? `折 ${money(c.value)}`
-        : c.type === 'percent' ? `${(100 - c.value) / 10} 折`
-        : '免運';
+        : `${(100 - c.value) / 10} 折`;
     return c.minSubtotal > 0 ? `滿 ${money(c.minSubtotal)} ${benefit}` : benefit;
 }
 

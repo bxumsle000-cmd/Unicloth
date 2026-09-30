@@ -81,8 +81,7 @@
 
     function couponCard(c) {
         const benefit = c.type === 'amount' ? money(c.value)
-            : c.type === 'percent' ? `${(100 - c.value) / 10} 折`
-            : '免運';
+            : `${(100 - c.value) / 10} 折`;
         return `
             <div class="coupon${c.status === 'usable' ? '' : ' inactive'}">
                 <div class="benefit">${benefit}</div>

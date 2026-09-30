@@ -32,11 +32,11 @@ public class Coupon {
     @Column(nullable = false)
     private String title;
 
-    // amount / percent / shipping
+    // amount / percent（沒有免運券）
     @Column(nullable = false)
     private String type;
 
-    // amount → 折多少元；percent → 折幾 %（10 = 9 折）；shipping → 0
+    // amount → 折多少元；percent → 折幾 %（10 = 9 折）
     @Column(nullable = false)
     private Integer value;
 

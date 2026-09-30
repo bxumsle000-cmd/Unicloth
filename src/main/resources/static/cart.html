@@ -168,7 +168,6 @@
         if (!isNone) {
             // 未達低消：還是列出來但不能選，提示再買多少
             right = !c.meetsMinSubtotal ? `再買 ${money(c.minSubtotal - subtotal)} 可使用`
-                : c.type === 'shipping' ? '免運'
                 : `−${money(c.discount)}`;
         }
         return `

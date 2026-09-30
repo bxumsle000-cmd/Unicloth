@@ -71,7 +71,7 @@ public class Order {
     @Builder.Default
     private Integer discount = 0;
 
-    // 運費（滿 1490 免運、否則 50）
+    // 運費（商品小計滿 2500 免運、否則 50）
     @Column(name = "shipping_fee", nullable = false)
     @Builder.Default
     private Integer shippingFee = 50;
