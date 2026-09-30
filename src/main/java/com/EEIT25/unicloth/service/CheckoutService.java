@@ -1,7 +1,7 @@
 package com.EEIT25.unicloth.service;
 
-import com.EEIT25.unicloth.dto.order.CheckoutRequest;
-import com.EEIT25.unicloth.dto.order.CheckoutResponse;
+import com.EEIT25.unicloth.dto.checkout.CheckoutRequest;
+import com.EEIT25.unicloth.dto.checkout.CheckoutResponse;
 import com.EEIT25.unicloth.entity.CartItem;
 import com.EEIT25.unicloth.entity.Coupon;
 import com.EEIT25.unicloth.entity.Member;

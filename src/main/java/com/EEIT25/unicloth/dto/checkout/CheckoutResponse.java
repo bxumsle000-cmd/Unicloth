@@ -1,4 +1,4 @@
-package com.EEIT25.unicloth.dto.order;
+package com.EEIT25.unicloth.dto.checkout;
 
 import com.EEIT25.unicloth.entity.Order;
 

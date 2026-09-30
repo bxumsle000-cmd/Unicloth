@@ -1,4 +1,4 @@
-package com.EEIT25.unicloth.dto.order;
+package com.EEIT25.unicloth.dto.checkout;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
