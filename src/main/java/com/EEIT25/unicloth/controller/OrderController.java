@@ -1,23 +1,22 @@
 package com.EEIT25.unicloth.controller;
 
-import com.EEIT25.unicloth.dto.checkout.CheckoutRequest;
-import com.EEIT25.unicloth.dto.checkout.CheckoutResponse;
-import com.EEIT25.unicloth.service.CheckoutService;
-import jakarta.validation.Valid;
+import com.EEIT25.unicloth.dto.order.OrderResponse;
+import com.EEIT25.unicloth.service.OrderService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/orders")
+@RequestMapping("/api/checkout")
 public class OrderController {
-    private final CheckoutService checkoutService;
+    private final OrderService orderService;
 
-    /** 結帳：把目前購物車的內容建成一張訂單，回傳訂單摘要給「訂單完成」頁顯示 */
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public CheckoutResponse checkout(@Valid @RequestBody CheckoutRequest request){
-        return checkoutService.checkout(request);
+    @GetMapping
+    public List<OrderResponse> getOrders(){
+        return orderService.getOrders();
     }
 }
