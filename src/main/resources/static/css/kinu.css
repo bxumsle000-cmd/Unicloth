@@ -7,7 +7,7 @@
 /* ===== 基本樣式 ===== */
 :root { --paper: #F6F5F2; --cream: #F0EBE3; --stone: #D9CFC7; --ink: #000; --muted: #76716c; --line: #dfd9d2; --white: #fff; --serif: var(--sans); --sans: 'DM Sans','Noto Sans TC',sans-serif; }
 * { box-sizing: border-box; }
-body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--sans); font-size: 14px; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--sans), sans-serif; font-size: 14px; }
 button, input, select { font: inherit; }
 button { cursor: pointer; color: inherit; border: 0; background: none; }
 a { color: inherit; }
