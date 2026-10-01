@@ -188,6 +188,7 @@ function renderHeader() {
                 <a class="text-action" href="/wishlist.html"><span data-i18n="favorites">收藏</span> <span class="text-count" id="wishlistCount">0</span></a>
                 <a class="text-action" href="/cart.html"><span data-i18n="cart">購物車</span> <span class="text-count" id="cartCount">0</span></a>
                 <a class="text-action" href="/coupons.html" data-i18n="coupons">折價券</a>
+                <a class="text-action" href="/orders.html" data-i18n="orders">訂單</a>
                 <button class="text-action" data-i18n="member" onclick="toast('會員功能即將推出')">會員</button>
                 <div class="language-control">
                     <button class="language-toggle" aria-label="選擇語言" onclick="toggleLanguageMenu()">
@@ -361,16 +362,16 @@ function toggleLanguageMenu() {
 
 function setLanguage(locale) {
     const labels = {
-        'zh-Hant': ['女裝', '男裝', '兒童', '搜尋', '收藏', '購物車', '折價券', '會員'],
-        en: ['WOMEN', 'MEN', 'KIDS', 'Search', 'Wishlist', 'Cart', 'Coupons', 'Account'],
-        ja: ['ウィメンズ', 'メンズ', 'キッズ', '検索', 'お気に入り', 'カート', 'クーポン', '会員'],
-        ko: ['여성', '남성', '키즈', '검색', '위시리스트', '장바구니', '쿠폰', '회원'],
-        ar: ['نسائي', 'رجالي', 'أطفال', 'بحث', 'المفضلة', 'السلة', 'القسائم', 'حسابي'],
-        es: ['MUJER', 'HOMBRE', 'NIÑOS', 'Buscar', 'Favoritos', 'Bolsa', 'Cupones', 'Cuenta']
-    }[locale] || ['女裝', '男裝', '兒童', '搜尋', '收藏', '購物車', '折價券', '會員'];
+        'zh-Hant': ['女裝', '男裝', '兒童', '搜尋', '收藏', '購物車', '折價券', '訂單', '會員'],
+        en: ['WOMEN', 'MEN', 'KIDS', 'Search', 'Wishlist', 'Cart', 'Coupons', 'Orders', 'Account'],
+        ja: ['ウィメンズ', 'メンズ', 'キッズ', '検索', 'お気に入り', 'カート', 'クーポン', '注文履歴', '会員'],
+        ko: ['여성', '남성', '키즈', '검색', '위시리스트', '장바구니', '쿠폰', '주문 내역', '회원'],
+        ar: ['نسائي', 'رجالي', 'أطفال', 'بحث', 'المفضلة', 'السلة', 'القسائم', 'الطلبات', 'حسابي'],
+        es: ['MUJER', 'HOMBRE', 'NIÑOS', 'Buscar', 'Favoritos', 'Bolsa', 'Cupones', 'Pedidos', 'Cuenta']
+    }[locale] || ['女裝', '男裝', '兒童', '搜尋', '收藏', '購物車', '折價券', '訂單', '會員'];
     setLanguageBase(locale);
     document.getElementById('languageMenu').classList.remove('open');
-    const keys = ['women', 'men', 'kids', 'search', 'favorites', 'cart', 'coupons', 'member'];
+    const keys = ['women', 'men', 'kids', 'search', 'favorites', 'cart', 'coupons', 'orders', 'member'];
     keys.forEach((key, i) => document.querySelectorAll(`[data-i18n="${key}"]`).forEach(el => el.textContent = labels[i]));
     document.getElementById('headerSearch').placeholder = ({ en: 'Search items', ja: '商品を検索', ko: '상품 검색', ar: 'ابحث عن منتج', es: 'Buscar productos' })[locale] || '搜尋商品';
     // 記住選擇，換頁後維持同一個語言（瀏覽器不允許時就算了）

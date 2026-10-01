@@ -42,6 +42,22 @@
         .coupon-opt.disabled { color: #b9b2aa; cursor: not-allowed; }
         .coupon-opt.disabled .off { font-size: 10px; color: var(--muted); }
         .coupon-empty { font-size: 10px; color: var(--muted); letter-spacing: .06em; padding: 4px 0; }
+        .checkout-form { border-top: 1px solid var(--line); margin-top: 18px; padding-top: 18px; display: flex; flex-direction: column; gap: 14px; }
+        .checkout-form[hidden] { display: none; }
+        .checkout-form h3 { font-size: 11px; letter-spacing: .22em; font-weight: 500; margin: 0; }
+        .checkout-form label { display: flex; flex-direction: column; gap: 6px; font-size: 10px; color: var(--muted); letter-spacing: .08em; }
+        .checkout-form input[type="text"], .checkout-form input[type="tel"], .checkout-form input[type="email"], .checkout-form textarea { width: 100%; box-sizing: border-box; padding: 8px 0; border: 0; border-bottom: 1px solid var(--line); background: transparent; font-size: 12px; color: #000; letter-spacing: .04em; outline: none; resize: vertical; }
+        .checkout-form input:focus, .checkout-form textarea:focus { border-color: #000; }
+        .checkout-form fieldset { border: 0; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 16px; }
+        .checkout-form legend { font-size: 10px; color: var(--muted); letter-spacing: .08em; padding: 0; margin-bottom: 8px; }
+        .checkout-form fieldset label { flex-direction: row; align-items: center; gap: 6px; font-size: 12px; color: #000; cursor: pointer; }
+        .checkout-form fieldset input { margin: 0; accent-color: #000; }
+        .checkout-form .btn { margin-top: 6px; }
+        .done { max-width: 460px; margin: 60px auto 0; background: #fff; padding: 40px 34px; text-align: center; }
+        .done h2 { font-size: 18px; font-weight: 500; letter-spacing: .08em; margin: 0 0 10px; }
+        .done .no { font-size: 13px; letter-spacing: .1em; margin: 18px 0 6px; }
+        .done .info { font-size: 11px; color: var(--muted); letter-spacing: .06em; line-height: 1.9; }
+        .done .actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 28px; }
         @media (max-width: 900px) {
             .cart { grid-template-columns: 1fr; }
             .summary { position: static; }
@@ -67,7 +83,10 @@
 <script src="/js/kinu.js"></script>
 <script>
     const FREE_SHIPPING = 2500;   // 公告列寫的「滿 NT$2,500 免運」
+    const SHIPPING_FEE = 50;      // 未滿免運的運費；跟 CheckoutService 的 SHIPPING_FEE 一樣，改的話兩邊要一起改
     let items = [];
+    let showCheckout = false;       // 按過「前往結帳」就展開收件資料表單
+    let submitting = false;         // 送出中，避免連按重複下單
     let coupons = [];               // 這次小計下，未使用、未過期的券（含未達低消的）
     let selectedCouponId = null;    // 選中的券（MemberCoupon.id），null = 不使用
     let couponRequest = 0;          // 快速連按改數量時，只採用最後一次的查詢結果
@@ -96,6 +115,8 @@
         const subtotal = valid.reduce((sum, it) => sum + it.price * it.qty, 0);
         const remain = Math.max(0, FREE_SHIPPING - subtotal);
         const hasProblem = valid.length !== items.length;
+        const shippingFee = shippingFeeOf(subtotal);
+        const draft = readDraft();      // 改數量會重畫整塊，先記下表單已經填的內容
 
         box.innerHTML = `
             <div class="cart">
@@ -103,7 +124,7 @@
                 <aside class="summary">
                     <h2>訂單摘要</h2>
                     <div class="sum-row"><span>商品小計</span><span>${money(subtotal)}</span></div>
-                    <div class="sum-row"><span>運費</span><span>${remain === 0 ? '免運' : '結帳時計算'}</span></div>
+                    <div class="sum-row"><span>運費</span><span>${shippingFee === 0 ? '免運' : money(shippingFee)}</span></div>
                     <p class="ship-note">${remain === 0 ? '已達免運門檻' : `再買 ${money(remain)} 即可享免運`}</p>
                     <div class="ship-bar"><i style="width:${Math.min(100, subtotal / FREE_SHIPPING * 100)}%"></i></div>
                     <div class="coupon-box">
@@ -111,15 +132,151 @@
                         <div id="couponList"><div class="coupon-empty">載入中…</div></div>
                     </div>
                     <div class="sum-row" id="discountRow" hidden><span>折價券折抵</span><span id="discountAmount"></span></div>
-                    <div class="sum-row total"><span>合計</span><span id="totalAmount">${money(subtotal)}</span></div>
-                    ${hasProblem ? '<p class="ship-note" style="color:#9a3b2d">部分商品已下架或庫存不足，未計入金額。</p>' : ''}
-                    <button class="btn" disabled>前往結帳　→</button>
-                    <div class="later">結帳功能即將推出</div>
+                    <div class="sum-row total"><span>合計</span><span id="totalAmount">${money(subtotal + shippingFee)}</span></div>
+                    ${hasProblem ? '<p class="ship-note" style="color:#9a3b2d">部分商品已下架或庫存不足，不會一起結帳。</p>' : ''}
+                    ${showCheckout ? checkoutForm(valid.length) : `<button class="btn" id="checkoutBtn" ${valid.length === 0 ? 'disabled' : ''}>前往結帳　→</button>`}
                 </aside>
             </div>`;
 
         box.querySelectorAll('[data-action]').forEach(btn => btn.addEventListener('click', onAction));
+        const checkoutBtn = document.getElementById('checkoutBtn');
+        if (checkoutBtn) checkoutBtn.addEventListener('click', openCheckout);
+        const form = document.getElementById('checkoutForm');
+        if (form) {
+            fillDraft(draft);
+            form.addEventListener('change', updateAddressLabel);
+            form.addEventListener('submit', submitCheckout);
+            updateAddressLabel();
+        }
         loadCoupons(subtotal);
+    }
+
+    // ---------- 結帳 ----------
+
+    // 沒有能結帳的商品時不收運費（只是畫面顯示用，真正的金額以後端算的為準）
+    function shippingFeeOf(subtotal) {
+        return subtotal === 0 || subtotal >= FREE_SHIPPING ? 0 : SHIPPING_FEE;
+    }
+
+    // 欄位名稱同 CheckoutRequest；代碼 home / cvs、credit / atm / cod 也同後端的驗證規則
+    function checkoutForm(validCount) {
+        return `
+            <form class="checkout-form" id="checkoutForm" novalidate>
+                <h3>收件資料</h3>
+                <label>收件人<input type="text" name="receiverName" maxlength="50" required autocomplete="name"></label>
+                <label>手機<input type="tel" name="receiverPhone" maxlength="20" required autocomplete="tel"></label>
+                <label>Email（訂單通知用，可不填）<input type="email" name="receiverEmail" maxlength="255" autocomplete="email"></label>
+                <fieldset>
+                    <legend>配送方式</legend>
+                    <label><input type="radio" name="shippingMethod" value="home" checked> 宅配</label>
+                    <label><input type="radio" name="shippingMethod" value="cvs"> 超商取貨</label>
+                </fieldset>
+                <label><span id="addressLabel">收件地址</span><input type="text" name="shippingAddress" maxlength="255" required></label>
+                <fieldset>
+                    <legend>付款方式</legend>
+                    <label><input type="radio" name="paymentMethod" value="credit" checked> 信用卡</label>
+                    <label><input type="radio" name="paymentMethod" value="atm"> ATM 轉帳</label>
+                    <label><input type="radio" name="paymentMethod" value="cod"> 貨到付款</label>
+                </fieldset>
+                <label>備註（可不填）<textarea name="note" rows="2" maxlength="255"></textarea></label>
+                <button class="btn" type="submit" ${validCount === 0 || submitting ? 'disabled' : ''}>${submitting ? '送出中…' : '確認下單'}</button>
+            </form>`;
+    }
+
+    // 第一次展開表單時，用會員資料先幫忙填好姓名、手機、Email、地址
+    async function openCheckout() {
+        showCheckout = true;
+        render();
+        try {
+            const me = await api('/api/member/me');
+            const form = document.getElementById('checkoutForm');
+            if (!form) return;
+            const fill = (name, value) => { if (value && !form.elements[name].value) form.elements[name].value = value; };
+            fill('receiverName', me.name);
+            fill('receiverPhone', me.phone);
+            fill('receiverEmail', me.email);
+            if (form.elements.shippingMethod.value === 'home') fill('shippingAddress', me.address);
+        } catch {}     // 拿不到會員資料就讓使用者自己填
+    }
+
+    function updateAddressLabel() {
+        const form = document.getElementById('checkoutForm');
+        document.getElementById('addressLabel').textContent =
+            form.elements.shippingMethod.value === 'cvs' ? '超商門市名稱' : '收件地址';
+    }
+
+    function readDraft() {
+        const form = document.getElementById('checkoutForm');
+        return form ? Object.fromEntries(new FormData(form)) : null;
+    }
+
+    function fillDraft(draft) {
+        if (!draft) return;
+        const form = document.getElementById('checkoutForm');
+        Object.entries(draft).forEach(([name, value]) => {
+            const el = form.elements[name];
+            if (el) el.value = value;       // radio 群組設 value 會自動勾選對應的選項
+        });
+    }
+
+    async function submitCheckout(e) {
+        e.preventDefault();
+        if (submitting) return;                 // 送出中又按 Enter 或連點，不要重複下單
+        const form = e.currentTarget;
+        if (!form.reportValidity()) return;     // 必填沒填、Email 格式不對，瀏覽器會直接提示
+
+        // 只結帳能買的品項（已下架、超過庫存的留在購物車）
+        const cartItemIdList = items.filter(it => it.onSale && it.qty <= it.stock).map(it => it.id);
+        const data = Object.fromEntries(new FormData(form));
+        const body = {
+            receiverName: data.receiverName.trim(),
+            receiverPhone: data.receiverPhone.trim(),
+            receiverEmail: data.receiverEmail.trim() || null,
+            shippingMethod: data.shippingMethod,
+            shippingAddress: data.shippingAddress.trim(),
+            paymentMethod: data.paymentMethod,
+            note: data.note.trim() || null,
+            memberCouponId: selectedCouponId,
+            cartItemIdList
+        };
+
+        const btn = form.querySelector('button[type="submit"]');
+        submitting = true;
+        btn.disabled = true;
+        btn.textContent = '送出中…';
+        try {
+            const order = await api('/api/checkout', { method: 'POST', body });
+            showDone(order);
+            refreshCounts();
+        } catch (err) {
+            toast(err.message, true);
+            submitting = false;
+            load();     // 跟後端重新同步（例如庫存剛被別人買走、券已經用掉）；表單內容會保留
+        }
+    }
+
+    const SHIPPING_TEXT = { home: '宅配', cvs: '超商取貨' };
+    const PAYMENT_TEXT = { credit: '信用卡', atm: 'ATM 轉帳', cod: '貨到付款' };
+
+    function showDone(o) {
+        document.getElementById('count').textContent = '';
+        document.getElementById('content').innerHTML = `
+            <div class="done">
+                <div class="page-eyebrow">THANK YOU</div>
+                <h2>訂單已成立</h2>
+                <div class="no">${esc(o.orderNo)}</div>
+                <div class="info">
+                    ${fmtDate(o.createdAt)} 下單　·　實付 ${money(o.total)}<br>
+                    ${esc(o.receiverName)}　${esc(o.receiverPhone)}<br>
+                    ${SHIPPING_TEXT[o.shippingMethod] || esc(o.shippingMethod)}　·　${esc(o.shippingAddress)}<br>
+                    ${PAYMENT_TEXT[o.paymentMethod] || esc(o.paymentMethod)}
+                </div>
+                <div class="actions">
+                    <a class="btn" href="/orders.html">查看我的訂單</a>
+                    <a class="btn btn-ghost" href="/products.html?category=all_women">繼續購物</a>
+                </div>
+            </div>`;
+        window.scrollTo(0, 0);
     }
 
     // ---------- 折價券 ----------
@@ -181,13 +338,14 @@
             </label>`;
     }
 
-    // 合計 = 小計 − 折抵；運費在結帳時才算，這裡先不加
+    // 合計 = 小計 − 折抵 + 運費，算法同 CheckoutService（免運看的是折抵前的小計）
     function updateTotal(subtotal) {
         const coupon = coupons.find(c => c.id === selectedCouponId);
         const discount = coupon ? coupon.discount : 0;
+        const shippingFee = shippingFeeOf(subtotal);
         document.getElementById('discountRow').hidden = discount === 0;
         document.getElementById('discountAmount').textContent = '−' + money(discount);
-        document.getElementById('totalAmount').textContent = money(subtotal - discount);
+        document.getElementById('totalAmount').textContent = money(subtotal - discount + shippingFee);
     }
 
     function itemRow(it) {
