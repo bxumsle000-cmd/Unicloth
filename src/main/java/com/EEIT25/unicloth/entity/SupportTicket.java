@@ -1,5 +1,6 @@
 package com.EEIT25.unicloth.entity;
 
+import com.EEIT25.unicloth.enums.TicketStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -45,10 +46,11 @@ public class SupportTicket {
     @Column(nullable = false)
     private String message;
 
-    // IN_PROGRESS / PENDING / RESOLVED
+    // 存成大寫字串，例如 IN_PROGRESS
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
-    private String status = "IN_PROGRESS";
+    private TicketStatus status = TicketStatus.IN_PROGRESS;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

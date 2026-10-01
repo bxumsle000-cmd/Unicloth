@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="#F6F5F2">
+    <title>聯絡我們 — KINU</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/kinu.css">
+    <style>
+        /* ===== 客服頁專用 ===== */
+        .support-layout { display: grid; grid-template-columns: minmax(0, 420px) minmax(0, 1fr); gap: 48px; align-items: start; margin-top: 30px; }
+        .support-layout h2 { font-size: 11px; letter-spacing: .22em; font-weight: 500; margin: 0 0 18px; }
+
+        /* 表單：沿用結帳表單的底線輸入框 */
+        .support-form { background: #fff; padding: 24px 22px; display: flex; flex-direction: column; gap: 16px; }
+        .support-form h2 { margin: 0; }
+        .support-form label { display: flex; flex-direction: column; gap: 6px; font-size: 10px; color: var(--muted); letter-spacing: .08em; }
+        .support-form input, .support-form select, .support-form textarea { width: 100%; box-sizing: border-box; padding: 8px 0; border: 0; border-bottom: 1px solid var(--line); background: transparent; font-size: 12px; color: #000; letter-spacing: .04em; outline: none; border-radius: 0; }
+        .support-form textarea { resize: vertical; line-height: 1.7; }
+        .support-form input:focus, .support-form select:focus, .support-form textarea:focus { border-color: #000; }
+        .support-form .hint { font-size: 10px; color: var(--muted); letter-spacing: .06em; text-align: right; }
+        .support-form .btn { margin-top: 4px; }
+
+        /* 我的客服單 */
+        .ticket-list { display: flex; flex-direction: column; gap: 16px; }
+        .ticket { background: #fff; }
+        .ticket-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; padding: 16px 22px; border-bottom: 1px solid var(--line); }
+        .ticket-head .no { font-size: 13px; letter-spacing: .08em; }
+        .ticket-head .date { font-size: 10px; color: var(--muted); letter-spacing: .06em; margin-top: 4px; }
+        .ticket-head .status { font-size: 10px; letter-spacing: .1em; padding: 5px 10px; border: 1px solid #000; }
+        .ticket-head .status.resolved { border-color: var(--line); color: var(--muted); }
+        .ticket-body { padding: 16px 22px 18px; }
+        .ticket-body .topic { font-size: 10px; letter-spacing: .1em; color: var(--muted); }
+        .ticket-body .message { font-size: 12px; letter-spacing: .04em; line-height: 1.8; margin-top: 8px; white-space: pre-wrap; word-break: break-word; }
+        #tickets .state { padding: 50px 0; }
+
+        @media (max-width: 900px) {
+            .support-layout { grid-template-columns: 1fr; gap: 36px; }
+        }
+        @media (max-width: 760px) {
+            .support-form, .ticket-head, .ticket-body { padding-left: 16px; padding-right: 16px; }
+        }
+    </style>
+</head>
+<body>
+<div id="site-header"></div>
+
+<main class="page">
+    <div class="page-eyebrow">CONTACT</div>
+    <h1 class="page-title">聯絡我們</h1>
+    <div class="page-sub">有任何問題都可以留言給我們，客服會以 Email 回覆。</div>
+
+    <div class="support-layout">
+        <form class="support-form" id="supportForm" novalidate>
+            <h2>送出客服單</h2>
+            <label>Email（客服回覆用）<input type="email" name="email" maxlength="255" required autocomplete="email"></label>
+            <label>問題類型
+                <select name="topic" required>
+                    <option value="" disabled selected>請選擇</option>
+                </select>
+            </label>
+            <label>問題內容<textarea name="message" rows="6" maxlength="2000" required placeholder="請描述你遇到的狀況，若和訂單有關，請附上訂單編號"></textarea></label>
+            <div class="hint" id="messageCount">0 / 2000</div>
+            <button class="btn" type="submit">送出</button>
+        </form>
+
+        <section>
+            <h2>我的客服單</h2>
+            <div id="tickets"><div class="state">載入中…</div></div>
+        </section>
+    </div>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="/js/kinu.js"></script>
+<script>
+    // 問題類型同 CreateSupportTicketRequest 的驗證規則，改的話兩邊要一起改
+    const TOPICS = ['訂單與物流', '退換貨', '商品諮詢', '付款與發票', '折價券與活動', '會員帳號問題', '其他'];
+    // status 是後端 TicketStatus 的 name()，中文對照同 TicketStatus 的 label
+    const STATUS_TEXT = {
+        IN_PROGRESS: '處理中',
+        RESOLVED: '已解決'
+    };
+    const MESSAGE_MAX = 2000;
+    let tickets = [];
+    let submitting = false;         // 送出中，避免連按重複送單
+
+    const form = document.getElementById('supportForm');
+    form.elements.topic.insertAdjacentHTML('beforeend',
+        TOPICS.map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join(''));
+
+    // 字數提示；開始打字就清掉「只填空白」的提示
+    form.elements.message.addEventListener('input', () => {
+        document.getElementById('messageCount').textContent = `${form.elements.message.value.length} / ${MESSAGE_MAX}`;
+        form.elements.message.setCustomValidity('');
+    });
+
+    form.addEventListener('submit', async e => {
+        e.preventDefault();
+        if (submitting) return;
+        // 只填空白也算沒填
+        form.elements.message.setCustomValidity(form.elements.message.value.trim() ? '' : '請填寫問題內容');
+        if (!form.reportValidity()) return;     // 必填沒填、Email 格式不對，瀏覽器會直接提示
+
+        const data = Object.fromEntries(new FormData(form));
+        const body = {
+            email: data.email.trim(),
+            topic: data.topic,
+            message: data.message.trim()
+        };
+
+        const btn = form.querySelector('button[type="submit"]');
+        submitting = true;
+        btn.disabled = true;
+        btn.textContent = '送出中…';
+        try {
+            const ticket = await api('/api/support-tickets', { method: 'POST', body });
+            toast(`已送出，客服單號 ${ticket.ticketNo}`);
+            // Email 留著，下次不用再填
+            form.elements.topic.value = '';
+            form.elements.message.value = '';
+            document.getElementById('messageCount').textContent = `0 / ${MESSAGE_MAX}`;
+            tickets.unshift(ticket);
+            renderTickets();
+        } catch (err) {
+            toast(err.message, true);
+        } finally {
+            submitting = false;
+            btn.disabled = false;
+            btn.textContent = '送出';
+        }
+    });
+
+    function renderTickets() {
+        const box = document.getElementById('tickets');
+        box.innerHTML = tickets.length === 0
+            ? '<div class="state">還沒有送出過客服單</div>'
+            : `<div class="ticket-list">${tickets.map(ticketCard).join('')}</div>`;
+    }
+
+    function ticketCard(t) {
+        return `
+            <div class="ticket">
+                <div class="ticket-head">
+                    <div>
+                        <div class="no">${esc(t.ticketNo)}</div>
+                        <div class="date">${fmtDate(t.createdAt)} 送出</div>
+                    </div>
+                    <span class="status${t.status === 'RESOLVED' ? ' resolved' : ''}">${STATUS_TEXT[t.status] || esc(t.status)}</span>
+                </div>
+                <div class="ticket-body">
+                    <div class="topic">${esc(t.topic)}　·　${esc(t.email)}</div>
+                    <div class="message">${esc(t.message)}</div>
+                </div>
+            </div>`;
+    }
+
+    (async () => {
+        try {
+            tickets = await api('/api/support-tickets');
+            renderTickets();
+        } catch (e) {
+            document.getElementById('tickets').innerHTML = `<div class="state">${esc(e.message)}</div>`;
+        }
+    })();
+
+    // 用會員資料先幫忙填好 Email；拿不到就讓使用者自己填
+    (async () => {
+        try {
+            const me = await api('/api/member/me');
+            if (me.email && !form.elements.email.value) form.elements.email.value = me.email;
+        } catch {}
+    })();
+</script>
+</body>
+</html>

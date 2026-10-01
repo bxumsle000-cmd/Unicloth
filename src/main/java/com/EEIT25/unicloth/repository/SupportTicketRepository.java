@@ -1,6 +1,7 @@
 package com.EEIT25.unicloth.repository;
 
 import com.EEIT25.unicloth.entity.SupportTicket;
+import com.EEIT25.unicloth.enums.TicketStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -18,7 +19,7 @@ public interface SupportTicketRepository extends JpaRepository<SupportTicket, Lo
     List<SupportTicket> findByMemberIdOrderByCreatedAtDesc(Long memberId);
 
     // 後台依狀態篩選（IN_PROGRESS / PENDING / RESOLVED）
-    List<SupportTicket> findByStatusOrderByCreatedAtDesc(String status);
+    List<SupportTicket> findByStatusOrderByCreatedAtDesc(TicketStatus status);
 
     // 後台全部列表，最新的在前
     List<SupportTicket> findAllByOrderByCreatedAtDesc();

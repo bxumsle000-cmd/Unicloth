@@ -251,7 +251,7 @@ function renderFooter() {
                 <div class="footer-links">
                     <a href="#">配送與退貨</a>
                     <a href="#">常見問題</a>
-                    <a href="#">聯絡我們</a>
+                    <a href="/support.html">聯絡我們</a>
                     <a href="#">Instagram ↗</a>
                 </div>
             </div>
