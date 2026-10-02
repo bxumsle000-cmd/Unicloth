@@ -21,7 +21,7 @@ a { color: inherit; }
 .icon-btn { position: relative; width: 30px; height: 34px; display: grid; place-items: center; padding: 0; }
 .icon-btn svg { width: 20px; height: 20px; stroke-width: 1.45; fill: none; stroke: currentColor; }
 .weather { display: flex; align-items: center; gap: 4px; font-size: 10px; white-space: nowrap; color: #36322e; }
-.text-action { padding: 7px 0; white-space: nowrap; font-size: 20px; letter-spacing: .06em; text-decoration: none; }
+.text-action { padding: 7px 0; white-space: nowrap; font-size: 15px; letter-spacing: .06em; text-decoration: none; }
 .text-count { font-size: 9px; color: #777; }
 
 /* 頁尾 */
@@ -71,7 +71,7 @@ a { color: inherit; }
 .brand img { position: static; display: block; width: 119px; height: auto; max-width: none; mix-blend-mode: multiply; }
 
 /* ===== 導覽列文字按鈕 ===== */
-.navlinks button.nav-trigger { position: relative; padding: 10px 0; background: transparent; border: 0; color: inherit; font-size: 20px; letter-spacing: .08em; white-space: nowrap; }
+.navlinks button.nav-trigger { position: relative; padding: 10px 0; background: transparent; border: 0; color: inherit; font-size: 15px; letter-spacing: .08em; white-space: nowrap; }
 .navlinks button.nav-trigger:after { content: ''; position: absolute; left: 0; right: 0; bottom: 3px; height: 1px; background: #000; transform: scaleX(0); transition: transform .2s; }
 .navlinks button.nav-trigger:hover:after, .navlinks button.nav-trigger.active:after { transform: scaleX(1); }
 @media (max-width: 760px) {
