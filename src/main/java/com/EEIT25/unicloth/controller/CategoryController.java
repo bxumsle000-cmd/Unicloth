@@ -7,6 +7,7 @@ import com.EEIT25.unicloth.dto.category.FilterOptionsResponse;
 import com.EEIT25.unicloth.dto.category.ProductCardResponse;
 import com.EEIT25.unicloth.dto.category.ProductFilterRequest;
 import com.EEIT25.unicloth.service.CategoryService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
@@ -48,7 +49,7 @@ public class CategoryController {
     @GetMapping("/{code}/products")
     public Page<ProductCardResponse> getProducts(
         @PathVariable String code,
-        @ParameterObject @ModelAttribute ProductFilterRequest filter,
+        @ParameterObject @Valid @ModelAttribute ProductFilterRequest filter,
         @ParameterObject @PageableDefault(size = 25, sort = "id", direction = Sort.Direction.DESC)Pageable pageable) {
         return categoryService.getProducts(code, filter, pageable);
     }
