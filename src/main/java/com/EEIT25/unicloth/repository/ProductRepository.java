@@ -1,6 +1,7 @@
 package com.EEIT25.unicloth.repository;
 
 import com.EEIT25.unicloth.entity.Product;
+import com.EEIT25.unicloth.enums.ProductStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,7 +15,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     boolean existsBySlug(String slug);
 
     /** 分類 id 在清單內、且狀態符合的商品（分頁）*/
-    Page<Product> findByCategoryIdInAndStatus(Collection<Long> categoryIds, String status, Pageable pageable);
+    Page<Product> findByCategoryIdInAndStatus(Collection<Long> categoryIds, ProductStatus status, Pageable pageable);
 
     /**
      * 分類商品 + 篩選（分頁）。每個條件都是「沒帶就不篩」：<br>
@@ -35,7 +36,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                       AND (:allColors = true OR v.color IN :colors)
                       AND (:allSizes = true OR v.size IN :sizes)))
             """)
-    Page<Product> findByFilter(Collection<Long> categoryIds, String status,
+    Page<Product> findByFilter(Collection<Long> categoryIds, ProductStatus status,
                                Integer minPrice, Integer maxPrice,
                                boolean filterSku,
                                boolean allColors, Collection<String> colors,
@@ -43,9 +44,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                                Pageable pageable);
 
     /** 上架中的商品（依 slug） */
-    @Query("SELECT p FROM Product p WHERE p.slug = :slug AND p.status = 'on_sale'")
+    @Query("SELECT p FROM Product p WHERE p.slug = :slug AND p.status = com.EEIT25.unicloth.enums.ProductStatus.ON_SALE")
     Optional<Product> findOnSaleBySlug(String slug);
 
     /** 狀態符合、名稱包含關鍵字的商品（分頁），不分大小寫；LIKE 的 % _ 由 Spring 自動跳脫 */
-    Page<Product> findByStatusAndNameContainingIgnoreCase(String status, String name, Pageable pageable);
+    Page<Product> findByStatusAndNameContainingIgnoreCase(ProductStatus status, String name, Pageable pageable);
 }

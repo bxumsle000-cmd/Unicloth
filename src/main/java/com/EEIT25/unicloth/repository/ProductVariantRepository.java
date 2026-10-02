@@ -1,6 +1,7 @@
 package com.EEIT25.unicloth.repository;
 
 import com.EEIT25.unicloth.entity.ProductVariant;
+import com.EEIT25.unicloth.enums.ProductStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -22,14 +23,14 @@ public interface ProductVariantRepository extends JpaRepository<ProductVariant, 
             SELECT DISTINCT v.color FROM ProductVariant v
             WHERE v.product.category.id IN :categoryIds AND v.product.status = :status
             """)
-    List<String> findDistinctColors(Collection<Long> categoryIds, String status);
+    List<String> findDistinctColors(Collection<Long> categoryIds, ProductStatus status);
 
     /** 同上，出現過的所有尺寸 */
     @Query("""
             SELECT DISTINCT v.size FROM ProductVariant v
             WHERE v.product.category.id IN :categoryIds AND v.product.status = :status
             """)
-    List<String> findDistinctSizes(Collection<Long> categoryIds, String status);
+    List<String> findDistinctSizes(Collection<Long> categoryIds, ProductStatus status);
 
     // ==================== 以下提供給訂單模組（CheckoutService 結帳）使用 ====================
 

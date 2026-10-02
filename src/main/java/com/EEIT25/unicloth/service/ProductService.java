@@ -4,6 +4,7 @@ import com.EEIT25.unicloth.dto.category.ProductCardResponse;
 import com.EEIT25.unicloth.dto.product.ProductDetailResponse;
 import com.EEIT25.unicloth.entity.Product;
 import com.EEIT25.unicloth.entity.ProductVariant;
+import com.EEIT25.unicloth.enums.ProductStatus;
 import com.EEIT25.unicloth.exception.ApiException;
 import com.EEIT25.unicloth.repository.ProductRepository;
 import com.EEIT25.unicloth.repository.ProductVariantRepository;
@@ -23,8 +24,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class ProductService {
-    private static final String ON_SALE = "on_sale";
-
     private final ProductRepository productRepository;
     private final ProductVariantRepository productVariantRepository;
 
@@ -47,7 +46,7 @@ public class ProductService {
         if (kw.isEmpty()) {
             return Page.empty(pageable);
         }
-        return productRepository.findByStatusAndNameContainingIgnoreCase(ON_SALE, kw, pageable)
+        return productRepository.findByStatusAndNameContainingIgnoreCase(ProductStatus.ON_SALE, kw, pageable)
                 .map(ProductCardResponse::from);
     }
 }

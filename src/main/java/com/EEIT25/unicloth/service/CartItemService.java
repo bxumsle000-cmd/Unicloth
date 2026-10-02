@@ -6,6 +6,7 @@ import com.EEIT25.unicloth.dto.cartItem.ChangeCartItemQtyRequest;
 import com.EEIT25.unicloth.entity.CartItem;
 import com.EEIT25.unicloth.entity.Member;
 import com.EEIT25.unicloth.entity.ProductVariant;
+import com.EEIT25.unicloth.enums.ProductStatus;
 import com.EEIT25.unicloth.exception.ApiException;
 import com.EEIT25.unicloth.repository.CartItemRepository;
 import com.EEIT25.unicloth.repository.MemberRepository;
@@ -52,7 +53,7 @@ public class CartItemService {
                 .orElseThrow(() -> ApiException.unauthorized("登入過期或失效"));
         ProductVariant productVariant = productVariantRepository.findById(request.variantId())
                 .orElseThrow(()-> ApiException.notFound("沒有找到商品"));
-        if(!"on_sale".equals(productVariant.getProduct().getStatus())){
+        if(productVariant.getProduct().getStatus() != ProductStatus.ON_SALE){
             throw ApiException.conflict("商品已下架");
         }
 

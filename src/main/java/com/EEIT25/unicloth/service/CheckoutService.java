@@ -10,6 +10,8 @@ import com.EEIT25.unicloth.entity.Order;
 import com.EEIT25.unicloth.entity.OrderItem;
 import com.EEIT25.unicloth.entity.Product;
 import com.EEIT25.unicloth.entity.ProductVariant;
+import com.EEIT25.unicloth.enums.CouponType;
+import com.EEIT25.unicloth.enums.ProductStatus;
 import com.EEIT25.unicloth.exception.ApiException;
 import com.EEIT25.unicloth.repository.CartItemRepository;
 import com.EEIT25.unicloth.repository.MemberCouponRepository;
@@ -72,7 +74,7 @@ public class CheckoutService {
         int subtotal = 0;
         for (CartItem cartItem : cartItemList) {
             Product product = cartItem.getVariant().getProduct();
-            if (!"on_sale".equals(product.getStatus())) {
+            if (product.getStatus() != ProductStatus.ON_SALE) {
                 throw ApiException.conflict("「" + product.getName() + "」已下架，請先從購物車移除");
             }
             subtotal += product.getPrice() * cartItem.getQty();
@@ -99,9 +101,9 @@ public class CheckoutService {
             // 折抵規則同 UsableCouponResponse（結帳頁顯示的金額），改規則時兩邊要一起改
             switch (coupon.getType()) {
                 // 折固定金額，最多折到 0 元
-                case "amount" -> discount = Math.min(coupon.getValue(), subtotal);
+                case AMOUNT -> discount = Math.min(coupon.getValue(), subtotal);
                 // 折 %，小數無條件捨去
-                case "percent" -> discount = subtotal * coupon.getValue() / 100;
+                case PERCENT -> discount = subtotal * coupon.getValue() / 100;
             }
         }
 

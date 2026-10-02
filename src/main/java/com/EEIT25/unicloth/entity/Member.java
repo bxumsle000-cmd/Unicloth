@@ -1,5 +1,6 @@
 package com.EEIT25.unicloth.entity;
 
+import com.EEIT25.unicloth.enums.MemberStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -52,10 +53,11 @@ public class Member {
     @Column(nullable = false)
     private LocalDate birthday;
 
-    // active / disabled
+    // 存成大寫字串，例如 ACTIVE
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
-    private String status = "active";
+    private MemberStatus status = MemberStatus.ACTIVE;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

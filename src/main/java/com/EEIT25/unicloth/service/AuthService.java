@@ -4,6 +4,7 @@ import com.EEIT25.unicloth.dto.auth.LoginRequest;
 import com.EEIT25.unicloth.dto.auth.LoginResponse;
 import com.EEIT25.unicloth.dto.auth.RegisterRequest;
 import com.EEIT25.unicloth.entity.Member;
+import com.EEIT25.unicloth.enums.MemberStatus;
 import com.EEIT25.unicloth.exception.ApiException;
 import com.EEIT25.unicloth.repository.MemberRepository;
 import com.EEIT25.unicloth.security.CurrentMember;
@@ -32,7 +33,7 @@ public class AuthService {
         if(!passwordEncoder.matches(request.password(), member.getPasswordHash())){
             throw ApiException.unauthorized("帳號或密碼錯誤");
         }
-        if(!"active".equals(member.getStatus())){
+        if(member.getStatus() != MemberStatus.ACTIVE){
             throw ApiException.forbidden("此帳號已被停用");
         }
 

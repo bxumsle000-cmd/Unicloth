@@ -3,6 +3,7 @@ package com.EEIT25.unicloth.exception;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -65,6 +66,25 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), message));
+    }
+
+    /**
+     * 【2-1. 請求內容讀不懂】負責處理前端送來的 JSON「根本轉不成 DTO」。
+     * <p>
+     * 觸發時機：JSON 語法錯誤，或 enum 欄位送了不存在的值，
+     * 例如 shippingMethod 送 "home"（正確是 "HOME"），Jackson 轉不過去就會丟這個例外。
+     * <p>
+     * 處理方式：固定回 400。不用 e.getMessage()，裡面會帶 Java 類別名稱等內部細節。
+     * <p>
+     * 例：shippingMethod 送 "abc"
+     *   → HTTP 400 { "code": 400, "message": "請求內容格式錯誤，請確認欄位值是否正確" }
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleNotReadable(HttpMessageNotReadableException e) {
+        log.warn("請求內容無法解析 {}", e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "請求內容格式錯誤，請確認欄位值是否正確"));
     }
 
     /**

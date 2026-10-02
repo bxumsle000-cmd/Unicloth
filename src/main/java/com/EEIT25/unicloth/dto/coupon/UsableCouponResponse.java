@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
  * @param id               會員持有這張券的 id（MemberCoupon.id）；結帳套用券時前端要傳回來
  * @param code             折扣碼
  * @param title            券名稱，例如 新會員 100 元折價券
- * @param type             amount / percent（沒有免運券）
+ * @param type             AMOUNT / PERCENT（沒有免運券）
  * @param value            amount → 折多少元；percent → 折幾 %（10 = 9 折）
  * @param minSubtotal      最低消費
  * @param expireAt         到期時間
@@ -47,9 +47,9 @@ public record UsableCouponResponse(
         if (meetsMinSubtotal) {
             switch (coupon.getType()) {
                 // 折固定金額，最多折到 0 元
-                case "amount" -> discount = Math.min(coupon.getValue(), subtotal);
+                case AMOUNT -> discount = Math.min(coupon.getValue(), subtotal);
                 // 折 %，小數無條件捨去
-                case "percent" -> discount = subtotal * coupon.getValue() / 100;
+                case PERCENT -> discount = subtotal * coupon.getValue() / 100;
             }
         }
 
@@ -57,7 +57,7 @@ public record UsableCouponResponse(
                 memberCoupon.getId(),
                 coupon.getCode(),
                 coupon.getTitle(),
-                coupon.getType(),
+                coupon.getType().name(),
                 coupon.getValue(),
                 coupon.getMinSubtotal(),
                 memberCoupon.getExpireAt(),

@@ -1,6 +1,8 @@
 package com.EEIT25.unicloth.entity;
 
 import com.EEIT25.unicloth.enums.OrderStatus;
+import com.EEIT25.unicloth.enums.PaymentMethod;
+import com.EEIT25.unicloth.enums.ShippingMethod;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -53,17 +55,19 @@ public class Order {
     @Column(name = "receiver_email")
     private String receiverEmail;
 
-    // home / cvs
+    // 存成大寫字串：HOME / CVS
+    @Enumerated(EnumType.STRING)
     @Column(name = "shipping_method", nullable = false)
-    private String shippingMethod;
+    private ShippingMethod shippingMethod;
 
     // 宅配地址或超商門市名
     @Column(name = "shipping_address", nullable = false)
     private String shippingAddress;
 
-    // credit / atm / cod
+    // 存成大寫字串：CREDIT / ATM / COD
+    @Enumerated(EnumType.STRING)
     @Column(name = "payment_method", nullable = false)
-    private String paymentMethod;
+    private PaymentMethod paymentMethod;
 
     @Column(nullable = true)
     private String note;

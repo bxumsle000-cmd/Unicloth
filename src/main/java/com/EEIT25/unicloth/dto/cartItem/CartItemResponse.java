@@ -3,6 +3,7 @@ package com.EEIT25.unicloth.dto.cartItem;
 import com.EEIT25.unicloth.entity.CartItem;
 import com.EEIT25.unicloth.entity.Product;
 import com.EEIT25.unicloth.entity.ProductVariant;
+import com.EEIT25.unicloth.enums.ProductStatus;
 
 /**
  * 購物車上的一筆
@@ -48,6 +49,6 @@ public record CartItemResponse(
                 product.getPrice(),
                 cartItem.getQty(),
                 productVariant.getStock(),
-                "on_sale".equals(product.getStatus()));
+                product.getStatus() == ProductStatus.ON_SALE);
     }
 }

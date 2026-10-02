@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
  * @param createdAt       訂購日期
  * @param receiverName    收件人
  * @param receiverPhone   收件人手機
- * @param shippingMethod  home（宅配）/ cvs（超商取貨）
- * @param paymentMethod   credit / atm / cod
+ * @param shippingMethod  HOME（宅配）/ CVS（超商取貨）
+ * @param paymentMethod   CREDIT / ATM / COD
  * @param shippingAddress 宅配地址或超商門市名
  * @param total           最終金額（商品小計 - 折抵 + 運費）
  */
@@ -35,8 +35,8 @@ public record CheckoutResponse(
                 order.getCreatedAt(),
                 order.getReceiverName(),
                 order.getReceiverPhone(),
-                order.getShippingMethod(),
-                order.getPaymentMethod(),
+                order.getShippingMethod().name(),
+                order.getPaymentMethod().name(),
                 order.getShippingAddress(),
                 order.getTotal());
     }

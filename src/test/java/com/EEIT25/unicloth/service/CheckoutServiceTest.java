@@ -9,7 +9,11 @@ import com.EEIT25.unicloth.entity.MemberCoupon;
 import com.EEIT25.unicloth.entity.Order;
 import com.EEIT25.unicloth.entity.OrderItem;
 import com.EEIT25.unicloth.entity.ProductVariant;
+import com.EEIT25.unicloth.enums.CouponType;
 import com.EEIT25.unicloth.enums.OrderStatus;
+import com.EEIT25.unicloth.enums.PaymentMethod;
+import com.EEIT25.unicloth.enums.ProductStatus;
+import com.EEIT25.unicloth.enums.ShippingMethod;
 import com.EEIT25.unicloth.exception.ApiException;
 import com.EEIT25.unicloth.repository.CartItemRepository;
 import com.EEIT25.unicloth.repository.CouponRepository;
@@ -73,7 +77,7 @@ class CheckoutServiceTest {
 
         // 隨便挑一個上架中、庫存至少 2 的 SKU
         variant = productVariantRepository.findAll().stream()
-                .filter(v -> "on_sale".equals(v.getProduct().getStatus()) && v.getStock() >= 2)
+                .filter(v -> v.getProduct().getStatus() == ProductStatus.ON_SALE && v.getStock() >= 2)
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("資料庫沒有可結帳的商品，無法測試"));
     }
@@ -84,12 +88,12 @@ class CheckoutServiceTest {
     }
 
     private CheckoutRequest request(List<Long> cartItemIdList, Long memberCouponId) {
-        return new CheckoutRequest("王小明", "0912345678", "test@example.com", "home", "台北市信義區某路 1 號",
-                "cod", null, memberCouponId, cartItemIdList);
+        return new CheckoutRequest("王小明", "0912345678", "test@example.com", ShippingMethod.HOME, "台北市信義區某路 1 號",
+                PaymentMethod.COD, null, memberCouponId, cartItemIdList);
     }
 
     /** 建一張屬於測試會員的折價券 */
-    private MemberCoupon giveCoupon(String type, int value, int minSubtotal) {
+    private MemberCoupon giveCoupon(CouponType type, int value, int minSubtotal) {
         Coupon coupon = couponRepository.save(Coupon.builder()
                 .code("ORDER-TEST-" + type)
                 .title("測試券")
@@ -135,8 +139,8 @@ class CheckoutServiceTest {
         assertNotNull(response.createdAt());
         assertEquals("王小明", response.receiverName());
         assertEquals("0912345678", response.receiverPhone());
-        assertEquals("home", response.shippingMethod());
-        assertEquals("cod", response.paymentMethod());
+        assertEquals("HOME", response.shippingMethod());
+        assertEquals("COD", response.paymentMethod());
         assertEquals("台北市信義區某路 1 號", response.shippingAddress());
         assertEquals(order.getTotal(), response.total());
 
@@ -162,7 +166,7 @@ class CheckoutServiceTest {
     void 小計未滿2500_運費50() {
         // 找一個單價低於 2500 的 SKU，買 1 件
         ProductVariant cheap = productVariantRepository.findAll().stream()
-                .filter(v -> "on_sale".equals(v.getProduct().getStatus()) && v.getStock() >= 1
+                .filter(v -> v.getProduct().getStatus() == ProductStatus.ON_SALE && v.getStock() >= 1
                         && v.getProduct().getPrice() < 2500)
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("找不到單價低於 2500 的商品，無法測試"));
@@ -180,7 +184,7 @@ class CheckoutServiceTest {
     void 小計滿2500_免運() {
         // 找一個「庫存 × 單價」能湊到 2500 的 SKU，買剛好湊滿 2500 的數量
         ProductVariant v = productVariantRepository.findAll().stream()
-                .filter(x -> "on_sale".equals(x.getProduct().getStatus())
+                .filter(x -> x.getProduct().getStatus() == ProductStatus.ON_SALE
                         && x.getStock() * x.getProduct().getPrice() >= 2500)
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("找不到能湊滿 2500 的商品，無法測試"));
@@ -208,7 +212,7 @@ class CheckoutServiceTest {
     @Test
     void 只結帳勾選的項目_沒勾的留在購物車() {
         ProductVariant other = productVariantRepository.findAll().stream()
-                .filter(v -> "on_sale".equals(v.getProduct().getStatus()) && v.getStock() >= 1
+                .filter(v -> v.getProduct().getStatus() == ProductStatus.ON_SALE && v.getStock() >= 1
                         && !v.getId().equals(variant.getId()))
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("找不到第二個可結帳的 SKU，無法測試"));
@@ -264,7 +268,7 @@ class CheckoutServiceTest {
     void 使用折價券_金額有折抵_券標記為已使用() {
         Long cartItemId = addToCart(variant, 2);
         int subtotal = variant.getProduct().getPrice() * 2;
-        MemberCoupon mc = giveCoupon("amount", 100, 0);
+        MemberCoupon mc = giveCoupon(CouponType.AMOUNT, 100, 0);
 
         checkoutService.checkout(request(List.of(cartItemId), mc.getId()));
         flushAndClear();
@@ -282,7 +286,7 @@ class CheckoutServiceTest {
     @Test
     void 券已使用過_不能再用() {
         Long cartItemId = addToCart(variant, 1);
-        MemberCoupon mc = giveCoupon("amount", 100, 0);
+        MemberCoupon mc = giveCoupon(CouponType.AMOUNT, 100, 0);
         mc.setUsedAt(LocalDateTime.now());
 
         ApiException e = assertThrows(ApiException.class, () -> checkoutService.checkout(request(List.of(cartItemId), mc.getId())));
@@ -292,7 +296,7 @@ class CheckoutServiceTest {
     @Test
     void 未達最低消費_不能用券() {
         Long cartItemId = addToCart(variant, 1);
-        MemberCoupon mc = giveCoupon("amount", 100, 99_999_999);
+        MemberCoupon mc = giveCoupon(CouponType.AMOUNT, 100, 99_999_999);
 
         ApiException e = assertThrows(ApiException.class, () -> checkoutService.checkout(request(List.of(cartItemId), mc.getId())));
         assertEquals(HttpStatus.BAD_REQUEST, e.getStatus());

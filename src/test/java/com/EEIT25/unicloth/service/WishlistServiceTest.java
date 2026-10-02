@@ -3,6 +3,7 @@ package com.EEIT25.unicloth.service;
 import com.EEIT25.unicloth.dto.wishlist.WishlistItemResponse;
 import com.EEIT25.unicloth.entity.Member;
 import com.EEIT25.unicloth.entity.Product;
+import com.EEIT25.unicloth.enums.ProductStatus;
 import com.EEIT25.unicloth.repository.MemberRepository;
 import com.EEIT25.unicloth.repository.ProductRepository;
 import com.EEIT25.unicloth.repository.WishlistItemRepository;
@@ -56,7 +57,7 @@ class WishlistServiceTest {
 
         // 隨便挑一件上架中的商品
         product = productRepository.findAll().stream()
-                .filter(p -> "on_sale".equals(p.getStatus()))
+                .filter(p -> p.getStatus() == ProductStatus.ON_SALE)
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("資料庫沒有上架中的商品，無法測試"));
     }
@@ -70,7 +71,7 @@ class WishlistServiceTest {
 
     /** 把商品下架，並寫進資料庫 */
     private void takeOffShelf(Product p) {
-        p.setStatus("off_shelf");
+        p.setStatus(ProductStatus.OFF_SHELF);
         em.flush();
     }
 

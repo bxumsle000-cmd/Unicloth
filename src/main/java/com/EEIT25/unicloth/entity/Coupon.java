@@ -1,5 +1,6 @@
 package com.EEIT25.unicloth.entity;
 
+import com.EEIT25.unicloth.enums.CouponType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,11 +33,12 @@ public class Coupon {
     @Column(nullable = false)
     private String title;
 
-    // amount / percent（沒有免運券）
+    // 存成大寫字串：AMOUNT / PERCENT（沒有免運券）
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String type;
+    private CouponType type;
 
-    // amount → 折多少元；percent → 折幾 %（10 = 9 折）
+    // AMOUNT → 折多少元；PERCENT → 折幾 %（10 = 9 折）
     @Column(nullable = false)
     private Integer value;
 

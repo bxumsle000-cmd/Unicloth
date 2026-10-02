@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
  * @param gender   性別
  * @param birthday 生日
  * @param address  地址
- * @param status   帳號狀態
+ * @param status   帳號狀態：ACTIVE / DISABLED
  * @param createdAt 建立時間
  */
 public record MemberResponse(
@@ -39,7 +39,7 @@ public record MemberResponse(
                 member.getGender(),
                 member.getBirthday(),
                 member.getAddress(),
-                member.getStatus(),
+                member.getStatus().name(),
                 member.getCreatedAt());
     }
 }

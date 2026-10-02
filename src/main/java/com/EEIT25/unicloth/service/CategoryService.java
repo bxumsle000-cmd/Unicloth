@@ -8,6 +8,7 @@ import com.EEIT25.unicloth.dto.category.ProductCardResponse;
 import com.EEIT25.unicloth.dto.category.ProductFilterRequest;
 import com.EEIT25.unicloth.entity.Category;
 import com.EEIT25.unicloth.entity.Product;
+import com.EEIT25.unicloth.enums.ProductStatus;
 import com.EEIT25.unicloth.exception.ApiException;
 import com.EEIT25.unicloth.repository.CategoryRepository;
 import com.EEIT25.unicloth.repository.ProductRepository;
@@ -37,8 +38,6 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class CategoryService {
-    private static final String ON_SALE = "on_sale";
-
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
     private final ProductVariantRepository variantRepository;
@@ -98,7 +97,7 @@ public class CategoryService {
         List<String> sizes = allSizes ? List.of("") : filter.sizes();
 
         Page<Product> products = productRepository.findByFilter(
-                categoryIds, ON_SALE,
+                categoryIds, ProductStatus.ON_SALE,
                 filter.minPrice(), filter.maxPrice(),
                 !(allColors && allSizes),
                 allColors, colors,
@@ -116,8 +115,8 @@ public class CategoryService {
         List<Long> categoryIds = findLeafCategoryIds(code);
 
         return new FilterOptionsResponse(
-                variantRepository.findDistinctColors(categoryIds, ON_SALE),
-                variantRepository.findDistinctSizes(categoryIds, ON_SALE));
+                variantRepository.findDistinctColors(categoryIds, ProductStatus.ON_SALE),
+                variantRepository.findDistinctSizes(categoryIds, ProductStatus.ON_SALE));
     }
 
     /**

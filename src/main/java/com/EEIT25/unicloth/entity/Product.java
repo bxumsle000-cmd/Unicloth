@@ -1,5 +1,6 @@
 package com.EEIT25.unicloth.entity;
 
+import com.EEIT25.unicloth.enums.ProductStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -60,9 +61,10 @@ public class Product {
     @Column(name = "image_url")
     private String imageUrl;
 
-    // on_sale / off_shelf
+    // 存成大寫字串，例如 ON_SALE
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
-    private String status = "on_sale";
+    private ProductStatus status = ProductStatus.ON_SALE;
 
 }

@@ -2,6 +2,7 @@ package com.EEIT25.unicloth.dto.wishlist;
 
 import com.EEIT25.unicloth.entity.Product;
 import com.EEIT25.unicloth.entity.WishlistItem;
+import com.EEIT25.unicloth.enums.ProductStatus;
 
 /**
  * 追蹤清單上的一件商品
@@ -30,6 +31,6 @@ public record WishlistItemResponse(
                 product.getName(),
                 product.getPrice(),
                 product.getImageUrl(),
-                "on_sale".equals(product.getStatus()));
+                product.getStatus() == ProductStatus.ON_SALE);
     }
 }
