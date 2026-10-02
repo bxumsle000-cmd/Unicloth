@@ -1,5 +1,12 @@
 package com.EEIT25.unicloth.dto.auth;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+
 import java.time.LocalDate;
 
 /**
@@ -12,12 +19,12 @@ import java.time.LocalDate;
  * @param address  地址
  */
 public record RegisterRequest(
-        String email,
-        String password,
-        String name,
-        String phone,
-        String gender,
-        LocalDate birthday,
-        String address
+        @NotBlank @Email String email,
+        @NotBlank @Size(min = 8, message = "密碼長度最少8字") String password,
+        @NotBlank @Size(max = 50) String name,
+        @NotBlank @Size(max = 20) String phone,
+        @NotBlank String gender,
+        @NotNull @Past LocalDate birthday,
+        @Size(max = 255) String address
 ) {
 }

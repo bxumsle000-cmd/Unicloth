@@ -1,5 +1,7 @@
 package com.EEIT25.unicloth.dto.category;
 
+import jakarta.validation.constraints.PositiveOrZero;
+
 import java.util.List;
 
 /**
@@ -14,7 +16,7 @@ import java.util.List;
 public record ProductFilterRequest(
         List<String> colors,
         List<String> sizes,
-        Integer minPrice,
-        Integer maxPrice
+        @PositiveOrZero Integer minPrice,
+        @PositiveOrZero Integer maxPrice
 ) {
 }
