@@ -54,6 +54,7 @@ class WishlistServiceTest {
                 .birthday(LocalDate.of(2000, 1, 1))
                 .build());
         when(currentMember.getCurrentId()).thenReturn(member.getId());
+        when(currentMember.require()).thenReturn(member);
 
         // 隨便挑一件上架中的商品
         product = productRepository.findAll().stream()

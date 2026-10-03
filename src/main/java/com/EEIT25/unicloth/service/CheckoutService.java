@@ -15,7 +15,6 @@ import com.EEIT25.unicloth.enums.ProductStatus;
 import com.EEIT25.unicloth.exception.ApiException;
 import com.EEIT25.unicloth.repository.CartItemRepository;
 import com.EEIT25.unicloth.repository.MemberCouponRepository;
-import com.EEIT25.unicloth.repository.MemberRepository;
 import com.EEIT25.unicloth.repository.OrderItemRepository;
 import com.EEIT25.unicloth.repository.OrderRepository;
 import com.EEIT25.unicloth.repository.ProductVariantRepository;
@@ -44,7 +43,6 @@ public class CheckoutService {
 
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
-    private final MemberRepository memberRepository;
     private final CartItemRepository cartItemRepository;
     private final ProductVariantRepository productVariantRepository;
     private final MemberCouponRepository memberCouponRepository;
@@ -57,8 +55,7 @@ public class CheckoutService {
     @Transactional
     public CheckoutResponse checkout(CheckoutRequest request){
         // 1. 目前登入的會員
-        Member member = memberRepository.findById(currentMember.getCurrentId())
-                .orElseThrow(() -> ApiException.unauthorized("登入過期或失效"));
+        Member member = currentMember.require();
 
         // 2. 勾選的購物車項目（SKU、商品一起 JOIN FETCH 進來）
         //    撈到的筆數要跟勾選的一樣多；少了代表有 id 不是自己的，或已經從購物車刪掉

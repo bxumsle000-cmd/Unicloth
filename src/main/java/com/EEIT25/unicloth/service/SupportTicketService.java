@@ -4,8 +4,6 @@ import com.EEIT25.unicloth.dto.supportTicket.CreateSupportTicketRequest;
 import com.EEIT25.unicloth.dto.supportTicket.SupportTicketResponse;
 import com.EEIT25.unicloth.entity.Member;
 import com.EEIT25.unicloth.entity.SupportTicket;
-import com.EEIT25.unicloth.exception.ApiException;
-import com.EEIT25.unicloth.repository.MemberRepository;
 import com.EEIT25.unicloth.repository.SupportTicketRepository;
 import com.EEIT25.unicloth.security.CurrentMember;
 import lombok.RequiredArgsConstructor;
@@ -28,15 +26,13 @@ import java.util.concurrent.ThreadLocalRandom;
 @RequiredArgsConstructor
 public class SupportTicketService {
     private final SupportTicketRepository supportTicketRepository;
-    private final MemberRepository memberRepository;
     private final CurrentMember currentMember;
 
     /** 送出客服單，回傳剛建立的客服單（含單號） */
     @Transactional
     public SupportTicketResponse create(CreateSupportTicketRequest request){
         // TODO 登入機制做好後：未登入時這裡不要丟例外，member 存 null（見類別說明）
-        Member member = memberRepository.findById(currentMember.getCurrentId())
-                .orElseThrow(() -> ApiException.unauthorized("登入過期或失效"));
+        Member member = currentMember.require();
 
         // 產生客服單號，例如 CS12345678；撞號就重抽
         String ticketNo;

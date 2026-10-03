@@ -45,6 +45,7 @@ class SupportTicketServiceTest {
     void setUp() {
         member = saveMember("support-test@example.com");
         when(currentMember.getCurrentId()).thenReturn(member.getId());
+        when(currentMember.require()).thenReturn(member);
     }
 
     private Member saveMember(String email) {
@@ -102,10 +103,12 @@ class SupportTicketServiceTest {
         // 換成另一個會員送一張
         Member other = saveMember("support-other@example.com");
         when(currentMember.getCurrentId()).thenReturn(other.getId());
+        when(currentMember.require()).thenReturn(other);
         SupportTicketResponse othersTicket = supportTicketService.create(request("別人的"));
 
         // 換回自己
         when(currentMember.getCurrentId()).thenReturn(member.getId());
+        when(currentMember.require()).thenReturn(member);
         List<SupportTicketResponse> myTicketList = supportTicketService.getMyTickets();
 
         assertEquals(1, myTicketList.size());

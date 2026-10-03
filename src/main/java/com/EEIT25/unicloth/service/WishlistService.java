@@ -6,7 +6,6 @@ import com.EEIT25.unicloth.entity.Member;
 import com.EEIT25.unicloth.entity.Product;
 import com.EEIT25.unicloth.entity.WishlistItem;
 import com.EEIT25.unicloth.exception.ApiException;
-import com.EEIT25.unicloth.repository.MemberRepository;
 import com.EEIT25.unicloth.repository.ProductRepository;
 import com.EEIT25.unicloth.repository.WishlistItemRepository;
 import com.EEIT25.unicloth.security.CurrentMember;
@@ -28,7 +27,6 @@ import java.util.List;
 public class WishlistService {
     private final WishlistItemRepository wishlistItemRepository;
     private final ProductRepository productRepository;
-    private final MemberRepository memberRepository;
     private final CurrentMember currentMember;
 
     /** 我的追蹤清單，最新追蹤的在前面 */
@@ -43,8 +41,7 @@ public class WishlistService {
     /** 追蹤商品（只能追蹤上架中的）；已經追蹤過就直接略過 */
     @Transactional
     public void add(String slug){
-        Member member = memberRepository.findById(currentMember.getCurrentId())
-                .orElseThrow(()-> ApiException.unauthorized("登入過期或失效"));
+        Member member = currentMember.require();
 
         Product product = productRepository.findOnSaleBySlug(slug)
                 .orElseThrow(()-> ApiException.notFound("找不到商品:"+slug));

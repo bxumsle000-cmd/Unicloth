@@ -9,7 +9,6 @@ import com.EEIT25.unicloth.entity.ProductVariant;
 import com.EEIT25.unicloth.enums.ProductStatus;
 import com.EEIT25.unicloth.exception.ApiException;
 import com.EEIT25.unicloth.repository.CartItemRepository;
-import com.EEIT25.unicloth.repository.MemberRepository;
 import com.EEIT25.unicloth.repository.ProductVariantRepository;
 import com.EEIT25.unicloth.security.CurrentMember;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +29,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CartItemService {
     private final CartItemRepository cartItemRepository;
-    private final MemberRepository memberRepository;
     private final CurrentMember currentMember;
     private final ProductVariantRepository productVariantRepository;
 
@@ -49,8 +47,7 @@ public class CartItemService {
      */
     @Transactional
     public void add(AddCartItemRequest request){
-        Member member = memberRepository.findById(currentMember.getCurrentId())
-                .orElseThrow(() -> ApiException.unauthorized("登入過期或失效"));
+        Member member = currentMember.require();
         ProductVariant productVariant = productVariantRepository.findById(request.variantId())
                 .orElseThrow(()-> ApiException.notFound("沒有找到商品"));
         if(productVariant.getProduct().getStatus() != ProductStatus.ON_SALE){
@@ -81,8 +78,7 @@ public class CartItemService {
     /** 把某個購物車項目的數量直接改成指定值（不是加減）；只能改自己的，不能超過庫存 */
     @Transactional
     public void changeQty(ChangeCartItemQtyRequest request){
-        Member member = memberRepository.findById(currentMember.getCurrentId())
-                .orElseThrow(() -> ApiException.unauthorized("登入過期或失效"));
+        Member member = currentMember.require();
 
         CartItem cartItem = cartItemRepository.findByIdAndMember(request.cartItemId(), member)
                 .orElseThrow(()->ApiException.notFound("找不到購物車編號"));
@@ -98,8 +94,7 @@ public class CartItemService {
     /** 移除購物車項目；只會刪到自己的，編號不存在也不會報錯 */
     @Transactional
     public void remove(Long cartItemId){
-        Member member = memberRepository.findById(currentMember.getCurrentId())
-                .orElseThrow(() -> ApiException.unauthorized("登入過期或失效"));
+        Member member = currentMember.require();
 
         cartItemRepository.deleteByIdAndMember(cartItemId,member);
     }

@@ -1,6 +1,11 @@
 package com.EEIT25.unicloth.security;
 
+import com.EEIT25.unicloth.entity.Member;
+import com.EEIT25.unicloth.exception.ApiException;
+import com.EEIT25.unicloth.repository.MemberRepository;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /**
@@ -21,7 +26,17 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Getter
+@RequiredArgsConstructor
 public class CurrentMember {
     private final  Long  currentId = 1L ;
     private final  String currentToken = "DEV_CURRENT_TOKEN" ;
+
+    @Getter(AccessLevel.NONE)
+    private final MemberRepository memberRepository;
+
+    /** 取得目前登入的會員；資料庫查不到代表登入失效，丟 401 */
+    public Member require() {
+        return memberRepository.findById(currentId)
+                .orElseThrow(() -> ApiException.unauthorized("登入過期或失效"));
+    }
 }

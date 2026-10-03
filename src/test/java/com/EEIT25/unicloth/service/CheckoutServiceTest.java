@@ -74,6 +74,7 @@ class CheckoutServiceTest {
                 .birthday(LocalDate.of(2000, 1, 1))
                 .build());
         when(currentMember.getCurrentId()).thenReturn(member.getId());
+        when(currentMember.require()).thenReturn(member);
 
         // 隨便挑一個上架中、庫存至少 2 的 SKU
         variant = productVariantRepository.findAll().stream()

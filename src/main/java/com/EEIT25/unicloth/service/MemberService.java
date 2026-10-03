@@ -5,7 +5,6 @@ import com.EEIT25.unicloth.dto.member.MemberResponse;
 import com.EEIT25.unicloth.dto.member.UpdateMemberRequest;
 import com.EEIT25.unicloth.entity.Member;
 import com.EEIT25.unicloth.exception.ApiException;
-import com.EEIT25.unicloth.repository.MemberRepository;
 import com.EEIT25.unicloth.security.CurrentMember;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class MemberService {
-    private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final CurrentMember currentMember;
 
@@ -29,16 +27,14 @@ public class MemberService {
     /** 取得目前登入會員的資料 */
     @Transactional
     public MemberResponse getMe(){
-        Member member = memberRepository.findById(currentMember.getCurrentId())
-                .orElseThrow(()-> ApiException.notFound("登入過期或失效"));
+        Member member = currentMember.require();
         return MemberResponse.from(member);
     }
 
     /** 修改會員資料（姓名、電話、地址）；在交易內改 entity，結束時會自動存回資料庫 */
     @Transactional
     public MemberResponse updateProfile(UpdateMemberRequest request){
-        Member member = memberRepository.findById(currentMember.getCurrentId())
-                .orElseThrow(()-> ApiException.notFound("登入過期或失效"));
+        Member member = currentMember.require();
 
         member.setName(request.name());
         member.setPhone(request.phone());
@@ -50,8 +46,7 @@ public class MemberService {
     /** 修改密碼：舊密碼要對，新密碼不能跟舊的一樣 */
     @Transactional
     public void changePassword(ChangePasswordRequest request){
-        Member member = memberRepository.findById(currentMember.getCurrentId())
-                .orElseThrow(()-> ApiException.notFound("登入過期或失效"));
+        Member member = currentMember.require();
 
         if (!passwordEncoder.matches(request.oldPassword(),member.getPasswordHash())){
             throw ApiException.badRequest("密碼錯誤");

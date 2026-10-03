@@ -27,16 +27,14 @@ public class CouponService {
 
     @Transactional
     public List<CouponResponse> getMyCoupons(){
-        Member member = memberRepository.findById(currentMember.getCurrentId())
-                .orElseThrow(()-> ApiException.unauthorized("登入過期或失效"));
+        Member member = currentMember.require();
         return memberCouponRepository.findByMemberOrderByExpireAtAsc(member)
                 .stream().map(memberCoupon -> CouponResponse.from(memberCoupon))
                 .toList();
     }
     @Transactional
     public List<UsableCouponResponse>  getUsableCoupons(int subtotal){
-        Member member = memberRepository.findById(currentMember.getCurrentId())
-                .orElseThrow(()-> ApiException.unauthorized("登入過期或失效"));
+        Member member = currentMember.require();
 
         LocalDateTime now = LocalDateTime.now();
 
