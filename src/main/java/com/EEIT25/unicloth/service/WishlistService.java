@@ -32,7 +32,9 @@ public class WishlistService {
     /** 我的追蹤清單，最新追蹤的在前面 */
     @Transactional(readOnly = true)
     public List<WishlistItemResponse> getWishlist(){
-        return wishlistItemRepository.findWishlistWithProducts(currentMember.getCurrentId())
+        Member member = currentMember.require();
+
+        return wishlistItemRepository.findWishlistWithProducts(member.getId())
                 .stream()
                 .map(wishlistItem -> WishlistItemResponse.from(wishlistItem))
                 .toList();
@@ -61,13 +63,17 @@ public class WishlistService {
     /** 取消追蹤；本來就沒追蹤也不會報錯 */
     @Transactional
     public void remove(String slug){
-        wishlistItemRepository.deleteByMemberIdAndProductSlug(currentMember.getCurrentId(), slug);
+        Member member = currentMember.require();
+
+        wishlistItemRepository.deleteByMemberIdAndProductSlug(member.getId(), slug);
     }
 
     /** 商品頁愛心要不要亮：這件商品是否已追蹤 */
     @Transactional
     public boolean isInWishlist(String slug){
-        return wishlistItemRepository.existsByMemberIdAndProductSlug(currentMember.getCurrentId(), slug);
+        Member member = currentMember.require();
+
+        return wishlistItemRepository.existsByMemberIdAndProductSlug(member.getId(), slug);
     }
 
 

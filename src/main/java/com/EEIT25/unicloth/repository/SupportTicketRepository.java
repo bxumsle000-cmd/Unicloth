@@ -18,7 +18,7 @@ public interface SupportTicketRepository extends JpaRepository<SupportTicket, Lo
     // 會員查自己送出的客服單
     List<SupportTicket> findByMemberIdOrderByCreatedAtDesc(Long memberId);
 
-    // 後台依狀態篩選（IN_PROGRESS / PENDING / RESOLVED）
+    // 後台依狀態篩選（IN_PROGRESS / RESOLVED）
     List<SupportTicket> findByStatusOrderByCreatedAtDesc(TicketStatus status);
 
     // 後台全部列表，最新的在前

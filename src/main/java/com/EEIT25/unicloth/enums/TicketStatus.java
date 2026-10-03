@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
- * 客服單狀態：處理中 → 待回覆 → 已解決<br>
+ * 客服單狀態：處理中 → 已解決<br>
  * DB 存的是 name()，例如 "IN_PROGRESS"
  */
 @Getter

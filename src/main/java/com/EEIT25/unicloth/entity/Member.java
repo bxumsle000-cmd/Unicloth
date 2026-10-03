@@ -28,7 +28,7 @@ public class Member {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 登入帳號，存小寫
+    // 登入帳號
     @Column(nullable = false, unique = true)
     private String email;
 

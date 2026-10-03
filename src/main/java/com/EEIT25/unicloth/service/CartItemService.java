@@ -35,7 +35,9 @@ public class CartItemService {
     /** 我的購物車，先加入的在前面 */
     @Transactional(readOnly = true)
     public List<CartItemResponse> getCartItems(){
-        List<CartItem> cartList = cartItemRepository.findCartWithProducts(currentMember.getCurrentId());
+        Member member = currentMember.require();
+
+        List<CartItem> cartList = cartItemRepository.findCartWithProducts(member.getId());
         return cartList.stream()
                 .map(cartItem -> CartItemResponse.from(cartItem))
                 .toList();

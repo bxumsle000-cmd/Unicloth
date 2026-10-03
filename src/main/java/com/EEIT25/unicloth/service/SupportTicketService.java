@@ -54,7 +54,7 @@ public class SupportTicketService {
     /** 我送出的客服單，最新的在前面 */
     @Transactional(readOnly = true)
     public List<SupportTicketResponse> getMyTickets(){
-        return supportTicketRepository.findByMemberIdOrderByCreatedAtDesc(currentMember.getCurrentId())
+        return supportTicketRepository.findByMemberIdOrderByCreatedAtDesc(currentMember.require().getId())
                 .stream()
                 .map(supportTicket -> SupportTicketResponse.from(supportTicket))
                 .toList();

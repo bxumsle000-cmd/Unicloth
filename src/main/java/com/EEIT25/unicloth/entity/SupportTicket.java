@@ -43,7 +43,7 @@ public class SupportTicket {
     @Column(nullable = false)
     private String topic;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 2000)
     private String message;
 
     // 存成大寫字串，例如 IN_PROGRESS

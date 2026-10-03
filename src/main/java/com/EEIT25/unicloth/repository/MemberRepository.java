@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
-    // 登入用：email 存的是小寫，查之前記得先 toLowerCase()
+    // 登入用：用 email 查會員
     Optional<Member> findByEmail(String email);
 
     // 註冊用：檢查 email 是否已被使用

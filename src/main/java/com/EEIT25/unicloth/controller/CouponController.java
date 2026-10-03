@@ -1,8 +1,10 @@
 package com.EEIT25.unicloth.controller;
 
 import com.EEIT25.unicloth.dto.coupon.CouponResponse;
+import com.EEIT25.unicloth.dto.coupon.GrantCouponRequest;
 import com.EEIT25.unicloth.dto.coupon.UsableCouponResponse;
 import com.EEIT25.unicloth.service.CouponService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +29,7 @@ public class CouponController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void grantTo(Long memberId, Long couponId){
-        couponService.grantTo(memberId,couponId);
+    public void grantTo(@Valid @RequestBody GrantCouponRequest request){
+        couponService.grantTo(request);
     }
 }

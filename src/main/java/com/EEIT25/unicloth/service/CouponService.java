@@ -1,6 +1,7 @@
 package com.EEIT25.unicloth.service;
 
 import com.EEIT25.unicloth.dto.coupon.CouponResponse;
+import com.EEIT25.unicloth.dto.coupon.GrantCouponRequest;
 import com.EEIT25.unicloth.dto.coupon.UsableCouponResponse;
 import com.EEIT25.unicloth.entity.Coupon;
 import com.EEIT25.unicloth.entity.Member;
@@ -48,10 +49,10 @@ public class CouponService {
     }
 
     @Transactional
-    public void grantTo(Long memberId, Long couponId){
-        Member member = memberRepository.findById(memberId)
+    public void grantTo(GrantCouponRequest request){
+        Member member = memberRepository.findById(request.memberId())
                 .orElseThrow(()-> ApiException.unauthorized("登入過期或失效"));
-        Coupon coupon = couponRepository.findById(couponId)
+        Coupon coupon = couponRepository.findById(request.couponId())
                 .orElseThrow(()-> ApiException.notFound("沒有找到這張折價券"));
 
         if (!coupon.isActive()) {

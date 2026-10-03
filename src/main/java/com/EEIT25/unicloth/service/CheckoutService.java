@@ -59,9 +59,7 @@ public class CheckoutService {
 
         // 2. 勾選的購物車項目（SKU、商品一起 JOIN FETCH 進來）
         //    撈到的筆數要跟勾選的一樣多；少了代表有 id 不是自己的，或已經從購物車刪掉
-        if (request.cartItemIdList() == null || request.cartItemIdList().isEmpty()) {
-            throw ApiException.badRequest("請至少勾選一件商品");
-        }
+        //    （沒勾任何商品的情況，CheckoutRequest 的 @NotEmpty 已經在 Controller 擋掉）
         List<CartItem> cartItemList = cartItemRepository.findSelectedWithProducts(member.getId(), request.cartItemIdList());
         if (cartItemList.size() != request.cartItemIdList().size()) {
             throw ApiException.badRequest("有勾選的商品不在你的購物車裡，請重新整理購物車");

@@ -112,7 +112,7 @@ CREATE TABLE product_variants (
 -- 會員
 CREATE TABLE members (
     id            BIGINT IDENTITY(1,1) NOT NULL,
-    email         NVARCHAR(255) NOT NULL,      -- 登入帳號，存小寫
+    email         NVARCHAR(255) NOT NULL,      -- 登入帳號
     password_hash NVARCHAR(255) NOT NULL,      -- BCrypt 雜湊，絕對不存明碼
     name          NVARCHAR(50)  NOT NULL,
     phone         NVARCHAR(20)  NOT NULL,
@@ -250,8 +250,8 @@ CREATE TABLE support_tickets (
     member_id  BIGINT        NULL,             -- 未登入也能送，所以可 NULL
     email      NVARCHAR(255) NOT NULL,
     topic      NVARCHAR(50)  NOT NULL,         -- 訂單與物流 / 退換貨 / 商品諮詢 / 付款與發票 / 折價券與活動 / 會員帳號問題 / 其他
-    message    NVARCHAR(MAX) NOT NULL,
-    status     NVARCHAR(20)  NOT NULL CONSTRAINT df_tickets_status DEFAULT N'IN_PROGRESS',  -- IN_PROGRESS / PENDING / RESOLVED
+    message    NVARCHAR(2000) NOT NULL,
+    status     NVARCHAR(20)  NOT NULL CONSTRAINT df_tickets_status DEFAULT N'IN_PROGRESS',  -- IN_PROGRESS / RESOLVED
     created_at DATETIME2(0)  NOT NULL CONSTRAINT df_tickets_created_at DEFAULT SYSDATETIME(),
     CONSTRAINT pk_support_tickets PRIMARY KEY (id),
     CONSTRAINT uk_tickets_no UNIQUE (ticket_no),

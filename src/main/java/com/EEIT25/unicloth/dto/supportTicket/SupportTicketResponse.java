@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
  * @param email     聯絡 Email
  * @param topic     問題類型
  * @param message   問題內容
- * @param status    IN_PROGRESS / PENDING / RESOLVED
+ * @param status    IN_PROGRESS / RESOLVED
  * @param createdAt 送出時間
  */
 public record SupportTicketResponse(

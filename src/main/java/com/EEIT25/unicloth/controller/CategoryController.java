@@ -44,7 +44,7 @@ public class CategoryController {
 
     /**
      * 分類底下的商品，分頁 + 篩選（篩選條件都可省略）：<br>
-     * ?page=0&size=20&colors=黑色&colors=白色&sizes=M&minPrice=500&maxPrice=1500
+     * ?page=0&size=25&colors=黑色&colors=白色&sizes=M&minPrice=500&maxPrice=1500
      */
     @GetMapping("/{code}/products")
     public Page<ProductCardResponse> getProducts(

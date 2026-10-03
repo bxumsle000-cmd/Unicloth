@@ -203,14 +203,6 @@ class CheckoutServiceTest {
     }
 
     @Test
-    void 沒有勾選任何商品_不能結帳() {
-        addToCart(variant, 1);
-
-        ApiException e = assertThrows(ApiException.class, () -> checkoutService.checkout(request(List.of(), null)));
-        assertEquals(HttpStatus.BAD_REQUEST, e.getStatus());
-    }
-
-    @Test
     void 只結帳勾選的項目_沒勾的留在購物車() {
         ProductVariant other = productVariantRepository.findAll().stream()
                 .filter(v -> v.getProduct().getStatus() == ProductStatus.ON_SALE && v.getStock() >= 1
