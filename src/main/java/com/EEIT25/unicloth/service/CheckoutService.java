@@ -160,9 +160,13 @@ public class CheckoutService {
         orderItemRepository.saveAll(orderItemList);
 
         // 10. 折價券標記為已使用，並記錄用在哪張訂單
+        //     跟扣庫存一樣用一條 UPDATE 同時檢查「還沒用過」和標記，兩個人同時拿同一張券結帳也只有一個會成功
+        //     （步驟 4 的檢查只是為了提早回錯誤訊息，兩邊可能同時通過，這裡才是真正把關）
         if (memberCoupon != null) {
-            memberCoupon.setUsedAt(LocalDateTime.now());
-            memberCoupon.setOrder(order);
+            int updated = memberCouponRepository.markUsed(memberCoupon.getId(), order, LocalDateTime.now());
+            if (updated == 0) {
+                throw ApiException.conflict("這張折價券已經使用過");
+            }
         }
 
         // 11. 從購物車移除已結帳的項目（沒勾的留著）

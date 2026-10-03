@@ -2,7 +2,9 @@ package com.EEIT25.unicloth.repository;
 
 import com.EEIT25.unicloth.entity.Member;
 import com.EEIT25.unicloth.entity.MemberCoupon;
+import com.EEIT25.unicloth.entity.Order;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -35,6 +37,14 @@ public interface MemberCouponRepository extends JpaRepository<MemberCoupon, Long
 
     // 結帳套用券時確認這張券真的是該會員的
     Optional<MemberCoupon> findByIdAndMemberId(Long id, Long memberId);
+
+    /** 還沒用過才標記為已使用；回傳更新了幾筆（0 = 已經被用掉，例如同時有另一筆結帳搶先用了） */
+    @Modifying
+    @Query("""
+            UPDATE MemberCoupon mc SET mc.usedAt = :usedAt, mc.order = :order
+            WHERE mc.id = :id AND mc.usedAt IS NULL
+            """)
+    int markUsed(@Param("id") Long id, @Param("order") Order order, @Param("usedAt") LocalDateTime usedAt);
 
     List<MemberCoupon> findByMember(Member member);
 

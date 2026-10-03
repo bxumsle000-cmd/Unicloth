@@ -9,6 +9,7 @@ import com.EEIT25.unicloth.entity.ProductVariant;
 import com.EEIT25.unicloth.enums.CouponType;
 import com.EEIT25.unicloth.enums.PaymentMethod;
 import com.EEIT25.unicloth.enums.ShippingMethod;
+import com.EEIT25.unicloth.exception.ApiException;
 import com.EEIT25.unicloth.repository.CartItemRepository;
 import com.EEIT25.unicloth.repository.CouponRepository;
 import com.EEIT25.unicloth.repository.MemberCouponRepository;
@@ -21,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
@@ -38,6 +40,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
@@ -155,13 +158,13 @@ class CheckoutCouponConcurrencyTest {
         pool.shutdown();
 
         int successCount = 0;
-        List<String> failureList = new ArrayList<>();
+        List<Throwable> failureList = new ArrayList<>();
         for (Future<?> future : futureList) {
             try {
                 future.get(30, TimeUnit.SECONDS);
                 successCount++;
             } catch (Exception e) {
-                failureList.add(String.valueOf(e.getCause()));
+                failureList.add(e.getCause());
             }
         }
 
@@ -172,5 +175,10 @@ class CheckoutCouponConcurrencyTest {
 
         assertEquals(1, successCount, "同一張券應該只有一個請求能結帳成功");
         assertEquals(1, ordersUsingCoupon, "同一張券應該只被一張訂單使用");
+
+        // 搶輸的那一個要收到 409「這張折價券已經使用過」
+        assertEquals(1, failureList.size());
+        ApiException e = assertInstanceOf(ApiException.class, failureList.get(0));
+        assertEquals(HttpStatus.CONFLICT, e.getStatus());
     }
 }
