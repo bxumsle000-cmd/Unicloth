@@ -11,7 +11,7 @@ Uniqlo 台灣官網商品爬蟲：照官網「分類」篩選器一路展開到�
 用法（在專案根目錄執行）：
   python tools/scraper/uniqlo_leaf_scraper.py --tree               # 只印分類樹與每個細類的商品數，不抓商品
   python tools/scraper/uniqlo_leaf_scraper.py --per-gender 2       # 先小量測試
-  python tools/scraper/uniqlo_leaf_scraper.py --per-gender 100     # 男裝、女裝、童裝各 100 件
+  python tools/scraper/uniqlo_leaf_scraper.py                      # 男裝、女裝、童裝全部商品
   python tools/scraper/verify_products.py
 
 分類樹怎麼來的：
@@ -114,9 +114,9 @@ def polite_sleep():
     time.sleep(random.uniform(1.0, 2.0))
 
 
-def fetch_list(category_code: str, page_size: int) -> dict:
+def fetch_list(category_code: str, page_size: int, page: int = 1) -> dict:
     body = {
-        "pageInfo": {"page": 1, "pageSize": page_size},
+        "pageInfo": {"page": page, "pageSize": page_size},
         "belongTo": "pc", "rank": "overall",
         "priceRange": {"low": 0, "high": 0},
         "color": [], "size": [], "identity": [], "exist": [],
@@ -127,6 +127,21 @@ def fetch_list(category_code: str, page_size: int) -> dict:
     r.raise_for_status()
     polite_sleep()
     return r.json()["resp"][0]
+
+
+def fetch_all_items(category_code: str, page_size: int = 200) -> list[dict]:
+    """一頁一頁往下翻，把這個分類的商品全部抓完（某頁不滿 page_size 就是最後一頁）"""
+    items, seen, page = [], set(), 1
+    while True:
+        batch = fetch_list(category_code, page_size, page)["productList"]
+        new = [x for x in batch if x["code"] not in seen]
+        if not new:                                 # 保險：API 如果不認 page、一直回同一頁，就停下來
+            return items
+        items.extend(new)
+        seen.update(x["code"] for x in new)
+        if len(batch) < page_size:
+            return items
+        page += 1
 
 
 def fetch_children(code: str) -> list[dict]:
@@ -214,7 +229,7 @@ def build_groups(gender_code: str, gender_name: str, subs: list[str]) -> list[di
     # 每個細類的完整商品清單：用來挑商品，也用來算 alsoIn
     for g in groups:
         for leaf in g["leaves"]:
-            leaf["items"] = fetch_list(leaf["code"], 200)["productList"]
+            leaf["items"] = fetch_all_items(leaf["code"])
     return groups
 
 
@@ -313,21 +328,14 @@ def build_product(item: dict, detail: dict, category_path: list[str], category_c
 # ------------------------------------------------------------------ 主流程
 
 def crawl_gender(gender_code: str, gender_name: str, prefix: str, groups: list[dict],
-                 limit: int, seen_codes: set, stats: dict) -> list[dict]:
-    """一輪一輪地收：每一輪每個細類各收 1 件，直到湊滿 limit，這樣每個細類分到的數量差不多"""
-    leaves = [(g, leaf) for g in groups for leaf in g["kept"]]
-    cursor = {leaf["code"]: 0 for _, leaf in leaves}
+                 limit: int | None, seen_codes: set, stats: dict) -> list[dict]:
+    """依序把每個細類的商品全部收完；有給 limit 就收到 limit 件為止（小量測試用）"""
     products = []
-
-    while len(products) < limit:
-        progress = False
-        for g, leaf in leaves:
-            if len(products) >= limit:
-                break
-            items = leaf["items"]
-            while cursor[leaf["code"]] < len(items):
-                item = items[cursor[leaf["code"]]]
-                cursor[leaf["code"]] += 1
+    for g in groups:
+        for leaf in g["kept"]:
+            for item in leaf["items"]:
+                if limit is not None and len(products) >= limit:
+                    return products
                 if item["code"] in seen_codes:      # 已經被別的細類（或別的性別）收走：同一件商品只收一次
                     stats["skipped_dup"] += 1
                     continue
@@ -349,17 +357,18 @@ def crawl_gender(gender_code: str, gender_name: str, prefix: str, groups: list[d
                     print(f"  [略過] {slug} 沒有可用的 SKU")
                     continue
                 products.append(p)
-                progress = True
-                print(f"  ✓ {len(products):>3} {' › '.join(path)}  {slug}  {p['name']}  SKU×{len(p['variants'])}")
-                break                               # 這一輪這個細類收 1 件就換下一個
-        if not progress:                            # 所有細類都沒商品可收了
-            break
+                print(f"  ✓ {len(products):>4} {' › '.join(path)}  {slug}  {p['name']}  SKU×{len(p['variants'])}")
     return products
+
+
+def save_json(products: list[dict]):
+    JSON_PATH.parent.mkdir(parents=True, exist_ok=True)
+    JSON_PATH.write_text(json.dumps(products, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--per-gender", type=int, default=100, help="每個性別抓幾件商品")
+    ap.add_argument("--per-gender", type=int, default=None, help="每個性別最多抓幾件（測試用，不給就全部抓）")
     ap.add_argument("--tree", action="store_true", help="只印分類樹與商品數，不抓商品")
     args = ap.parse_args()
 
@@ -374,16 +383,15 @@ def main():
         print_groups(gender_name, groups)
         if args.tree:
             continue
-        print(f"\n=== 抓 {gender_name} {args.per_gender} 件 ===")
+        print(f"\n=== 抓 {gender_name} {args.per_gender or '全部'} 件 ===")
         ps = crawl_gender(gender_code, gender_name, prefix, groups, args.per_gender, seen_codes, stats)
         counts[gender_name] = len(ps)
         all_products.extend(ps)
+        save_json(all_products)                     # 每個性別跑完就先存，中途失敗前面的不會白跑
+        print(f"\n已存檔：目前共 {len(all_products)} 件")
 
     if args.tree:
         return
-
-    JSON_PATH.parent.mkdir(parents=True, exist_ok=True)
-    JSON_PATH.write_text(json.dumps(all_products, ensure_ascii=False, indent=2), encoding="utf-8")
 
     print("\n=== 完成 ===")
     for g, n in counts.items():
