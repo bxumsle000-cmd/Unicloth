@@ -24,7 +24,7 @@ function ProductCard({ product }) {
                 </div>
 
                 {/* 名稱 */}
-                <div className="mt-3 mb-[5px] text-xs leading-[1.6] tracking-[.04em]">{product.name}</div>
+                <div className="mt-3 mb-[5px] text-[14px] leading-[1.6] tracking-[.04em]">{product.name}</div>
 
                 {/* 價格：特價時售價變紅，原價加刪除線 */}
                 <div className={`text-xs tracking-[.05em] ${onSaleNow ? "text-[#9a3b2d]" : ""}`}>

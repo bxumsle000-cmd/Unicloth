@@ -43,7 +43,7 @@ function Category(){
                 <Filters filters={filters} />
             </div>
             {/*商品*/}
-            <div className="grid grid-cols-4 gap-x-5 gap-y-9
+            <div className="grid grid-cols-6 gap-x-5 gap-y-9
                             max-[1100px]:grid-cols-3 max-[760px]:grid-cols-2 max-[760px]:gap-x-3 max-[760px]:gap-y-[26px]">
                 {products.content.map((product) => (
                     <ProductCard key={product.slug} product={product} />
