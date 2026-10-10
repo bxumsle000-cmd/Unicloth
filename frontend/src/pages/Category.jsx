@@ -5,6 +5,7 @@ import Breadcrumb from "../component/Breadcrumb.jsx";
 import SubCategories from "../component/SubCategories.jsx";
 import Filters from "../component/Filters.jsx";
 import ProductCard from "../component/ProductCard.jsx";
+import SortSelect from "../component/SortSelect.jsx";
 
 function Category(){
     const {code} = useParams();
@@ -25,9 +26,12 @@ function Category(){
     }, [code]);
 
     const [products, setProducts] = useState({ content: [], page: null });
+
+    // 排序：值直接當 sort 參數送給後端，例如 price,asc
+    const [sort, setSort] = useState("id,desc");
     useEffect(() => {
-        api(`/api/categories/${code}/products?page=0`).then(setProducts);
-    }, [code]);
+        api(`/api/categories/${code}/products?page=0&sort=${sort}`).then(setProducts);
+    }, [code, sort]);
 
     if (!category) return <div className="flex-1 py-24 text-center text-[11px] tracking-[.06em] text-[#76716c]">載入中…</div>;
     return(
@@ -42,6 +46,8 @@ function Category(){
             <div className="pt-[18px]">
                 <Filters filters={filters} />
             </div>
+            {/* 排序 */}
+            <SortSelect sort={sort} setSort={setSort} />
             {/*商品*/}
             <div className="grid grid-cols-6 gap-x-5 gap-y-9
                             max-[1100px]:grid-cols-3 max-[760px]:grid-cols-2 max-[760px]:gap-x-3 max-[760px]:gap-y-[26px]">
