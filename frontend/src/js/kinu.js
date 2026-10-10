@@ -33,11 +33,6 @@ export function imgSrc(url) {
     return url ? '/' + url.replace(/^\//, '') : '';
 }
 
-/** 網址參數：/products.html?category=all_men → param('category') 得到 'all_men' */
-export function param(name) {
-    return new URLSearchParams(location.search).get(name);
-}
-
 /** 畫面下方跳出提示，幾秒後自動消失 */
 export function toast(message, isError = false) {
     let el = document.getElementById('toast');

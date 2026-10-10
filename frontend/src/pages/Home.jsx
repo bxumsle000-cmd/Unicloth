@@ -15,6 +15,22 @@ function Home() {
                    autoPlay muted loop playsInline
                    className="absolute inset-0 size-full object-cover object-[center_42%] saturate-[.73]
                               max-[760px]:object-[58%_center]" />
+
+            {/* 漸層遮罩：讓白字在影片上看得清楚 */}
+            <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(25,22,19,.35),transparent_72%)]
+                            max-[760px]:bg-[linear-gradient(0deg,rgba(0,0,0,.5),transparent_82%)]"></div>
+
+            {/* 標語 */}
+            <div className="absolute top-1/2 left-[8%] z-10 max-w-[440px] -translate-y-[43%] text-white
+                            max-[760px]:top-auto max-[760px]:bottom-[13%] max-[760px]:left-[7%] max-[760px]:max-w-[300px] max-[760px]:translate-y-0">
+                <div className="text-[10px] tracking-[.23em] uppercase">THE ART OF EVERYDAY</div>
+                <h1 className="mt-[18px] mb-[15px] text-[clamp(38px,5.3vw,72px)] font-normal leading-[1.18] tracking-[.03em] max-[760px]:text-[47px]">
+                    日常，<br />恰好的美。
+                </h1>
+                <p className="text-xs leading-[2] tracking-[.07em]">
+                    留一點餘白，給生活更多可能。<br />以柔軟質地，陪你走過每一個日常。
+                </p>
+            </div>
         </section>
 
         {/* 跑馬標語 */}
