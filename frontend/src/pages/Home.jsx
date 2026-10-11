@@ -20,7 +20,7 @@ function Home() {
             <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(25,22,19,.35),transparent_72%)]
                             max-[760px]:bg-[linear-gradient(0deg,rgba(0,0,0,.5),transparent_82%)]"></div>
 
-            {/* 標語 */}
+            {/* 影片內文 */}
             <div className="absolute top-1/2 left-[8%] z-10 max-w-[440px] -translate-y-[43%] text-white
                             max-[760px]:top-auto max-[760px]:bottom-[13%] max-[760px]:left-[7%] max-[760px]:max-w-[300px] max-[760px]:translate-y-0">
                 <div className="text-[10px] tracking-[.23em] uppercase">THE ART OF EVERYDAY</div>
@@ -33,7 +33,7 @@ function Home() {
             </div>
         </section>
 
-        {/* 跑馬標語 */}
+        {/* 中間標語 */}
         <div className="flex items-center justify-center gap-[34px] px-3 py-[23px] text-[9px] tracking-[.18em] text-[#6f6963]
                         max-[760px]:flex-wrap max-[760px]:gap-3 max-[760px]:text-[7px] max-[760px]:tracking-[.08em]">
             <span>MADE FOR YOUR EVERYDAY</span>

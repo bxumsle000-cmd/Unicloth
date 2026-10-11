@@ -22,7 +22,7 @@ import java.util.List;
  * 啟動時把 data/products.json 匯進資料庫。
  *
  * 只有 application.properties 設 app.seed.products=true 時這個 class 才會被建立（預設 false，什麼都不做）。
- * 匯入是「補上還沒有的」：slug 已存在的商品會跳過，所以重複執行不會塞出重複資料。
+ * 匯入是「補上還沒有的」：slug 或 SKU 已存在的商品會跳過，所以重複執行不會塞出重複資料。
  */
 @Slf4j
 @Component
@@ -47,7 +47,7 @@ public class DataSeeder implements CommandLineRunner {
 
         int inserted = 0, skipped = 0;
         for (ProductJson json : items) {
-            if (productRepository.existsBySlug(json.slug())) {
+            if (productRepository.existsBySlug(json.slug()) || skuAlreadyExists(json)) {
                 skipped++;
                 continue;
             }
@@ -60,6 +60,18 @@ public class DataSeeder implements CommandLineRunner {
             inserted++;
         }
         log.info("[seed] 完成：新增 {} 件、跳過 {} 件（已存在）", inserted, skipped);
+    }
+
+    /**
+     * 同一件商品（例如男女適穿）重爬後可能被放到另一個性別，slug 從 women-486119 變成 men-486119，
+     * 但 SKU 一樣；只看 slug 會重複插入而撞到 uk_variants_sku，所以 SKU 已存在也算匯過。
+     */
+    private boolean skuAlreadyExists(ProductJson json) {
+        if (json.variants() == null || json.variants().isEmpty()) {
+            return false;
+        }
+        List<String> skuCodes = json.variants().stream().map(ProductJson.VariantJson::skuCode).toList();
+        return variantRepository.existsBySkuCodeIn(skuCodes);
     }
 
     /**

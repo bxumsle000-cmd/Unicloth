@@ -298,7 +298,7 @@ def build_product(item: dict, detail: dict, category_path: list[str], category_c
             "colorKey": color_key,
             "size": size,
             "skuCode": f"{product_no}-{color_no}-{size}".upper(),
-            "stock": int(sku_stocks.get(row["productId"], 0)),
+            "stock": max(0, int(sku_stocks.get(row["productId"], 0))),   # 官網偶爾回 -1，當成缺貨
             "url": f"img/products/{slug}/{color_key}.jpg",
         })
 

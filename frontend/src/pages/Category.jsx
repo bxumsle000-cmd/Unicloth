@@ -25,13 +25,34 @@ function Category(){
         api(`/api/categories/${code}/filters`).then(setFilters);
     }, [code]);
 
+    // 使用者選了哪些篩選條件；換分類時清空，避免帶著上一個分類的條件
+    // 不用 useEffect 清：effect 在畫面畫完才跑，會先用舊條件打一次 API、價格框也會殘留舊值
+    const EMPTY_SELECTED = { colors: [], sizes: [], minPrice: "", maxPrice: "" };
+    const [selectedFilters, setSelectedFilters] = useState(EMPTY_SELECTED);
+    const [selectedCode, setSelectedCode] = useState(code);
+    if (selectedCode !== code) {
+        setSelectedCode(code);
+        setSelectedFilters(EMPTY_SELECTED);
+    }
+
     const [products, setProducts] = useState({ content: [], page: null });
 
     // 排序：值直接當 sort 參數送給後端，例如 price,asc
     const [sort, setSort] = useState("id,desc");
     useEffect(() => {
-        api(`/api/categories/${code}/products?page=0&sort=${sort}`).then(setProducts);
-    }, [code, sort]);
+        const params = new URLSearchParams({ page: 0, sort: sort });
+        selectedFilters.colors.forEach((color) => params.append("colors", color));
+        selectedFilters.sizes.forEach((size) => params.append("sizes", size));
+        if (selectedFilters.minPrice !== "") params.append("minPrice", selectedFilters.minPrice);
+        if (selectedFilters.maxPrice !== "") params.append("maxPrice", selectedFilters.maxPrice);
+
+        // 條件連續變動時，只採用最後一次請求的結果
+        let ignore = false;
+        api(`/api/categories/${code}/products?${params}`).then((data) => {
+            if (!ignore) setProducts(data);
+        });
+        return () => { ignore = true; };
+    }, [code, sort, selectedFilters]);
 
     if (!category) return <div className="flex-1 py-24 text-center text-[11px] tracking-[.06em] text-[#76716c]">載入中…</div>;
     return(
@@ -43,9 +64,7 @@ function Category(){
             {/* 下一層分類 */}
             <SubCategories children={category.children} />
             {/* 篩選面板 */}
-            <div className="pt-[18px]">
-                <Filters filters={filters} />
-            </div>
+            <Filters key={code} filters={filters} selectedFilters={selectedFilters} setSelectedFilters={setSelectedFilters} />
             {/* 排序 */}
             <SortSelect sort={sort} setSort={setSort} />
             {/*商品*/}

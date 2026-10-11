@@ -32,6 +32,9 @@ public interface ProductVariantRepository extends JpaRepository<ProductVariant, 
             """)
     List<String> findDistinctSizes(Collection<Long> categoryIds, ProductStatus status);
 
+    // 匯入種子資料用：同一件商品換了性別 slug 會不同，但 SKU 一樣，用 SKU 判斷是否已匯過
+    boolean existsBySkuCodeIn(Collection<String> skuCodes);
+
     // ==================== 以下提供給訂單模組（CheckoutService 結帳）使用 ====================
 
     /** 庫存夠才扣；回傳更新了幾筆（0 = 庫存不足或 SKU 不存在） */
