@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
-import { MdLanguage, MdMenu } from "react-icons/md";
+import { MdClose, MdLanguage, MdMenu } from "react-icons/md";
 import { api } from "../js/kinu.js";
 import MegaMenu from "./MegaMenu.jsx";
+import MobileMenu from "./MobileMenu.jsx";
 import {Link} from "react-router-dom";
 
 function Header () {
@@ -29,21 +30,25 @@ function Header () {
     const [openCode, setOpenCode] = useState(null);
     const openTop = menu.find((top) => top.code === openCode);
 
-    /** 收起分類選單 */
+    // 手機版選單是否打開
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+    /** 收起分類選單（電腦版、手機版都收） */
     function closeMenu() {
         setOpenCode(null);
+        setMobileMenuOpen(false);
     }
 
     // 點 Header 和選單以外的地方就收起來
     const headerAreaRef = useRef(null);
     useEffect(() => {
-        if (!openCode) return;
+        if (!openCode && !mobileMenuOpen) return;
         function closeOnOutsideClick(e) {
-            if (!headerAreaRef.current.contains(e.target)) setOpenCode(null);
+            if (!headerAreaRef.current.contains(e.target)) closeMenu();
         }
         document.addEventListener('click', closeOnOutsideClick);
         return () => document.removeEventListener('click', closeOnOutsideClick);
-    }, [openCode]);
+    }, [openCode, mobileMenuOpen]);
 
     return (
         <>
@@ -65,12 +70,14 @@ function Header () {
                 ))}
             </div>
             {/* 手機版：分類收進漢堡選單按鈕（電腦版隱藏） */}
-            <button aria-label="選單" className="hidden size-[30px] place-items-center max-[760px]:grid">
-                <MdMenu className="size-5" />
+            <button aria-label={mobileMenuOpen ? "關閉選單" : "選單"} onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                    className="-ml-[7px] hidden size-11 place-items-center max-[760px]:grid">
+                {mobileMenuOpen ? <MdClose className="size-5" /> : <MdMenu className="size-5" />}
             </button>
 
             {/* 分類選單 */}
             {openTop && <MegaMenu top={openTop} closeMenu={closeMenu} />}
+            {mobileMenuOpen && <MobileMenu menu={menu} closeMenu={closeMenu} />}
 
             {/* 中：Logo */}
             <Link onClick={closeMenu} to="/">
