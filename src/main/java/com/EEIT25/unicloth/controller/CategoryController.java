@@ -50,7 +50,7 @@ public class CategoryController {
     public Page<ProductCardResponse> getProducts(
         @PathVariable String code,
         @ParameterObject @Valid @ModelAttribute ProductFilterRequest filter,
-        @ParameterObject @PageableDefault(size = 25, sort = "id", direction = Sort.Direction.DESC)Pageable pageable) {
+        @ParameterObject @PageableDefault(size = 24, sort = "id", direction = Sort.Direction.DESC)Pageable pageable) {
         return categoryService.getProducts(code, filter, pageable);
     }
 

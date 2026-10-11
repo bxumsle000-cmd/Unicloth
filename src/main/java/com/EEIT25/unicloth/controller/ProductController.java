@@ -26,7 +26,7 @@ public class ProductController {
     @GetMapping
     public Page<ProductCardResponse> searchProducts(@RequestParam(defaultValue = "") String keyword,
         @ParameterObject
-        @PageableDefault(size = 25, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+        @PageableDefault(size = 24, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
         return productService.getProductsBySearch(keyword, pageable);
     }
 
