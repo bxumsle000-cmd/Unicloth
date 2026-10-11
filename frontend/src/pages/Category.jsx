@@ -55,6 +55,7 @@ function Category(){
     }, [code, sort, selectedFilters]);
 
     if (!category) return <div className="flex-1 py-24 text-center text-[11px] tracking-[.06em] text-[#76716c]">載入中…</div>;
+
     return(
         <main className="px-[5.5%] pt-[38px] pb-[90px]
         max-[760px]:px-[4%] max-[760px]:pt-[26px] max-[760px]:pb-[70px]">
