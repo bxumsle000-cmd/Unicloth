@@ -77,6 +77,7 @@ function Category(){
     return(
         <main className="px-[5.5%] pt-[38px] pb-[90px]
         max-[760px]:px-[4%] max-[760px]:pt-[26px] max-[760px]:pb-[70px]">
+            {/* breadcrumb */}
             <Breadcrumb breadcrumb={breadcrumb} />
             {/* 標題區 */}
             <h1 className="mt-2.5 mb-1.5 text-[clamp(24px,3vw,34px)] font-medium tracking-[.08em]">{category.name}</h1>

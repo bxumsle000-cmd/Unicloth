@@ -30,6 +30,12 @@ function Filters({ filters, selectedFilters, setSelectedFilters }) {
         setSelectedFilters({...selectedFilters, minPrice, maxPrice});
     }
 
+    function clearAll() {
+        setMinPrice("");
+        setMaxPrice("");
+        setSelectedFilters({ colors: [], sizes: [], minPrice: "", maxPrice: "" });
+    }
+
     return (
         <div className="pt-[18px] mb-[30px] grid gap-[22px] border-b border-[#dfd9d2] pt-1.5 pb-7">
             {/* 顏色 */}
@@ -67,6 +73,13 @@ function Filters({ filters, selectedFilters, setSelectedFilters }) {
                             className="ml-1.5 h-8 bg-black px-4 text-[11px] tracking-[.1em] text-white transition hover:opacity-80">套用價格</button>
                 </div>
             </div>
+
+            {/*清除所有篩選*/}
+            <button onClick={clearAll}
+                    className="justify-self-end text-[14px] tracking-[.1em] underline underline-offset-4 mx-5
+                    hover:no-underline  transition hover:text-black">
+                清除所有篩選
+            </button>
         </div>
     )
 }
