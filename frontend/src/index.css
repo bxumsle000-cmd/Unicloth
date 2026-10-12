@@ -1,0 +1,23 @@
+/* kinu.js 的 toast()：畫面下方跳出的提示 */
+.toast {
+    position: fixed;
+    left: 50%;
+    bottom: 32px;
+    z-index: 50;
+    transform: translate(-50%, 16px);
+    padding: 12px 24px;
+    background: #111;
+    color: #fff;
+    font-size: 13px;
+    letter-spacing: .06em;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .25s, transform .25s;
+}
+.toast.show {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
+.toast.error {
+    background: #9a3b2d;
+}
