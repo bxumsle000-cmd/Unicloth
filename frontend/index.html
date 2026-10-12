@@ -6,6 +6,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>frontend</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- KINU 首頁的色票和字型：用 bg-paper、text-muted、font-kinu 這類 class 取用 -->
+    <style type="text/tailwindcss">
+      @theme {
+        --color-paper: #F6F5F2;
+        --color-cream: #F0EBE3;
+        --color-stone: #D9CFC7;
+        --color-muted: #76716c;
+        --color-line: #dfd9d2;
+        --font-kinu: 'DM Sans', 'Noto Sans TC', sans-serif;
+      }
+    </style>
   </head>
   <body>
   <div id="root"></div>

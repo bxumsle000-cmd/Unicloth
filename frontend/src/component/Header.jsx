@@ -46,18 +46,18 @@ function Header () {
 
     return (
         <>
-        <div className="flex h-8 items-center justify-center bg-black text-white text-[10px] tracking-[.12em] ">
+        <div className="flex h-8 items-center justify-center bg-black font-kinu text-white text-[10px] tracking-[.12em]">
             全館滿 NT$2,500，享免運服務&emsp;·&emsp;新會員首購 95 折
         </div>
 
-        <div ref={headerAreaRef} className="relative">
-        <header className="grid h-[82px] grid-cols-[1fr_auto_1fr] items-center border-b border-[#dfd9d2] bg-[#F6F5F2] px-[5.5%]
+        <div ref={headerAreaRef} className="relative font-kinu">
+        <header className="grid h-[82px] grid-cols-[1fr_auto_1fr] items-center border-b border-line bg-paper px-[5.5%]
                            max-[760px]:h-auto max-[760px]:min-h-[65px] max-[760px]:gap-y-2 max-[760px]:px-[4%] max-[760px]:py-2.5">
             {/* 左：分類 */}
-            <div className="flex items-center gap-[25px] max-[760px]:hidden">
+            <div className="flex items-center gap-[26px] max-[760px]:hidden">
                 {TOP_CATEGORIES.map((top) => (
                     <button key={top.code} onClick={() => setOpenCode(openCode === top.code ? null : top.code)}
-                            className={`border-b py-2.5 text-[15px] tracking-[.08em] whitespace-nowrap
+                            className={`border-b py-2.5 text-[11px] tracking-[.08em] whitespace-nowrap
                                         ${openCode === top.code ? "border-black" : "border-transparent"}`}>
                         {top.label}
                     </button>

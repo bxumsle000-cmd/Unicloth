@@ -9,6 +9,7 @@ import Coupons from "./pages/Coupons.jsx";
 import Cart from "./pages/Cart.jsx";
 import Checkout from "./pages/Checkout.jsx";
 import OrderComplete from "./pages/OrderComplete.jsx";
+import Search from "./pages/Search.jsx";
 
 function App(){
     return (
@@ -25,6 +26,7 @@ function App(){
                 <Route path="/cart" element={<Cart/>}/>
                 <Route path="/checkout" element={<Checkout/>}/>
                 <Route path="/order-complete" element={<OrderComplete/>}/>
+                <Route path="/search" element={<Search/>}/>
             </Routes>
             </main>
             <Footer/>

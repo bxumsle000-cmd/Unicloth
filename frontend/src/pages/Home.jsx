@@ -1,3 +1,8 @@
+import { useState } from 'react'
+
+/** 主視覺輪播的三支影片 */
+const HERO_VIDEOS = ['/video/hero-01.mp4', '/video/hero-02.mp4', '/video/hero-03.mp4'];
+
 /** 三個系列大圖 */
 const LOOKS = [
     { code: 'all_women', img: '/img/look-01.png', alt: 'KINU 秋日女裝穿搭' },
@@ -6,13 +11,24 @@ const LOOKS = [
 ];
 
 function Home() {
+    // 目前播第幾支影片（從 0 開始）
+    const [heroIndex, setHeroIndex] = useState(0);
+
+    /** 切換影片：step 是 -1（上一支）或 1（下一支），超出頭尾就不動 */
+    function changeHeroVideo(step) {
+        const targetIndex = heroIndex + step;
+        if (targetIndex < 0 || targetIndex >= HERO_VIDEOS.length) return;
+        setHeroIndex(targetIndex);
+    }
+
     return (
-        <>
+        <div className="bg-paper font-kinu text-[14px] text-black">
         {/* 主視覺影片 */}
         <section className="relative h-[min(68vw,760px)] min-h-[540px] w-full overflow-hidden
                             max-[760px]:h-[78vh] max-[760px]:min-h-[530px]">
-            <video src="/video/hero-01.mp4" poster="/img/campaign.jpg"
-                   autoPlay muted loop playsInline
+            <video src={HERO_VIDEOS[heroIndex]} poster="/img/campaign.jpg"
+                   autoPlay muted playsInline
+                   onEnded={() => changeHeroVideo(1)}
                    className="absolute inset-0 size-full object-cover object-[center_42%] saturate-[.73]
                               max-[760px]:object-[58%_center]" />
 
@@ -31,6 +47,14 @@ function Home() {
                     留一點餘白，給生活更多可能。<br />以柔軟質地，陪你走過每一個日常。
                 </p>
             </div>
+
+            {/* 輪播切換：‹ 01 / 03 › ●○○ */}
+            <div className="absolute right-[5%] bottom-[26px] z-10 flex items-center gap-2 text-[10px] tracking-[.15em] text-white">
+                <button onClick={() => changeHeroVideo(-1)} aria-label="上一支影片" className="text-[22px]">‹</button>
+                <span>0{heroIndex + 1}　/　0{HERO_VIDEOS.length}</span>
+                <button onClick={() => changeHeroVideo(1)} aria-label="下一支影片" className="text-[22px]">›</button>
+                <span>　{HERO_VIDEOS.map((_, videoIndex) => videoIndex === heroIndex ? '●' : '○').join('　')}</span>
+            </div>
         </section>
 
         {/* 中間標語 */}
@@ -47,7 +71,7 @@ function Home() {
         <section id="collections">
             {LOOKS.map((look) => (
                 <div key={look.code}
-                   className="relative mb-[72px] block aspect-[2/1] w-full overflow-hidden bg-[#D9CFC7] max-[760px]:mb-12">
+                   className="relative mb-[72px] block aspect-[2/1] w-full overflow-hidden bg-stone max-[760px]:mb-12">
                     <img src={look.img} alt={look.alt} className="size-full object-cover object-[center_42%]" />
                 </div>
             ))}
@@ -65,7 +89,7 @@ function Home() {
                 <strong className="text-xs font-normal tracking-[.2em]">2026.10.15</strong>
             </div>
         </section>
-        </>
+        </div>
     )
 }
 

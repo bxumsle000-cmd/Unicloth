@@ -1,6 +1,6 @@
 function Footer() {
     return (
-        <footer className="bg-black px-[6.2%] pt-[43px] pb-6 text-white">
+        <footer className="bg-black font-kinu px-[6.2%] pt-[43px] pb-6 text-white">
             {/* 上半：Logo、標語、連結 */}
             <div className="flex justify-between pb-[37px] max-[760px]:block">
                 <div>
