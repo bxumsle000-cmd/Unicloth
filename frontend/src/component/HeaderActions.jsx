@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { MdLanguage } from "react-icons/md";
 import { Link } from "react-router-dom";
+import wishlist from "../pages/Wishlist.jsx";
+import {api} from "../js/kinu.js";
 
 /** Header 右邊：搜尋、天氣、各功能 */
 function HeaderActions() {
@@ -11,7 +13,13 @@ function HeaderActions() {
         .then(data => setTemp(Math.round(data.current.temperature_2m)))
     }, [])
 
+    const [wishCount, setWishCount] = useState(0);
+    useEffect(() => {
+        api('/api/wishlist').then(list => setWishCount(list.length)).catch(() => {});
+    }, []);
+
     const actionClass= "py-[7px] text-[15px] tracking-[.12em] whitespace-nowrap max-[760px]:text-[9px]"
+    const countClass = "ml-0.5 text-[12px] text-[#9a948d] max-[760px]:text-[8px]"
 
     return (
         <div className="flex items-center justify-end gap-[20px]
@@ -22,7 +30,7 @@ function HeaderActions() {
                    max-[760px]:w-[84px] max-[760px]:focus:w-[110px]"/>
 
             <div className="text-[15px] whitespace-nowrap text-[#36322e] max-[760px]:text-[10px]">台北 {temp}°</div>
-            <Link to={"/wishlist"} className={actionClass}>收藏</Link>
+            <Link to={"/wishlist"} className={actionClass}>收藏<span className={countClass}>{wishCount}</span></Link>
             <button className={actionClass}>購物車</button>
             <button className={actionClass}>折價券</button>
             <button className={actionClass}>訂單</button>
