@@ -1,17 +1,7 @@
 import { useState, useEffect } from "react";
-import { Link, Navigate, useLocation } from "react-router-dom";
-import { api, toast, money, imgSrc, FREE_SHIPPING_THRESHOLD, SHIPPING_FEE } from "../js/kinu.js";
-
-// 選項的 value 對應後端 enum（必須大寫）
-const SHIPPING_OPTIONS = [
-    { value: "HOME", label: "宅配" },
-    { value: "CVS", label: "超商取貨" },
-];
-const PAYMENT_OPTIONS = [
-    { value: "CREDIT", label: "信用卡" },
-    { value: "ATM", label: "ATM 轉帳" },
-    { value: "COD", label: "貨到付款" },
-];
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
+import { api, toast, money, imgSrc, FREE_SHIPPING_THRESHOLD, SHIPPING_FEE,
+         SHIPPING_OPTIONS, PAYMENT_OPTIONS } from "../js/kinu.js";
 
 const inputClass = "w-full border-b border-[#d6d0c7] bg-transparent py-2 text-[14px] tracking-[.04em] outline-none focus:border-black";
 
@@ -93,6 +83,36 @@ function Checkout() {
         });
     }
 
+    // 送出中：按鈕鎖住，避免連點送出兩張訂單
+    const [submitting, setSubmitting] = useState(false);
+    const navigate = useNavigate();
+
+    async function submitOrder() {
+        // 必填欄位先在前端擋，後端的錯誤訊息會帶英文欄位名，不適合直接給使用者看
+        if (!form.receiverName.trim()) return toast("請填寫收件人", true);
+        if (!form.receiverPhone.trim()) return toast("請填寫手機", true);
+        if (!form.receiverEmail.trim()) return toast("請填寫 Email", true);
+        if (!form.shippingAddress.trim()) {return toast("請填寫地址", true);}
+
+        setSubmitting(true);
+        try {
+            const order = await api(`/api/checkout`, {
+                method: "POST",
+                body: {
+                    ...form,
+                    note: form.note.trim() || null,
+                    memberCouponId: coupon ? coupon.id : null,
+                    cartItemIdList: buyList.map((item) => item.id),
+                },
+            });
+            // replace：按「上一頁」不會回到已經結完帳的確認訂單頁
+            navigate("/order-complete", { state: { order }, replace: true });
+        } catch (e) {
+            toast(e.message, true);
+            setSubmitting(false);
+        }
+    }
+
     // 一定要從購物車按「前往結帳」進來（會帶 state）；直接輸入網址就導回購物車
     // replace：取代這筆瀏覽紀錄，按「上一頁」才不會又跳回 /checkout
     if (!location.state) return <Navigate to="/cart" replace />;
@@ -162,7 +182,7 @@ function Checkout() {
                             <input className={inputClass} type="tel" value={form.receiverPhone} maxLength={20}
                                    onChange={(e) => changeField("receiverPhone", e.target.value)} />
                         </Field>
-                        <Field label="Email（訂單通知用，可不填）">
+                        <Field label="Email（訂單通知用）">
                             <input className={inputClass} type="email" value={form.receiverEmail} maxLength={255}
                                    onChange={(e) => changeField("receiverEmail", e.target.value)} />
                         </Field>
@@ -209,9 +229,10 @@ function Checkout() {
                         <span className="text-[19px] tracking-[.05em]">{money(total)}</span>
                     </div>
 
-                    {/* 確認下單：功能之後再做 */}
-                    <button className="mt-7 h-12 w-full bg-black text-[12px] tracking-[.18em] text-white transition-opacity hover:opacity-85">
-                        確認下單
+                    <button onClick={submitOrder} disabled={submitting}
+                            className="mt-7 h-12 w-full bg-black text-[12px] tracking-[.18em] text-white transition-opacity
+                                       hover:opacity-85 disabled:cursor-not-allowed disabled:opacity-50">
+                        {submitting ? "處理中…" : "確認下單"}
                     </button>
                 </div>
             </div>

@@ -8,6 +8,7 @@ import ProductDetail from "./pages/ProductDetail.jsx";
 import Coupons from "./pages/Coupons.jsx";
 import Cart from "./pages/Cart.jsx";
 import Checkout from "./pages/Checkout.jsx";
+import OrderComplete from "./pages/OrderComplete.jsx";
 
 function App(){
     return (
@@ -23,6 +24,7 @@ function App(){
                 <Route path="/coupons" element={<Coupons/>}/>
                 <Route path="/cart" element={<Cart/>}/>
                 <Route path="/checkout" element={<Checkout/>}/>
+                <Route path="/order-complete" element={<OrderComplete/>}/>
             </Routes>
             </main>
             <Footer/>
