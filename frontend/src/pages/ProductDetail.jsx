@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { CiHeart } from "react-icons/ci";
 import { IoHeart } from "react-icons/io5";
 import { HiArrowLongRight } from "react-icons/hi2";
-import { api, toast, money, imgSrc } from "../js/kinu.js";
+import { api, toast, money, imgSrc, FREE_SHIPPING_THRESHOLD, SHIPPING_FEE } from "../js/kinu.js";
 import Accordion from "../component/Accordion.jsx";
 
 function ProductDetail() {
@@ -199,8 +199,8 @@ function ProductDetail() {
 
                         <Accordion title="運費說明">
                             <ul className="list-disc space-y-1 pl-5">
-                                <li>單筆訂單商品金額滿 {money(2500)} 即享免運。</li>
-                                <li>未滿 {money(2500)} 酌收運費 {money(50)}。</li>
+                                <li>單筆訂單商品金額滿 {money(FREE_SHIPPING_THRESHOLD)} 即享免運。</li>
+                                <li>未滿 {money(FREE_SHIPPING_THRESHOLD)} 酌收運費 {money(SHIPPING_FEE)}。</li>
                                 <li>宅配與超商取貨運費相同。</li>
                             </ul>
                         </Accordion>

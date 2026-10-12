@@ -16,7 +16,9 @@ export async function api(path, options = {}) {
         try {
             const err = await res.json();
             if (err.message) message = err.message;
-        } catch {}
+        } catch {
+            // 回應不是 JSON（例如伺服器掛掉回 HTML），就用上面預設的 message
+        }
         throw new Error(message);
     }
     const text = await res.text();          // 204 No Content 沒有內容
@@ -79,3 +81,7 @@ export function sortSizes(sizes) {
         return a.localeCompare(b);                      // 數字一樣再比文字，例如 75/80 AB → 75/80 CD
     });
 }
+
+/** 運費規則（同後端 CheckoutService）：商品小計滿 2500 免運，否則 50 */
+export const FREE_SHIPPING_THRESHOLD = 2500;
+export const SHIPPING_FEE = 50;

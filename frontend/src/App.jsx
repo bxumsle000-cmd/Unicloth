@@ -5,6 +5,8 @@ import Category from "./pages/Category.jsx";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Wishlist from "./pages/Wishlist.jsx";
 import ProductDetail from "./pages/ProductDetail.jsx";
+import Coupons from "./pages/Coupons.jsx";
+import Cart from "./pages/Cart.jsx";
 
 function App(){
     return (
@@ -17,6 +19,8 @@ function App(){
                 <Route path="/category/:code" element={<Category/>}/>
                 <Route path="/wishlist/" element={<Wishlist/>}/>
                 <Route path="/product/:slug" element={<ProductDetail/>}/>
+                <Route path="/coupons" element={<Coupons/>}/>
+                <Route path="/cart" element={<Cart/>}/>
             </Routes>
             </main>
             <Footer/>

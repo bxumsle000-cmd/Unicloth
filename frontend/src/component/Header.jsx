@@ -47,7 +47,7 @@ function Header () {
     return (
         <>
         <div className="flex h-8 items-center justify-center bg-black text-white text-[10px] tracking-[.12em] ">
-            全館滿 NT$2,500，享免運服務　·　新會員首購 95 折
+            全館滿 NT$2,500，享免運服務&emsp;·&emsp;新會員首購 95 折
         </div>
 
         <div ref={headerAreaRef} className="relative">

@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { MdLanguage } from "react-icons/md";
 import { Link } from "react-router-dom";
-import wishlist from "../pages/Wishlist.jsx";
 import {api} from "../js/kinu.js";
 
 /** Header 右邊：搜尋、天氣、各功能 */
@@ -31,8 +30,8 @@ function HeaderActions() {
 
             <div className="text-[15px] whitespace-nowrap text-[#36322e] max-[760px]:text-[10px]">台北 {temp}°</div>
             <Link to={"/wishlist"} className={actionClass}>收藏<span className={countClass}>{wishCount}</span></Link>
-            <button className={actionClass}>購物車</button>
-            <button className={actionClass}>折價券</button>
+            <Link to={"/cart"} className={actionClass}>購物車</Link>
+            <Link to={"/coupons"} className={actionClass}>折價券</Link>
             <button className={actionClass}>訂單</button>
             <button className={actionClass}>會員</button>
             <button aria-label="選擇語言" className="grid size-8 place-items-center">
