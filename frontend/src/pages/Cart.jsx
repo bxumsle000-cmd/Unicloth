@@ -79,9 +79,10 @@ function Cart() {
                                      transition-colors hover:bg-black hover:text-white">
                         去逛逛
                     </Link>
-                </div>
-            ) : (
-                <div className="grid grid-cols-[1fr_340px] items-start gap-[6%] max-[1000px]:grid-cols-1 max-[1000px]:gap-10">
+                </div>) :
+                (
+                <div className="grid grid-cols-[1fr_340px] items-start gap-[6%]
+                                max-[1000px]:grid-cols-1 max-[1000px]:gap-10">
                     {/* 左：商品清單 */}
                     <div className="border-t border-[#e5e0d8]">
                         {cartItemList.map((item) => (
@@ -107,12 +108,13 @@ function Cart() {
                             )}
                         </div>
 
-                        {/* 免運進度條 */}
+                        {/* 免運進度 */}
                         <div className="mt-4 text-[10px] tracking-[.06em] text-[#76716c]">
                             {shippingFee === 0
                                 ? "已達免運門檻"
                                 : `再買 ${money(FREE_SHIPPING_THRESHOLD - subtotal)} 即可免運`}
                         </div>
+                        {/* 免運進度條 */}
                         <div className="mt-2 h-[2px] bg-[#e5e0d8]">
                             <div className="h-full bg-black transition-[width]"
                                  style={{ width: `${Math.min(subtotal / FREE_SHIPPING_THRESHOLD, 1) * 100}%` }} />
