@@ -53,7 +53,7 @@ function HeaderActions() {
             <Link to={"/wishlist"} className={actionClass}>收藏<span className={countClass}>{wishCount}</span></Link>
             <Link to={"/cart"} className={actionClass}>購物車<span className={countClass}>{cartCount}</span></Link>
             <Link to={"/coupons"} className={actionClass}>折價券</Link>
-            <button className={actionClass}>訂單</button>
+            <Link to={"/orders"} className={actionClass}>訂單</Link>
             <button className={actionClass}>會員</button>
             <button aria-label="選擇語言" className="grid size-8 place-items-center">
                 <MdLanguage className="size-5" />

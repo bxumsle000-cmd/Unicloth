@@ -10,6 +10,7 @@ import Cart from "./pages/Cart.jsx";
 import Checkout from "./pages/Checkout.jsx";
 import OrderComplete from "./pages/OrderComplete.jsx";
 import Search from "./pages/Search.jsx";
+import Orders from "./pages/Orders.jsx";
 
 function App(){
     return (
@@ -27,6 +28,7 @@ function App(){
                 <Route path="/checkout" element={<Checkout/>}/>
                 <Route path="/order-complete" element={<OrderComplete/>}/>
                 <Route path="/search" element={<Search/>}/>
+                <Route path="/orders" element={<Orders/>}/>
             </Routes>
             </main>
             <Footer/>
