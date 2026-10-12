@@ -17,6 +17,14 @@ function HeaderActions() {
         api('/api/wishlist').then(list => setWishCount(list.length)).catch(() => {});
     }, []);
 
+    const [cartCount, setCartCount] = useState(0);
+    useEffect(() => {
+        api('/api/cart')
+            .then(cartItemList => setCartCount(cartItemList.reduce((sum, item) => sum + item.qty, 0)))
+            .catch(() => {});
+    }, []);
+
+
     // 搜尋：按 Enter 送出表單，關鍵字放在網址上（重新整理、上一頁都還在）
     const [keyword, setKeyword] = useState("");
     const navigate = useNavigate();
@@ -43,7 +51,7 @@ function HeaderActions() {
 
             <div className="text-[10px] whitespace-nowrap text-[#36322e] max-[760px]:text-[9px]">台北 {temp}°</div>
             <Link to={"/wishlist"} className={actionClass}>收藏<span className={countClass}>{wishCount}</span></Link>
-            <Link to={"/cart"} className={actionClass}>購物車</Link>
+            <Link to={"/cart"} className={actionClass}>購物車<span className={countClass}>{cartCount}</span></Link>
             <Link to={"/coupons"} className={actionClass}>折價券</Link>
             <button className={actionClass}>訂單</button>
             <button className={actionClass}>會員</button>
