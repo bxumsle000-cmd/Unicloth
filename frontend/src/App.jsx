@@ -7,6 +7,7 @@ import Wishlist from "./pages/Wishlist.jsx";
 import ProductDetail from "./pages/ProductDetail.jsx";
 import Coupons from "./pages/Coupons.jsx";
 import Cart from "./pages/Cart.jsx";
+import Checkout from "./pages/Checkout.jsx";
 
 function App(){
     return (
@@ -21,6 +22,7 @@ function App(){
                 <Route path="/product/:slug" element={<ProductDetail/>}/>
                 <Route path="/coupons" element={<Coupons/>}/>
                 <Route path="/cart" element={<Cart/>}/>
+                <Route path="/checkout" element={<Checkout/>}/>
             </Routes>
             </main>
             <Footer/>

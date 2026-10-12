@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { HiArrowLongRight } from "react-icons/hi2";
 import { api, toast, money, fmtDate, FREE_SHIPPING_THRESHOLD, SHIPPING_FEE } from "../js/kinu.js";
 import CartItem from "../component/CartItem.jsx";
@@ -36,6 +36,12 @@ function Cart() {
 
     const shippingFee = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE;
     const total = subtotal - discount + shippingFee;
+
+    // 前往結帳：把選的折價券（整張，沒選是 null）帶到結帳頁
+    const navigate = useNavigate();
+    function goCheckout() {
+        navigate("/checkout", { state: { coupon: coupon ?? null } });
+    }
 
     // 改數量：後端成功才改畫面
     async function changeQty(item, qty) {
@@ -167,9 +173,10 @@ function Cart() {
                             <span className="text-[17px] tracking-[.05em]">{money(total)}</span>
                         </div>
 
-                        {/* 結帳：功能之後再做 */}
-                        <button className="mt-7 flex h-12 w-full items-center justify-center gap-2 bg-black text-[12px] tracking-[.18em] text-white
-                                           transition-opacity hover:opacity-85">
+                        {/* 前往結帳 */}
+                        <button onClick={goCheckout} disabled={subtotal === 0}
+                                className="mt-7 flex h-12 w-full items-center justify-center gap-2 bg-black text-[12px] tracking-[.18em] text-white
+                                           transition-opacity hover:opacity-85 disabled:opacity-30">
                             前往結帳 <HiArrowLongRight className="size-4" />
                         </button>
                     </aside>
