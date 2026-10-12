@@ -1,5 +1,6 @@
 import { money, imgSrc } from "../js/kinu.js";
 import { IoHeart } from "react-icons/io5";
+import {Link} from "react-router-dom";
 
 /** 收藏卡片：list 是 /api/wishlist 回來的一筆；onRemove 是按愛心要做的事（取消收藏） */
 function WishListCard({ list, remove }) {
@@ -7,6 +8,7 @@ function WishListCard({ list, remove }) {
     return (
         <div className="relative">
             {/* 商品圖 */}
+            <Link to={`/product/${list.slug}`}>
             <div className="relative aspect-[3/4] overflow-hidden bg-[#F0EBE3]">
                 {list.imageUrl && (
                     <img src={imgSrc(list.imageUrl)} alt={list.name} loading="lazy"
@@ -21,7 +23,7 @@ function WishListCard({ list, remove }) {
                     </span>
                 )}
             </div>
-
+            </Link>
             {/* 名稱 */}
             <div className={`mt-3 mb-[5px] text-[14px] leading-[1.6] tracking-[.04em] ${list.onSale ? "" : "text-[#9a948d]"}`}>
                 {list.name}

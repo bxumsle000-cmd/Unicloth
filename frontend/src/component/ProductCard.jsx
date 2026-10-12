@@ -1,6 +1,7 @@
 import { money, imgSrc } from "../js/kinu.js";
 import { CiHeart } from "react-icons/ci";
 import { IoHeart } from "react-icons/io5";
+import { Link } from "react-router-dom";
 
 /**
  * 商品卡片：product 是 /api/categories/{code}/products 回來 content 裡的一筆
@@ -12,6 +13,8 @@ function ProductCard({ product, liked, toggleLike }) {
 
     return (
         <div className="relative">
+            {/* 點圖片或名稱進商品頁 */}
+            <Link to={`/product/${product.slug}`}>
                 {/* 商品圖 */}
                 <div className="relative aspect-[3/4]  bg-[#F0EBE3]">
                     {product.imageUrl && (
@@ -35,6 +38,7 @@ function ProductCard({ product, liked, toggleLike }) {
                     {onSaleNow && <del className="ml-[7px] text-[11px] text-[#76716c]">{money(product.origPrice)}</del>}
                     {money(product.price)}
                 </div>
+            </Link>
 
 
             {/* 收藏愛心：已收藏是紅色實心，沒收藏是空心 */}
