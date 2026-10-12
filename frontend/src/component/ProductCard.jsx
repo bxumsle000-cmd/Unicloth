@@ -1,8 +1,12 @@
 import { money, imgSrc } from "../js/kinu.js";
 import { CiHeart } from "react-icons/ci";
+import { IoHeart } from "react-icons/io5";
 
-/** 商品卡片：product 是 /api/categories/{code}/products 回來 content 裡的一筆 */
-function ProductCard({ product }) {
+/**
+ * 商品卡片：product 是 /api/categories/{code}/products 回來 content 裡的一筆
+ * liked 是否已收藏；onToggle 是按愛心要做的事
+ */
+function ProductCard({ product, liked, toggleLike }) {
     // 有原價而且比售價高，就顯示成特價
     const onSaleNow = product.origPrice && product.origPrice > product.price;
 
@@ -33,10 +37,13 @@ function ProductCard({ product }) {
                 </div>
 
 
-            {/* 收藏愛心（目前只有外觀） */}
-            <button aria-label="收藏"
+            {/* 收藏愛心：已收藏是紅色實心，沒收藏是空心 */}
+            <button aria-label={liked ? "取消收藏" : "收藏"}
+                    onClick={() => toggleLike(product.slug)}
                     className="absolute top-1.5 right-1.5  grid size-[34px] place-items-center rounded-full bg-[#ffffffcc]">
-                <CiHeart className="size-[19px]" />
+                {liked
+                    ? <IoHeart className="size-[18px] text-[#9a3b2d]" />
+                    : <CiHeart className="size-[19px]" />}
             </button>
         </div>
     )

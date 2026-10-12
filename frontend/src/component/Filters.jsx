@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { sortSizes } from "../js/kinu.js";
 
 /**
  * 篩選選項：filters 是 /api/categories/{code}/filters 回來的 { colors, sizes }<br>
@@ -53,7 +54,7 @@ function Filters({ filters, selectedFilters, setSelectedFilters }) {
             <div className={filterGridClass}>
                 <div className={filterLabelClass}>尺寸</div>
                 <div className="flex flex-wrap gap-2">
-                    {filters.sizes.map((size) => (
+                    {sortSizes(filters.sizes).map((size) => (
                         <button key={size} onClick={() => toggle("sizes", size)}
                                 className={selectedFilters.sizes.includes(size) ? selectedButtonClass : unselectedButtonClass}>{size}</button>
                     ))}

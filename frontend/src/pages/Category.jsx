@@ -1,4 +1,4 @@
-import {api} from "../js/kinu.js";
+import {api, toast} from "../js/kinu.js";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Breadcrumb from "../component/Breadcrumb.jsx";
@@ -27,6 +27,30 @@ function Category(){
     useEffect(() => {
         api(`/api/categories/${code}/filters`).then(setFilters);
     }, [code]);
+
+    // 已收藏的商品 slug；進頁面抓一次就好，換頁、換篩選都不會變
+    const [likedSet, setLikedSet] = useState(new Set());
+    useEffect(() => {
+        api(`/api/wishlist`)
+            .then(list => setLikedSet(new Set(list.map(item => item.slug))))
+            .catch(() => {});   // 沒登入就當作都沒收藏
+    }, []);
+
+    // 按愛心：已收藏就取消，沒收藏就加入；後端成功才換愛心
+    async function toggleLike(slug) {
+        const liked = likedSet.has(slug);
+        try {
+            await api(`/api/wishlist/${slug}`, { method: liked ? 'DELETE' : 'POST' });
+            const next = new Set(likedSet);   // 複製一份新的，React 才知道有變
+            if (liked) {next.delete(slug);
+            } else
+            {next.add(slug);}
+            setLikedSet(next);
+            toast(liked ? '已取消收藏' : '已加入收藏');
+        } catch (e) {
+            toast(e.message, true);
+        }
+    }
 
     // 排序：值直接當 sort 參數送給後端，例如 price,asc
     const [sort, setSort] = useState("id,desc");
@@ -91,7 +115,8 @@ function Category(){
             <div className="grid grid-cols-6 gap-x-5 gap-y-9
                             max-[1100px]:grid-cols-3 max-[760px]:grid-cols-2 max-[760px]:gap-x-3 max-[760px]:gap-y-[26px]">
                 {products.content.map((product) => (
-                    <ProductCard key={product.slug} product={product} />
+                    <ProductCard key={product.slug} product={product}
+                                 liked={likedSet.has(product.slug)} toggleLike={toggleLike} />
                 ))}
             </div>
             {/* 換頁 */}

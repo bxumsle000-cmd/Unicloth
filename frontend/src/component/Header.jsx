@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
-import { MdClose, MdLanguage, MdMenu } from "react-icons/md";
+import { MdClose, MdMenu } from "react-icons/md";
 import { api } from "../js/kinu.js";
 import MegaMenu from "./MegaMenu.jsx";
 import MobileMenu from "./MobileMenu.jsx";
+import HeaderActions from "./HeaderActions.jsx";
 import {Link} from "react-router-dom";
 
 function Header () {
@@ -12,13 +13,6 @@ function Header () {
         { code: 'all_men', i18n: 'men', label: '男裝' },
         { code: 'all_kids', i18n: 'kids', label: '兒童' }
     ];
-
-    const [temp, setTemp] = useState(27)
-    useEffect(()=>{
-        fetch('https://api.open-meteo.com/v1/forecast?latitude=25.033&longitude=121.5654&current=temperature_2m&timezone=Asia%2FTaipei')
-        .then(res => res.json())
-        .then(data => setTemp(Math.round(data.current.temperature_2m)))
-    }, [])
 
     // 分類選單：menu 是 /api/categories 的整棵分類樹，只抓一次
     const [menu, setMenu] = useState([]);
@@ -85,23 +79,7 @@ function Header () {
             </Link>
 
             {/* 右：搜尋、天氣、各功能 */}
-            <div className="flex items-center justify-end gap-[20px]
-                            max-[760px]:col-span-full max-[760px]:justify-center max-[760px]:gap-[clamp(8px,2.5vw,14px)]">
-                <input type="search" placeholder="搜尋商品"
-                       className="w-[118px] border-b border-[#a39d97]  py-1.5 text-[10px] tracking-[.06em]
-                       outline-none transition-all focus:w-[150px] focus:border-black
-                       max-[760px]:w-[84px] max-[760px]:focus:w-[110px]"/>
-
-                <div className="text-[15px] whitespace-nowrap text-[#36322e] max-[760px]:text-[10px]">台北 {temp}°</div>
-                <button className="py-[7px] text-[15px] tracking-[.12em] whitespace-nowrap max-[760px]:text-[9px]">收藏</button>
-                <button className="py-[7px] text-[15px] tracking-[.12em] whitespace-nowrap max-[760px]:text-[9px]">購物車</button>
-                <button className="py-[7px] text-[15px] tracking-[.12em] whitespace-nowrap max-[760px]:text-[9px]">折價券</button>
-                <button className="py-[7px] text-[15px] tracking-[.12em] whitespace-nowrap max-[760px]:text-[9px]">訂單</button>
-                <button className="py-[7px] text-[15px] tracking-[.12em] whitespace-nowrap max-[760px]:text-[9px]">會員</button>
-                <button aria-label="選擇語言" className="grid size-8 place-items-center">
-                    <MdLanguage className="size-5" />
-                </button>
-            </div>
+            <HeaderActions />
         </header>
         </div>
         </>
