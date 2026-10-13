@@ -3,9 +3,14 @@
  * 失敗時丟出 Error，message 是後端 ErrorResponse 的 message（例如「不能超過庫存數量」）。
  * 用法：const cart = await api('/api/cart');
  *       await api('/api/cart', { method: 'POST', body: { variantId: 1, qty: 1 } });
+ * 有登入（localStorage 有 token）就自動帶上 Authorization header。
  */
 export async function api(path, options = {}) {
     const opt = { method: options.method || 'GET', headers: {} };
+    const token = getToken();
+    if (token) {
+        opt.headers['Authorization'] = 'Bearer ' + token;
+    }
     if (options.body !== undefined) {
         opt.headers['Content-Type'] = 'application/json';
         opt.body = JSON.stringify(options.body);
@@ -23,6 +28,36 @@ export async function api(path, options = {}) {
     }
     const text = await res.text();          // 204 No Content 沒有內容
     return text ? JSON.parse(text) : null;
+}
+
+// 登入後後端回傳的 JWT 存在這個 key；登入存、登出刪
+const TOKEN_KEY = 'token';
+
+/** 讀登入 token；沒登入、或瀏覽器不讓用 localStorage 時回 null */
+export function getToken() {
+    try {
+        return localStorage.getItem(TOKEN_KEY);
+    } catch {
+        return null;
+    }
+}
+
+/** 登入成功時存 token */
+export function setToken(token) {
+    try {
+        localStorage.setItem(TOKEN_KEY, token);
+    } catch {
+        // 不能存就只是重新整理後要再登入一次
+    }
+}
+
+/** 登出時刪 token（JWT 後端不記狀態，前端刪掉就等於登出） */
+export function clearToken() {
+    try {
+        localStorage.removeItem(TOKEN_KEY);
+    } catch {
+        // 同上
+    }
 }
 
 /** 990 → NT$990；12500 → NT$12,500 */

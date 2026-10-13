@@ -9,7 +9,7 @@ import com.EEIT25.unicloth.enums.MemberStatus;
 import com.EEIT25.unicloth.exception.ApiException;
 import com.EEIT25.unicloth.repository.MemberProfileRepository;
 import com.EEIT25.unicloth.repository.MemberRepository;
-import com.EEIT25.unicloth.security.CurrentMember;
+import com.EEIT25.unicloth.security.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,9 +26,9 @@ public class AuthService {
     private final MemberRepository memberRepository;
     private final MemberProfileRepository memberProfileRepository;
     private final PasswordEncoder passwordEncoder;
-    private final CurrentMember currentMember;
+    private final JwtService jwtService;
 
-    /** 會員登入：檢查帳號密碼、帳號是否停用，通過後回傳會員 id 和 token；帳號或密碼錯都回同一句，不透露是哪個錯 */
+    /** 會員登入：檢查帳號密碼、帳號是否停用，通過後回傳會員 id 和 JWT；帳號或密碼錯都回同一句，不透露是哪個錯 */
     @Transactional
     public LoginResponse login(LoginRequest request){
         Member member = memberRepository.findByEmail(request.email())
@@ -40,7 +40,7 @@ public class AuthService {
             throw ApiException.forbidden("此帳號已被停用");
         }
 
-        return new LoginResponse(member.getId(),currentMember.getCurrentToken());
+        return new LoginResponse(member.getId(), jwtService.generateToken(member.getId()));
     }
 
     /** 會員註冊：email 已存在就擋下，密碼加密後才存進資料庫；帳號和個人資料分別存進兩張表 */
