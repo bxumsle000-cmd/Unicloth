@@ -31,14 +31,18 @@ public class MemberService {
     @Transactional
     public MemberResponse getMe(){
         Member member = currentMember.require();
-        return MemberResponse.from(member, requireProfile(member));
+        MemberProfile profile = memberProfileRepository.findById(member.getId())
+                .orElseThrow(() -> ApiException.notFound("尚未填寫會員資料"));
+
+        return MemberResponse.from(member, profile);
     }
 
     /** 修改會員資料（姓名、電話、地址）；在交易內改 entity，結束時會自動存回資料庫 */
     @Transactional
     public MemberResponse updateProfile(UpdateMemberRequest request){
         Member member = currentMember.require();
-        MemberProfile profile = requireProfile(member);
+        MemberProfile profile = memberProfileRepository.findById(member.getId())
+                .orElseThrow(() -> ApiException.notFound("尚未填寫會員資料"));
 
         profile.setName(request.name());
         profile.setPhone(request.phone());
@@ -61,11 +65,5 @@ public class MemberService {
         }
 
         member.setPasswordHash(passwordEncoder.encode(request.newPassword()));
-    }
-
-    /** 取得會員的個人資料；查不到代表還沒填過，丟 404 */
-    private MemberProfile requireProfile(Member member){
-        return memberProfileRepository.findById(member.getId())
-                .orElseThrow(() -> ApiException.notFound("尚未填寫會員資料"));
     }
 }
