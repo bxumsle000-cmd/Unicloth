@@ -14,6 +14,7 @@ import Orders from "./pages/Orders.jsx";
 import Login from "./pages/Login.jsx";
 import CompleteProfile from "./pages/CompleteProfile.jsx";
 import ProfileGuard from "./component/ProfileGuard.jsx";
+import RequireLogin from "./component/RequireLogin.jsx";
 import { LanguageProvider } from "./js/LanguageProvider.jsx";
 
 function App(){
@@ -27,14 +28,14 @@ function App(){
             <Routes>
                 <Route path="/" element={<Home/>}/>
                 <Route path="/category/:code" element={<Category/>}/>
-                <Route path="/wishlist/" element={<Wishlist/>}/>
+                <Route path="/wishlist/" element={<RequireLogin><Wishlist/></RequireLogin>}/>
                 <Route path="/product/:slug" element={<ProductDetail/>}/>
-                <Route path="/coupons" element={<Coupons/>}/>
-                <Route path="/cart" element={<Cart/>}/>
-                <Route path="/checkout" element={<Checkout/>}/>
+                <Route path="/coupons" element={<RequireLogin><Coupons/></RequireLogin>}/>
+                <Route path="/cart" element={<RequireLogin><Cart/></RequireLogin>}/>
+                <Route path="/checkout" element={<RequireLogin><Checkout/></RequireLogin>}/>
                 <Route path="/order-complete" element={<OrderComplete/>}/>
                 <Route path="/search" element={<Search/>}/>
-                <Route path="/orders" element={<Orders/>}/>
+                <Route path="/orders" element={<RequireLogin><Orders/></RequireLogin>}/>
                 <Route path="/login" element={<Login/>}/>
                 <Route path="/complete-profile" element={<CompleteProfile/>}/>
             </Routes>

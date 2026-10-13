@@ -27,7 +27,7 @@ Google 只給 email 和名字，沒有電話、性別、生日，但結帳需要
 | 告訴前端 | `LoginResponse`、`GET /api/member/me` 多帶 `profileCompleted`（true / false） |
 | 補填 API | 新增 `PUT /api/member/me/complete-profile`，收 name、phone、gender、birthday、address（address 選填），新增一筆 `member_profiles` |
 | 後端阻擋 | 沒補齊時，除了 `GET /api/member/me` 和補填 API 之外，其他要登入的 API 一律回 403（只做前端導頁可以被繞過）。寫在 `SecurityConfig` 的授權規則 `profileCompleted()` |
-| 前端路由守衛 | 已登入但 `profileCompleted = false`，不管進哪一頁都導到 `/complete-profile`（`component/ProfileGuard.jsx`） |
+| 前端路由守衛 | 已登入但 `profileCompleted = false`，離開 `/complete-profile` 就當成不想填、自動登出；下次 Google 登入會再帶去補填（`component/ProfileGuard.jsx`） |
 | 名字 | 補填頁先帶入 Google 給的名字，讓使用者可以改（`firebase.js` 的 `getGoogleName()`） |
 | 補填頁 | `pages/CompleteProfile.jsx`；只能補填一次，第二次回 409，之後改資料走 `PUT /api/member/me/profile` |
 

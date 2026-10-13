@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { CiHeart } from "react-icons/ci";
 import { IoHeart } from "react-icons/io5";
 import { HiArrowLongRight } from "react-icons/hi2";
-import { api, toast, money, imgSrc, FREE_SHIPPING_THRESHOLD, SHIPPING_FEE } from "../js/kinu.js";
+import { api, getToken, toast, money, imgSrc, FREE_SHIPPING_THRESHOLD, SHIPPING_FEE } from "../js/kinu.js";
 import Accordion from "../component/product/Accordion.jsx";
 
 function ProductDetail() {
     const slug = useParams().slug;
+    const navigate = useNavigate();
 
     const [product, setProduct] = useState(null);
     const [notFound, setNotFound] = useState(false);
@@ -66,6 +67,12 @@ function ProductDetail() {
     }
 
     async function addToCart() {
+        // 沒登入就不打 API（後端會回 401），提示後帶去登入頁
+        if (!getToken()) {
+            toast('請先登入會員', true);
+            navigate('/login');
+            return;
+        }
         if (!sizeOption) {
             toast('請先選擇尺寸', true);
             return;
