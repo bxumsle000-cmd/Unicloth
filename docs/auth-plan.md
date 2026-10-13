@@ -9,14 +9,14 @@
 | 1 | JWT：登入發 token、`JwtAuthFilter` 驗 token、`CurrentMember` 從 token 取會員 | ✅ 完成 |
 | — | 會員拆成兩張表：`members`（帳號）＋ `member_profiles`（個人資料） | ✅ 完成 |
 | 2 | Google 登入：`POST /api/auth/firebase`、前端登入頁 | ✅ 程式完成，⚠️ 還沒用真的 Firebase 專案登入過 |
-| 3 | 第一次登入後強制補填個人資料 | ⬜ 未開始 |
+| 3 | 第一次登入後強制補填個人資料 | ✅ 完成 |
 | 4 | 拿掉帳號密碼登入 | ⬜ 未開始 |
 
 Firebase 專案的設定步驟見 [`firebase-setup.md`](firebase-setup.md)。
 
 ---
 
-## 步驟 3：強制補填個人資料
+## 步驟 3：強制補填個人資料（✅ 完成）
 
 Google 只給 email 和名字，沒有電話、性別、生日，但結帳需要這些資料。
 用 Google 第一次登入時只會建 `members`，**補填完才建 `member_profiles`**，所以「有沒有 profile」就代表「資料補齊了沒」。
@@ -26,9 +26,10 @@ Google 只給 email 和名字，沒有電話、性別、生日，但結帳需要
 | 判斷有沒有補齊 | `memberProfileRepository.existsById(memberId)`，不用另外加欄位 |
 | 告訴前端 | `LoginResponse`、`GET /api/member/me` 多帶 `profileCompleted`（true / false） |
 | 補填 API | 新增 `PUT /api/member/me/complete-profile`，收 name、phone、gender、birthday、address（address 選填），新增一筆 `member_profiles` |
-| 後端阻擋 | 沒補齊時，除了 `GET /api/member/me` 和補填 API 之外，其他要登入的 API 一律回 403（只做前端導頁可以被繞過） |
-| 前端路由守衛 | 已登入但 `profileCompleted = false`，不管進哪一頁都導到 `/complete-profile` |
-| 名字 | 補填頁先帶入 Google 給的名字，讓使用者可以改 |
+| 後端阻擋 | 沒補齊時，除了 `GET /api/member/me` 和補填 API 之外，其他要登入的 API 一律回 403（只做前端導頁可以被繞過）。寫在 `SecurityConfig` 的授權規則 `profileCompleted()` |
+| 前端路由守衛 | 已登入但 `profileCompleted = false`，不管進哪一頁都導到 `/complete-profile`（`component/ProfileGuard.jsx`） |
+| 名字 | 補填頁先帶入 Google 給的名字，讓使用者可以改（`firebase.js` 的 `getGoogleName()`） |
+| 補填頁 | `pages/CompleteProfile.jsx`；只能補填一次，第二次回 409，之後改資料走 `PUT /api/member/me/profile` |
 
 補填完不用重發 token：token 裡只放會員 id，「補齊了沒」每次都查資料庫，不會有舊 token 狀態不對的問題。
 

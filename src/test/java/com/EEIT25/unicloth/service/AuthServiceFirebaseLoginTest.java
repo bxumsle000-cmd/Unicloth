@@ -50,6 +50,8 @@ class AuthServiceFirebaseLoginTest {
         assertThat(member.getEmail()).isEqualTo("google-new@example.com");
         assertThat(member.getFirebaseUid()).isEqualTo("uid-new");
         assertThat(member.getPasswordHash()).isNull();
+        // 新會員還沒有個人資料，前端要導去補填頁
+        assertThat(response.profileCompleted()).isFalse();
         // 回傳的是我們自己的 JWT，解回來是同一個會員
         assertThat(jwtService.parseMemberId(response.token())).isEqualTo(member.getId());
     }

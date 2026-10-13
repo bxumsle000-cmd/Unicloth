@@ -47,7 +47,8 @@ public class AuthService {
             throw ApiException.forbidden("此帳號已被停用");
         }
 
-        return new LoginResponse(member.getId(), jwtService.generateToken(member.getId()));
+        return new LoginResponse(member.getId(), jwtService.generateToken(member.getId()),
+                memberProfileRepository.existsById(member.getId()));
     }
 
     /**
@@ -87,7 +88,8 @@ public class AuthService {
             throw ApiException.forbidden("此帳號已被停用");
         }
 
-        return new LoginResponse(member.getId(), jwtService.generateToken(member.getId()));
+        return new LoginResponse(member.getId(), jwtService.generateToken(member.getId()),
+                memberProfileRepository.existsById(member.getId()));
     }
 
     /** 會員註冊：email 已存在就擋下，密碼加密後才存進資料庫；帳號和個人資料分別存進兩張表 */

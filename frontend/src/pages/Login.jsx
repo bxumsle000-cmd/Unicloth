@@ -12,10 +12,10 @@ function Login() {
             // 1. Firebase 跳出 Google 登入視窗，拿到 Firebase 的 ID token
             const idToken = await signInWithGoogle();
             // 2. 送給後端驗證，換回我們自己的 JWT
-            const { token } = await api('/api/auth/firebase', { method: 'POST', body: { idToken } });
+            const { token, profileCompleted } = await api('/api/auth/firebase', { method: 'POST', body: { idToken } });
             setToken(token);
-            // 整頁重新載入：Header 的購物車數量等等才會用新的登入狀態重抓
-            window.location.href = '/';
+            // 整頁重新載入：Header 的購物車數量等等才會用新的登入狀態重抓；第一次登入要先去補填資料
+            window.location.href = profileCompleted ? '/' : '/complete-profile';
         } catch (e) {
             // 使用者自己把 Google 視窗關掉，不算錯誤
             if (e.code !== 'auth/popup-closed-by-user' && e.code !== 'auth/cancelled-popup-request') {
@@ -40,7 +40,7 @@ function Login() {
 
             {!firebaseReady && (
                 <p className="mt-4 text-[11px] tracking-[.04em] text-[#b0413e]">
-                    尚未設定 Firebase：請依 frontend/.env.example 建立 .env.local
+                    尚未設定 Firebase：請確認 frontend/.env 有 Firebase 設定值，並重新啟動 npm run dev
                 </p>
             )}
         </div>

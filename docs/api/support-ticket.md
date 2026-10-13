@@ -22,7 +22,7 @@
 
 > 目前**沒有任何 API 會改狀態**，所以透過這兩支 API 看到的一定是 `IN_PROGRESS`。
 
-> 🔒 **需要登入**：請求要帶 `Authorization: Bearer <token>`（token 從 `/api/auth/login` 或 `/api/auth/firebase` 取得），操作的是 token 裡的那個會員。沒帶 token 或 token 無效、過期回 401。
+> 🔒 **需要登入**：請求要帶 `Authorization: Bearer <token>`（token 從 `/api/auth/login` 或 `/api/auth/firebase` 取得），操作的是 token 裡的那個會員。沒帶 token 或 token 無效、過期回 401。登入了但還沒補填會員資料回 403「請先填寫會員資料」。
 >
 > 資料表 `support_tickets.member_id` 允許 `NULL`，原本設計是「**未登入也能送客服單**」，但目前分不出有沒有登入，所以先一律綁定目前的會員（見 `SupportTicketService` 的 TODO）。
 

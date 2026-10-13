@@ -12,6 +12,8 @@ import OrderComplete from "./pages/OrderComplete.jsx";
 import Search from "./pages/Search.jsx";
 import Orders from "./pages/Orders.jsx";
 import Login from "./pages/Login.jsx";
+import CompleteProfile from "./pages/CompleteProfile.jsx";
+import ProfileGuard from "./component/ProfileGuard.jsx";
 import { LanguageProvider } from "./js/LanguageProvider.jsx";
 
 function App(){
@@ -21,6 +23,7 @@ function App(){
         <div className="flex min-h-screen flex-col">
             <Header/>
             <main className="flex-1">
+            <ProfileGuard>
             <Routes>
                 <Route path="/" element={<Home/>}/>
                 <Route path="/category/:code" element={<Category/>}/>
@@ -33,7 +36,9 @@ function App(){
                 <Route path="/search" element={<Search/>}/>
                 <Route path="/orders" element={<Orders/>}/>
                 <Route path="/login" element={<Login/>}/>
+                <Route path="/complete-profile" element={<CompleteProfile/>}/>
             </Routes>
+            </ProfileGuard>
             </main>
             <Footer/>
         </div>

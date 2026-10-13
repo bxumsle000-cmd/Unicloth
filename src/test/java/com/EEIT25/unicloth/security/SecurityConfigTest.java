@@ -1,6 +1,8 @@
 package com.EEIT25.unicloth.security;
 
+import com.EEIT25.unicloth.repository.MemberProfileRepository;
 import com.EEIT25.unicloth.repository.MemberRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -10,11 +12,15 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -33,6 +39,13 @@ class SecurityConfigTest {
 
     // CurrentMember 需要它；這裡只測 getCurrentId()，不會真的查資料庫
     @MockitoBean MemberRepository memberRepository;
+    // SecurityConfig 用它判斷「補填過資料沒」；預設每個會員都填過，要測沒填的情況再個別改
+    @MockitoBean MemberProfileRepository memberProfileRepository;
+
+    @BeforeEach
+    void allMembersHaveProfile() {
+        when(memberProfileRepository.existsById(anyLong())).thenReturn(true);
+    }
 
     @RestController
     static class DummyController {
@@ -42,6 +55,8 @@ class SecurityConfigTest {
         @GetMapping("/api/products") String products() { return "products"; }
         @PostMapping("/api/products") String createProduct() { return "created"; }
         @PostMapping("/api/auth/login") String login() { return "ok"; }
+        @GetMapping("/api/member/me") String me() { return "me"; }
+        @PutMapping("/api/member/me/complete-profile") String completeProfile() { return "completed"; }
         /** 回傳 CurrentMember 認為的「現在是誰」，驗證整條鏈：Filter → SecurityContext → CurrentMember */
         @GetMapping("/api/whoami") Long whoami() { return currentMember.getCurrentId(); }
     }
@@ -111,5 +126,42 @@ class SecurityConfigTest {
             int status = mockMvc.perform(get(path)).andReturn().getResponse().getStatus();
             assertThat(status).as(path).isNotEqualTo(401);
         }
+    }
+
+    @Test
+    void 沒補填資料_其他要登入的API_403且回ErrorResponse格式() throws Exception {
+        when(memberProfileRepository.existsById(9L)).thenReturn(false);
+        String token = jwtService.generateToken(9L);
+
+        mockMvc.perform(get("/api/cart").header("Authorization", "Bearer " + token))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value(403))
+                .andExpect(jsonPath("$.message").value("請先填寫會員資料"));
+    }
+
+    @Test
+    void 沒補填資料_還是可以查自己的資料和補填() throws Exception {
+        when(memberProfileRepository.existsById(9L)).thenReturn(false);
+        String token = jwtService.generateToken(9L);
+
+        mockMvc.perform(get("/api/member/me").header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+        mockMvc.perform(put("/api/member/me/complete-profile").header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void 查自己的資料_沒帶token還是401() throws Exception {
+        mockMvc.perform(get("/api/member/me"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void 沒補填資料_看商品不受影響() throws Exception {
+        when(memberProfileRepository.existsById(9L)).thenReturn(false);
+        String token = jwtService.generateToken(9L);
+
+        mockMvc.perform(get("/api/products").header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
     }
 }

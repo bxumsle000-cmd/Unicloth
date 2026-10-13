@@ -6,8 +6,8 @@
 
 | 功能 | Method | 路徑 | 成功狀態碼 | 成功時回什麼 |
 |---|---|---|---|---|
-| 登入 | POST | `/api/auth/login` | 200 | `{ memberId, token }` |
-| Google 登入 | POST | `/api/auth/firebase` | 200 | `{ memberId, token }` |
+| 登入 | POST | `/api/auth/login` | 200 | `{ memberId, token, profileCompleted }` |
+| Google 登入 | POST | `/api/auth/firebase` | 200 | `{ memberId, token, profileCompleted }` |
 | 註冊 | POST | `/api/auth/register` | 204 | 沒有 body |
 | 登出 | POST | `/api/auth/logout` | 204 | 沒有 body |
 
@@ -36,7 +36,8 @@
 ```json
 {
   "memberId": 1,
-  "token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0Ijo..."
+  "token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0Ijo...",
+  "profileCompleted": true
 }
 ```
 
@@ -44,6 +45,7 @@
 |---|---|---|
 | `memberId` | number | 登入會員的 id |
 | `token` | string | JWT，有效 1 天。之後呼叫需要登入的 API 時，放在 header：`Authorization: Bearer <token>` |
+| `profileCompleted` | boolean | 會員資料填了沒；`false` 時前端要導去 `/complete-profile` 補填 |
 
 > 前端的 `kinu.js` 會自動從 localStorage 讀 token 帶上 header，各頁面呼叫 `api()` 不用自己處理。
 
@@ -99,7 +101,7 @@
 前端先用 Firebase SDK 跳出 Google 登入視窗，拿到 Firebase 的 **ID token**，再送來這裡換我們自己的 JWT。
 之後呼叫其他 API 用的都是我們的 JWT，跟帳號密碼登入完全一樣。
 
-> 後端要設定環境變數 `FIREBASE_PROJECT_ID`、前端要建 `frontend/.env.local`，步驟見 [`docs/firebase-setup.md`](../firebase-setup.md)。
+> 全組共用 Firebase 專案 `kinu-62cd9`，前端設定在 `frontend/.env`、後端在 `application.properties`，clone 下來就能用。細節見 [`docs/firebase-setup.md`](../firebase-setup.md)。
 
 ### Request
 
@@ -115,7 +117,7 @@
 
 ### Response — 成功 `200 OK`
 
-跟帳號密碼登入一樣：`{ memberId, token }`。
+跟帳號密碼登入一樣：`{ memberId, token, profileCompleted }`。第一次登入的新會員 `profileCompleted` 是 `false`。
 
 ### Response — 失敗
 
@@ -126,7 +128,7 @@
 | 401 | ID token 無效、過期、不是我們 Firebase 專案發的 | `Google 登入驗證失敗，請重新登入` |
 | 403 | 帳號被停用 | `此帳號已被停用` |
 | 409 | 同一個 email 已用密碼註冊，但 Google 沒驗證過這個 email，或那個帳號已經綁了別的 Google 帳號 | `此email已經註冊過` |
-| 503 | 後端沒設定 `FIREBASE_PROJECT_ID` | `伺服器尚未設定 Firebase，暫時無法使用 Google 登入` |
+| 503 | 後端的 `firebase.project-id` 是空的 | `伺服器尚未設定 Firebase，暫時無法使用 Google 登入` |
 
 ### 過程中做了什麼
 
@@ -154,7 +156,7 @@
 ```
 
 **資料庫影響：** 第一次登入會在 `members` 新增一筆；綁定既有帳號時會更新那筆的 `firebase_uid`。
-新會員**還沒有** `member_profiles`，所以 `GET /api/member/me` 會回 404，要等補填資料的功能做好。
+新會員**還沒有** `member_profiles`，要先呼叫 `PUT /api/member/me/complete-profile` 補填（見 `member.md`），在那之前其他要登入的 API 都回 403。
 
 ---
 

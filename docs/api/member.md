@@ -10,7 +10,7 @@
 | 修改我的會員資料 | PUT | `/api/member/me/profile` | 200 | 修改後的會員資料 |
 | 修改密碼 | PATCH | `/api/member/me/password` | 204 | 沒有 body |
 
-> 🔒 **需要登入**：請求要帶 `Authorization: Bearer <token>`（token 從 `/api/auth/login` 或 `/api/auth/firebase` 取得），操作的是 token 裡的那個會員。沒帶 token 或 token 無效、過期回 401。
+> 🔒 **需要登入**：請求要帶 `Authorization: Bearer <token>`（token 從 `/api/auth/login` 或 `/api/auth/firebase` 取得），操作的是 token 裡的那個會員。沒帶 token 或 token 無效、過期回 401。登入了但還沒補填會員資料回 403「請先填寫會員資料」。
 
 ---
 
@@ -32,9 +32,12 @@
   "birthday": "1998-05-20",
   "address": "台北市信義區市府路1號",
   "status": "ACTIVE",
-  "createdAt": "2026-10-03T14:30:00"
+  "createdAt": "2026-10-03T14:30:00",
+  "profileCompleted": true
 }
 ```
+
+還沒補填資料的會員（第一次用 Google 登入）一樣回 200，但 `name`、`phone`、`gender`、`birthday`、`address` 都是 `null`，`profileCompleted` 是 `false`。
 
 | 欄位 | 型別 | 說明 |
 |---|---|---|
@@ -47,6 +50,7 @@
 | `address` | string \| null | 地址，沒填過就是 `null` |
 | `status` | string | 帳號狀態：`ACTIVE`（正常）/ `DISABLED`（停用） |
 | `createdAt` | string | 註冊時間，格式 `yyyy-MM-ddTHH:mm:ss`（可能帶小數秒，例如 `2026-10-03T14:30:00.123`） |
+| `profileCompleted` | boolean | 會員資料填了沒；前端的路由守衛靠它決定要不要導去補填頁 |
 
 > 回應**不會**帶出密碼（`MemberResponse.from()` 沒有放 `passwordHash`）。
 
@@ -56,7 +60,8 @@
 |---|---|---|
 | 401 | 資料庫找不到目前登入的會員 | `登入過期或失效` |
 | 403 | 帳號被停用 | `此帳號已被停用` |
-| 404 | 還沒填個人資料（用 Google 登入、還沒補填的會員） | `尚未填寫會員資料` |
+
+> 還沒補填資料也能呼叫這支（SecurityConfig 特別放行），前端才知道要不要導去補填頁。
 
 ### 過程中做了什麼
 
@@ -67,13 +72,55 @@
 ① MemberService.getMe()
    ├─ CurrentMember.require()：用目前登入的會員 id 去 members 表查
    │    └─ 查不到 → 401「登入過期或失效」
-   └─ 把 Member 轉成 MemberResponse（拿掉密碼）
+   ├─ 用會員 id 去 member_profiles 表查個人資料（查不到 = 還沒補填）
+   └─ 把 Member、MemberProfile 轉成 MemberResponse（拿掉密碼）
    │
    ▼
 ② 回 200 + JSON
 ```
 
-**資料庫影響：** 只有「讀」`members` 表，不會寫入任何資料。
+**資料庫影響：** 只有「讀」`members`、`member_profiles` 表，不會寫入任何資料。
+
+---
+
+## 1-1. 補填會員資料 `PUT /api/member/me/complete-profile`
+
+第一次用 Google 登入的會員只有帳號，沒有個人資料。補填完才能用購物車、結帳等其他要登入的功能。
+
+### Request
+
+```json
+{
+  "name": "王小美",
+  "phone": "0912345678",
+  "gender": "female",
+  "birthday": "1998-05-20",
+  "address": "台北市信義區市府路1號"
+}
+```
+
+| 欄位 | 型別 | 必填 | 規則 |
+|---|---|---|---|
+| `name` | string | ✅ | 不可空白、最多 50 字 |
+| `phone` | string | ✅ | 不可空白、最多 20 字 |
+| `gender` | string | ✅ | 只能是 `male` 或 `female` |
+| `birthday` | string | ✅ | 格式 `yyyy-MM-dd`，必須是**過去的日期**（今天也不行） |
+| `address` | string | ❌ | 可以不傳或傳 `null`；有傳的話最多 255 字 |
+
+### Response — 成功 `200 OK`
+
+跟 `GET /api/member/me` 一樣的格式，`profileCompleted` 是 `true`。
+
+### Response — 失敗
+
+| 狀態碼 | 情況 | `message` |
+|---|---|---|
+| 400 | 欄位驗證沒過 | 例：`gender: 只能是 male 或 female` |
+| 401 | 沒登入、token 無效 | `尚未登入或登入已失效` |
+| 403 | 帳號被停用 | `此帳號已被停用` |
+| 409 | 已經補填過（之後要改資料請用 `PUT /api/member/me/profile`） | `已經填過會員資料` |
+
+**資料庫影響：** `member_profiles` 新增一筆，`member_id` 就是目前登入的會員 id。
 
 ---
 
@@ -125,7 +172,7 @@
 | 400 | 其他欄位格式錯誤 | `請求內容格式錯誤，請確認欄位值是否正確` |
 | 401 | 資料庫找不到目前登入的會員 | `登入過期或失效` |
 | 403 | 帳號被停用 | `此帳號已被停用` |
-| 404 | 還沒填個人資料（用 Google 登入、還沒補填的會員） | `尚未填寫會員資料` |
+| 403 | 還沒補填會員資料（要先呼叫 `PUT /api/member/me/complete-profile`） | `請先填寫會員資料` |
 
 ### 過程中做了什麼
 
