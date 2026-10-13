@@ -27,7 +27,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -76,10 +75,6 @@ class CheckoutCouponConcurrencyTest {
         member = memberRepository.save(Member.builder()
                 .email("coupon-race-" + System.nanoTime() + "@example.com")
                 .passwordHash("x")
-                .name("測試會員")
-                .phone("0900000000")
-                .gender("male")
-                .birthday(LocalDate.of(2000, 1, 1))
                 .build());
         when(currentMember.require()).thenReturn(member);
         when(currentMember.getCurrentId()).thenReturn(member.getId());

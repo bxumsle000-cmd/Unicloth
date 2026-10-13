@@ -1,6 +1,7 @@
 package com.EEIT25.unicloth.dto.member;
 
 import com.EEIT25.unicloth.entity.Member;
+import com.EEIT25.unicloth.entity.MemberProfile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -28,17 +29,18 @@ public record MemberResponse(
         LocalDateTime createdAt
 ) {
     /**
-     * @param member 要轉換的會員（不會帶出密碼）
+     * @param member  要轉換的會員帳號（不會帶出密碼）
+     * @param profile 這個會員的個人資料
      */
-    public static MemberResponse from(Member member){
+    public static MemberResponse from(Member member, MemberProfile profile){
         return new MemberResponse(
                 member.getId(),
                 member.getEmail(),
-                member.getName(),
-                member.getPhone(),
-                member.getGender(),
-                member.getBirthday(),
-                member.getAddress(),
+                profile.getName(),
+                profile.getPhone(),
+                profile.getGender(),
+                profile.getBirthday(),
+                profile.getAddress(),
                 member.getStatus().name(),
                 member.getCreatedAt());
     }

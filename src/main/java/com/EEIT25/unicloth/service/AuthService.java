@@ -4,8 +4,10 @@ import com.EEIT25.unicloth.dto.auth.LoginRequest;
 import com.EEIT25.unicloth.dto.auth.LoginResponse;
 import com.EEIT25.unicloth.dto.auth.RegisterRequest;
 import com.EEIT25.unicloth.entity.Member;
+import com.EEIT25.unicloth.entity.MemberProfile;
 import com.EEIT25.unicloth.enums.MemberStatus;
 import com.EEIT25.unicloth.exception.ApiException;
+import com.EEIT25.unicloth.repository.MemberProfileRepository;
 import com.EEIT25.unicloth.repository.MemberRepository;
 import com.EEIT25.unicloth.security.CurrentMember;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AuthService {
     private final MemberRepository memberRepository;
+    private final MemberProfileRepository memberProfileRepository;
     private final PasswordEncoder passwordEncoder;
     private final CurrentMember currentMember;
 
@@ -40,23 +43,27 @@ public class AuthService {
         return new LoginResponse(member.getId(),currentMember.getCurrentToken());
     }
 
-    /** 會員註冊：email 已存在就擋下，密碼加密後才存進資料庫 */
+    /** 會員註冊：email 已存在就擋下，密碼加密後才存進資料庫；帳號和個人資料分別存進兩張表 */
     @Transactional
     public void register(RegisterRequest request){
         if (memberRepository.existsByEmail(request.email())){
             throw ApiException.conflict("此email已經註冊過");
         }
 
-        Member member = Member.builder()
+        Member member = memberRepository.save(Member.builder()
                 .email(request.email())
                 .passwordHash(passwordEncoder.encode(request.password()))
+                .build());
+
+        // 先存帳號拿到 id，再用同一個 id 存個人資料
+        memberProfileRepository.save(MemberProfile.builder()
+                .memberId(member.getId())
                 .name(request.name())
                 .phone(request.phone())
                 .gender(request.gender())
                 .birthday(request.birthday())
                 .address(request.address())
-                .build();
-        memberRepository.save(member);
+                .build());
     }
 
 

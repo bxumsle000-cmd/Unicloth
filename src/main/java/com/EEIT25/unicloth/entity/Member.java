@@ -9,11 +9,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
- * 會員
+ * 會員帳號（登入用）
+ * 姓名、電話等個人資料在 {@link MemberProfile}
  */
 @Entity
 @Table(name = "members")
@@ -35,23 +35,6 @@ public class Member {
     // BCrypt 雜湊，絕對不存明碼
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
-
-    @Column(nullable = false)
-    private String name;
-
-    @Column(nullable = false)
-    private String phone;
-
-    // 可 NULL；結帳時當宅配地址的預設值
-    @Column(length = 255)
-    private String address;
-
-    // male / female
-    @Column(nullable = false)
-    private String gender;
-
-    @Column(nullable = false)
-    private LocalDate birthday;
 
     // 存成大寫字串，例如 ACTIVE
     @Enumerated(EnumType.STRING)

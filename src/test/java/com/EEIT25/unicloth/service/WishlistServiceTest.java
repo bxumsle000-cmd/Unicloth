@@ -16,7 +16,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -48,10 +47,6 @@ class WishlistServiceTest {
         member = memberRepository.save(Member.builder()
                 .email("wishlist-test@example.com")
                 .passwordHash("x")
-                .name("測試會員")
-                .phone("0900000000")
-                .gender("male")
-                .birthday(LocalDate.of(2000, 1, 1))
                 .build());
         when(currentMember.getCurrentId()).thenReturn(member.getId());
         when(currentMember.require()).thenReturn(member);

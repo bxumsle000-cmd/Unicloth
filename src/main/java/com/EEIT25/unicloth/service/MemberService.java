@@ -4,7 +4,9 @@ import com.EEIT25.unicloth.dto.member.ChangePasswordRequest;
 import com.EEIT25.unicloth.dto.member.MemberResponse;
 import com.EEIT25.unicloth.dto.member.UpdateMemberRequest;
 import com.EEIT25.unicloth.entity.Member;
+import com.EEIT25.unicloth.entity.MemberProfile;
 import com.EEIT25.unicloth.exception.ApiException;
+import com.EEIT25.unicloth.repository.MemberProfileRepository;
 import com.EEIT25.unicloth.security.CurrentMember;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,25 +24,27 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final CurrentMember currentMember;
+    private final MemberProfileRepository memberProfileRepository;
 
 
     /** 取得目前登入會員的資料 */
     @Transactional
     public MemberResponse getMe(){
         Member member = currentMember.require();
-        return MemberResponse.from(member);
+        return MemberResponse.from(member, requireProfile(member));
     }
 
     /** 修改會員資料（姓名、電話、地址）；在交易內改 entity，結束時會自動存回資料庫 */
     @Transactional
     public MemberResponse updateProfile(UpdateMemberRequest request){
         Member member = currentMember.require();
+        MemberProfile profile = requireProfile(member);
 
-        member.setName(request.name());
-        member.setPhone(request.phone());
-        member.setAddress(request.address());
+        profile.setName(request.name());
+        profile.setPhone(request.phone());
+        profile.setAddress(request.address());
 
-        return MemberResponse.from(member);
+        return MemberResponse.from(member, profile);
     }
 
     /** 修改密碼：舊密碼要對，新密碼不能跟舊的一樣 */
@@ -57,5 +61,11 @@ public class MemberService {
         }
 
         member.setPasswordHash(passwordEncoder.encode(request.newPassword()));
+    }
+
+    /** 取得會員的個人資料；查不到代表還沒填過，丟 404 */
+    private MemberProfile requireProfile(Member member){
+        return memberProfileRepository.findById(member.getId())
+                .orElseThrow(() -> ApiException.notFound("尚未填寫會員資料"));
     }
 }
