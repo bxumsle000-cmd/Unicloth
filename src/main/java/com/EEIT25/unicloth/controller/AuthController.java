@@ -1,5 +1,6 @@
 package com.EEIT25.unicloth.controller;
 
+import com.EEIT25.unicloth.dto.auth.FirebaseLoginRequest;
 import com.EEIT25.unicloth.dto.auth.LoginRequest;
 import com.EEIT25.unicloth.dto.auth.LoginResponse;
 import com.EEIT25.unicloth.dto.auth.RegisterRequest;
@@ -19,6 +20,12 @@ public class AuthController {
     @PostMapping("/login")
     public LoginResponse login(@Valid @RequestBody LoginRequest request){
         return authService.login(request);
+    }
+
+    /** Google 登入：前端用 Firebase 登入後，把 ID token 送來換我們自己的 JWT */
+    @PostMapping("/firebase")
+    public LoginResponse firebaseLogin(@Valid @RequestBody FirebaseLoginRequest request){
+        return authService.firebaseLogin(request);
     }
 
     /** 註冊 */

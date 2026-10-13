@@ -11,6 +11,7 @@ import Checkout from "./pages/Checkout.jsx";
 import OrderComplete from "./pages/OrderComplete.jsx";
 import Search from "./pages/Search.jsx";
 import Orders from "./pages/Orders.jsx";
+import Login from "./pages/Login.jsx";
 import { LanguageProvider } from "./js/LanguageProvider.jsx";
 
 function App(){
@@ -31,6 +32,7 @@ function App(){
                 <Route path="/order-complete" element={<OrderComplete/>}/>
                 <Route path="/search" element={<Search/>}/>
                 <Route path="/orders" element={<Orders/>}/>
+                <Route path="/login" element={<Login/>}/>
             </Routes>
             </main>
             <Footer/>

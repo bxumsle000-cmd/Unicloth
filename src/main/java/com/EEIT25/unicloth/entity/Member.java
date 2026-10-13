@@ -32,9 +32,13 @@ public class Member {
     @Column(nullable = false, unique = true)
     private String email;
 
-    // BCrypt 雜湊，絕對不存明碼
-    @Column(name = "password_hash", nullable = false)
+    // BCrypt 雜湊，絕對不存明碼；用 Google 登入的會員沒有密碼，是 NULL
+    @Column(name = "password_hash")
     private String passwordHash;
+
+    // Firebase 給每個 Google 帳號的唯一 id；用帳號密碼註冊、還沒用 Google 登入過的是 NULL
+    @Column(name = "firebase_uid", length = 128)
+    private String firebaseUid;
 
     // 存成大寫字串，例如 ACTIVE
     @Enumerated(EnumType.STRING)

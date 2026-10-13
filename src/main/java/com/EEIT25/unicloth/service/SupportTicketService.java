@@ -19,8 +19,8 @@ import java.util.concurrent.ThreadLocalRandom;
  * - {@link #getMyTickets()}：我送出的客服單
  * <p>
  * TODO 未登入送客服單：support_tickets.member_id 允許 NULL，原本設計是「未登入也能送」。
- * 目前 CurrentMember 寫死 id = 1，分不出有沒有登入，所以先一律綁定目前的會員；
- * 等真正的登入機制做好後，要改成「未登入時 member 存 null」，Controller 也要開放未登入呼叫。
+ * 目前送客服單一定要登入（SecurityConfig 把 /api/** 都設成要登入），一律綁定目前的會員；
+ * 要開放未登入送單的話：SecurityConfig 放行 POST /api/support-tickets，這裡改成「未登入時 member 存 null」。
  */
 @Service
 @RequiredArgsConstructor

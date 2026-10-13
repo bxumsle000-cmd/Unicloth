@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from "react-router-dom";
-import {api} from "../../js/kinu.js";
+import {api, getToken, clearToken} from "../../js/kinu.js";
+import { signOutFirebase } from "../../js/firebase.js";
 import { useLanguage } from "../../js/i18n.js";
 import LanguageMenu from "./LanguageMenu.jsx";
 
@@ -38,6 +39,14 @@ function HeaderActions() {
         navigate(`/search?keyword=${encodeURIComponent(trimmedKeyword)}`);
     }
 
+    // JWT 後端不記狀態：前端把 token 刪掉就等於登出；整頁重新載入讓各處的數量歸零
+    const loggedIn = Boolean(getToken());
+    async function logout() {
+        clearToken();
+        await signOutFirebase().catch(() => {});
+        window.location.href = '/';
+    }
+
     const actionClass= "py-[7px] text-[10px] tracking-[.06em] whitespace-nowrap max-[760px]:text-[9px]"
     const countClass = "ml-0.5 text-[9px] text-[#9a948d] max-[760px]:text-[8px]"
 
@@ -57,7 +66,9 @@ function HeaderActions() {
             <Link to={"/cart"} className={actionClass}>{t('cart')}<span className={countClass}>{cartCount}</span></Link>
             <Link to={"/coupons"} className={actionClass}>{t('coupons')}</Link>
             <Link to={"/orders"} className={actionClass}>{t('orders')}</Link>
-            <button className={actionClass}>{t('member')}</button>
+            {loggedIn
+                ? <button onClick={logout} className={actionClass}>{t('logout')}</button>
+                : <Link to={"/login"} className={actionClass}>{t('login')}</Link>}
             <LanguageMenu />
         </div>
     )

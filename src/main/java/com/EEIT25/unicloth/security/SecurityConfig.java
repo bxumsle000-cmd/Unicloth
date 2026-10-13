@@ -21,7 +21,7 @@ import java.nio.charset.StandardCharsets;
  * 不適合前後端分離 + JWT，所以這裡改成：
  * <ul>
  *   <li>每個請求先經過 {@link JwtAuthFilter}，有帶有效 token 就標記身分</li>
- *   <li>看商品、看分類、登入、註冊不用登入；其餘 /api/** 一律要登入</li>
+ *   <li>看商品、看分類、登入（含 Google 登入）、註冊不用登入；其餘 /api/** 一律要登入</li>
  *   <li>/api 以外（圖片、影片、Swagger、/error）都放行</li>
  *   <li>未登入打到要登入的 API → 401，body 跟其他錯誤一樣是 ErrorResponse 格式的 JSON</li>
  * </ul>
@@ -53,7 +53,7 @@ public class SecurityConfig {
                 // 授權規則：由上往下比對，第一條符合的生效，所以「放行」要寫在「要登入」前面
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST,
-                                "/api/auth/login", "/api/auth/register", "/api/auth/logout").permitAll()
+                                "/api/auth/login", "/api/auth/firebase", "/api/auth/register", "/api/auth/logout").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/products/**", "/api/categories/**").permitAll()
                         // 新增的 API 只要放在 /api 底下，預設就是要登入
                         .requestMatchers("/api/**").authenticated()

@@ -25,6 +25,8 @@ export const DICTIONARY = {
         coupons: '折價券',
         orders: '訂單',
         member: '會員',
+        login: '登入',
+        logout: '登出',
         chooseLanguage: '選擇語言',
         // Home
         heroTitle1: '日常，',
@@ -60,6 +62,8 @@ export const DICTIONARY = {
         coupons: 'Coupons',
         orders: 'Orders',
         member: 'Account',
+        login: 'Log in',
+        logout: 'Log out',
         chooseLanguage: 'Choose language',
         // Home
         heroTitle1: 'Everyday,',
@@ -95,6 +99,8 @@ export const DICTIONARY = {
         coupons: 'クーポン',
         orders: '注文履歴',
         member: '会員',
+        login: 'ログイン',
+        logout: 'ログアウト',
         chooseLanguage: '言語を選択',
         // Home
         heroTitle1: '日常に、',
@@ -130,6 +136,8 @@ export const DICTIONARY = {
         coupons: '쿠폰',
         orders: '주문 내역',
         member: '회원',
+        login: '로그인',
+        logout: '로그아웃',
         chooseLanguage: '언어 선택',
         // Home
         heroTitle1: '일상에,',

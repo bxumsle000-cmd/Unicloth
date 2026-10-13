@@ -10,7 +10,7 @@
 
 **結帳只買「勾選」的購物車項目**：前端把要買的購物車項目 id 放在 `cartItemIdList` 傳上來，沒勾的會留在購物車。
 
-> ⚠️ **目前是開發用的假登入**：結帳的對象是「目前登入的會員」，而 `security/CurrentMember.java` **寫死會員 id = 1**，不會看前端帶的 token。
+> 🔒 **需要登入**：請求要帶 `Authorization: Bearer <token>`（token 從 `/api/auth/login` 或 `/api/auth/firebase` 取得），操作的是 token 裡的那個會員。沒帶 token 或 token 無效、過期回 401。
 
 ---
 

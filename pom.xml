@@ -77,6 +77,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
+        <!--   驗證 Firebase 的 ID token（RS256 + Google 公開金鑰），用的是 Spring Security 內建的 NimbusJwtDecoder；
+               不需要 Firebase Admin SDK 和 service account 金鑰   -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-oauth2-jose</artifactId>
+        </dependency>
         <!--   JJWT：產生 / 解析 JWT。
                api 是寫程式用的介面；impl、jackson 只在執行時需要，所以 scope 是 runtime   -->
         <dependency>

@@ -17,7 +17,7 @@
 
 **追蹤的是「商品」不是 SKU**：同一件 T 恤不管哪個顏色、尺寸，都只算追蹤一次。
 
-> ⚠️ **目前是開發用的假登入**：這四支 API 都是操作「目前登入的會員」，而 `security/CurrentMember.java` **寫死會員 id = 1**，不會看前端帶的 token。
+> 🔒 **需要登入**：請求要帶 `Authorization: Bearer <token>`（token 從 `/api/auth/login` 或 `/api/auth/firebase` 取得），操作的是 token 裡的那個會員。沒帶 token 或 token 無效、過期回 401。
 
 ---
 

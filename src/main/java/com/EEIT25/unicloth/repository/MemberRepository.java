@@ -12,4 +12,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     // 註冊用：檢查 email 是否已被使用
     boolean existsByEmail(String email);
+
+    // Google 登入用：用 Firebase uid 查會員
+    Optional<Member> findByFirebaseUid(String firebaseUid);
 }

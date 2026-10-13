@@ -1,4 +1,4 @@
-# Auth API（登入 / 註冊 / 登出）
+# Auth API（登入 / Google 登入 / 註冊 / 登出）
 
 - Controller：`controller/AuthController.java`
 - Service：`service/AuthService.java`
@@ -7,12 +7,15 @@
 | 功能 | Method | 路徑 | 成功狀態碼 | 成功時回什麼 |
 |---|---|---|---|---|
 | 登入 | POST | `/api/auth/login` | 200 | `{ memberId, token }` |
+| Google 登入 | POST | `/api/auth/firebase` | 200 | `{ memberId, token }` |
 | 註冊 | POST | `/api/auth/register` | 204 | 沒有 body |
 | 登出 | POST | `/api/auth/logout` | 204 | 沒有 body |
 
 ---
 
 ## 1. 登入 `POST /api/auth/login`
+
+> 📌 帳號密碼登入、註冊之後會拿掉，只保留 Google 登入；目前保留是為了測試，規劃見 [`docs/auth-plan.md`](../auth-plan.md) 步驟 4。
 
 ### Request
 
@@ -33,16 +36,16 @@
 ```json
 {
   "memberId": 1,
-  "token": "DEV_CURRENT_TOKEN"
+  "token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0Ijo..."
 }
 ```
 
 | 欄位 | 型別 | 說明 |
 |---|---|---|
 | `memberId` | number | 登入會員的 id |
-| `token` | string | 登入 token，之後呼叫需要登入的 API 時使用 |
+| `token` | string | JWT，有效 1 天。之後呼叫需要登入的 API 時，放在 header：`Authorization: Bearer <token>` |
 
-> ⚠️ **目前是開發用的假 token**：不管誰登入，`token` 都固定回 `"DEV_CURRENT_TOKEN"`（來自 `security/CurrentMember.java`）。之後換成真正的登入機制（例如 JWT）時，這裡的格式可能會變。
+> 前端的 `kinu.js` 會自動從 localStorage 讀 token 帶上 header，各頁面呼叫 `api()` 不用自己處理。
 
 ### Response — 失敗
 
@@ -51,6 +54,7 @@
 | 400 | `email` 或 `password` 沒填、email 格式錯 | 例：`email: 必須是格式正確的電子郵件地址` |
 | 401 | 查不到這個 email | `帳號或密碼錯誤` |
 | 401 | email 存在但密碼錯 | `帳號或密碼錯誤` |
+| 401 | 這個帳號是用 Google 登入建立的，沒有密碼 | `帳號或密碼錯誤` |
 | 403 | 帳號狀態不是 `ACTIVE`（被停用） | `此帳號已被停用` |
 
 > 為什麼「email 不存在」和「密碼錯」回一樣的訊息？
@@ -77,7 +81,7 @@
    │    └─ 不符 → 401「帳號或密碼錯誤」
    ├─ 檢查 status 是不是 ACTIVE
    │    └─ 不是 → 403「此帳號已被停用」
-   └─ 全部通過 → 組出 LoginResponse(memberId, token)
+   └─ 全部通過 → JwtService 產生 JWT，組出 LoginResponse(memberId, token)
    │
    ▼
 ④ 回 200 + JSON
@@ -90,7 +94,73 @@
 
 ---
 
-## 2. 註冊 `POST /api/auth/register`
+## 2. Google 登入 `POST /api/auth/firebase`
+
+前端先用 Firebase SDK 跳出 Google 登入視窗，拿到 Firebase 的 **ID token**，再送來這裡換我們自己的 JWT。
+之後呼叫其他 API 用的都是我們的 JWT，跟帳號密碼登入完全一樣。
+
+> 後端要設定環境變數 `FIREBASE_PROJECT_ID`、前端要建 `frontend/.env.local`，步驟見 [`docs/firebase-setup.md`](../firebase-setup.md)。
+
+### Request
+
+```json
+{
+  "idToken": "eyJhbGciOiJSUzI1NiIsImtpZCI6..."
+}
+```
+
+| 欄位 | 型別 | 必填 | 規則 |
+|---|---|---|---|
+| `idToken` | string | ✅ | 不可空白；前端 `user.getIdToken()` 拿到的值 |
+
+### Response — 成功 `200 OK`
+
+跟帳號密碼登入一樣：`{ memberId, token }`。
+
+### Response — 失敗
+
+| 狀態碼 | 情況 | `message` |
+|---|---|---|
+| 400 | `idToken` 沒填 | `idToken: 不得空白` |
+| 400 | Google 帳號沒有 email | `這個 Google 帳號沒有提供 email，無法登入` |
+| 401 | ID token 無效、過期、不是我們 Firebase 專案發的 | `Google 登入驗證失敗，請重新登入` |
+| 403 | 帳號被停用 | `此帳號已被停用` |
+| 409 | 同一個 email 已用密碼註冊，但 Google 沒驗證過這個 email，或那個帳號已經綁了別的 Google 帳號 | `此email已經註冊過` |
+| 503 | 後端沒設定 `FIREBASE_PROJECT_ID` | `伺服器尚未設定 Firebase，暫時無法使用 Google 登入` |
+
+### 過程中做了什麼
+
+```
+前端 POST /api/auth/firebase
+   │
+   ▼
+① FirebaseTokenVerifier.verify()：驗證 ID token
+   ├─ 用 Google 公開的公鑰驗簽章（第一次會去 Google 下載，之後快取）
+   ├─ 檢查 exp（沒過期）、iss / aud（是我們的 Firebase 專案）、sub（uid 不可空白）
+   └─ 任一項不過 → 401
+   │
+   ▼
+② AuthService.firebaseLogin()   ← 整段包在 @Transactional 裡
+   ├─ 用 firebase_uid 找會員 → 找到就是他
+   ├─ 找不到，但 email 已經用密碼註冊過
+   │    ├─ Google 驗證過 email，且那個帳號還沒綁 Google → 把 uid 綁上去
+   │    └─ 否則 → 409
+   ├─ 都找不到 → 建新會員（只有 email + firebase_uid，沒有密碼、沒有個人資料）
+   ├─ 檢查 status 是不是 ACTIVE → 不是就 403
+   └─ JwtService 產生 JWT
+   │
+   ▼
+③ 回 200 + JSON
+```
+
+**資料庫影響：** 第一次登入會在 `members` 新增一筆；綁定既有帳號時會更新那筆的 `firebase_uid`。
+新會員**還沒有** `member_profiles`，所以 `GET /api/member/me` 會回 404，要等補填資料的功能做好。
+
+---
+
+## 3. 註冊 `POST /api/auth/register`
+
+> 📌 帳號密碼登入、註冊之後會拿掉，只保留 Google 登入；目前保留是為了測試，規劃見 [`docs/auth-plan.md`](../auth-plan.md) 步驟 4。
 
 ### Request
 
@@ -148,28 +218,30 @@
    ├─ 檢查 email 是否已存在（existsByEmail）
    │    └─ 已存在 → 409「此email已經註冊過」
    ├─ 用 BCrypt 把密碼加密成 password_hash
-   ├─ 組出 Member 物件
+   ├─ 存帳號進 members 表（email、password_hash）
    │    ├─ status 預設 ACTIVE
    │    └─ created_at 由 Hibernate 自動填現在時間
-   └─ 存進 members 表（save）
+   └─ 用剛拿到的會員 id 存個人資料進 member_profiles 表
    │
    ▼
 ④ 回 204（沒有 body）
 ```
 
-**資料庫影響：** `members` 表新增一筆。
+**資料庫影響：** `members`、`member_profiles` 各新增一筆。
 
-| 欄位 | 值從哪來 |
-|---|---|
-| `id` | 資料庫自動遞增（IDENTITY） |
-| `email`、`name`、`phone`、`gender`、`birthday`、`address` | Request 原封不動 |
-| `password_hash` | Request 的 `password` 經 BCrypt 加密 |
-| `status` | 固定 `ACTIVE` |
-| `created_at` | 寫入當下的時間 |
+| 表 | 欄位 | 值從哪來 |
+|---|---|---|
+| `members` | `id` | 資料庫自動遞增（IDENTITY） |
+| `members` | `email` | Request 原封不動 |
+| `members` | `password_hash` | Request 的 `password` 經 BCrypt 加密 |
+| `members` | `status` | 固定 `ACTIVE` |
+| `members` | `created_at` | 寫入當下的時間 |
+| `member_profiles` | `member_id` | 上面那筆 `members.id` |
+| `member_profiles` | `name`、`phone`、`gender`、`birthday`、`address` | Request 原封不動 |
 
 ---
 
-## 3. 登出 `POST /api/auth/logout`
+## 4. 登出 `POST /api/auth/logout`
 
 ### Request
 
@@ -181,5 +253,7 @@
 
 ### 過程中做了什麼
 
-**目前什麼都沒做**，方法是空的，呼叫一定回 204。
-等之後接上真正的登入機制，才會在這裡做「讓 token 失效」之類的處理。前端現階段登出時，自己把手上存的 token 清掉即可。
+**後端什麼都沒做**，方法是空的，呼叫一定回 204。
+JWT 是「無狀態」的：後端不記錄發過哪些 token，所以也沒辦法讓某一張 token 失效。
+登出就是前端把 localStorage 裡的 token 刪掉（`kinu.js` 的 `clearToken()`），沒有 token 就等於沒登入。
+被複製走的 token 在過期前（1 天）還是能用，這是 JWT 的取捨。

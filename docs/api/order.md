@@ -10,7 +10,7 @@
 
 訂單是在結帳時建立的，請看 [checkout.md](checkout.md)。
 
-> ⚠️ **目前是開發用的假登入**：查的是「目前登入的會員」的訂單，而 `security/CurrentMember.java` **寫死會員 id = 1**，不會看前端帶的 token。
+> 🔒 **需要登入**：請求要帶 `Authorization: Bearer <token>`（token 從 `/api/auth/login` 或 `/api/auth/firebase` 取得），操作的是 token 裡的那個會員。沒帶 token 或 token 無效、過期回 401。
 
 ---
 

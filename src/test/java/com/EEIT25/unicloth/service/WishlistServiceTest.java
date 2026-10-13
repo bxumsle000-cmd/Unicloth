@@ -24,7 +24,7 @@ import static org.mockito.Mockito.when;
 /**
  * 追蹤清單的行為測試（連真的資料庫）。
  * 每個測試結束都會 rollback，不會留下資料。<br>
- * CurrentMember 目前寫死 id=1，資料庫不一定有這個會員，所以測試自己建一個臨時會員，
+ * CurrentMember 要從登入 token 取得會員，測試沒有 token，所以測試自己建一個臨時會員，
  * 再把 CurrentMember 換成假的（mock），讓它回傳這個會員的 id。
  */
 @SpringBootTest
