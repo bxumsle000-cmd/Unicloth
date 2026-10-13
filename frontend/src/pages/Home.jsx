@@ -1,16 +1,19 @@
 import { useState } from 'react'
+import { useLanguage } from '../js/i18n.js';
 
 /** 主視覺輪播的三支影片 */
 const HERO_VIDEOS = ['/video/hero-01.mp4', '/video/hero-02.mp4', '/video/hero-03.mp4'];
 
-/** 三個系列大圖 */
+/** 三個系列大圖（alt 放字典的 key） */
 const LOOKS = [
-    { code: 'all_women', img: '/img/look-01.png', alt: 'KINU 秋日女裝穿搭' },
-    { code: 'all_men', img: '/img/look-02.png', alt: 'KINU 秋日男裝穿搭' },
-    { code: 'all_kids', img: '/img/look-03.png', alt: 'KINU 秋冬衣著系列' },
+    { code: 'all_women', img: '/img/look-01.png', alt: 'lookWomen' },
+    { code: 'all_men', img: '/img/look-02.png', alt: 'lookMen' },
+    { code: 'all_kids', img: '/img/look-03.png', alt: 'lookKids' },
 ];
 
 function Home() {
+    const { t } = useLanguage();
+
     // 目前播第幾支影片（從 0 開始）
     const [heroIndex, setHeroIndex] = useState(0);
 
@@ -41,18 +44,18 @@ function Home() {
                             max-[760px]:top-auto max-[760px]:bottom-[13%] max-[760px]:left-[7%] max-[760px]:max-w-[300px] max-[760px]:translate-y-0">
                 <div className="text-[10px] tracking-[.23em] uppercase">THE ART OF EVERYDAY</div>
                 <h1 className="mt-[18px] mb-[15px] text-[clamp(38px,5.3vw,72px)] font-normal leading-[1.18] tracking-[.03em] max-[760px]:text-[47px]">
-                    日常，<br />恰好的美。
+                    {t('heroTitle1')}<br />{t('heroTitle2')}
                 </h1>
                 <p className="text-xs leading-[2] tracking-[.07em]">
-                    留一點餘白，給生活更多可能。<br />以柔軟質地，陪你走過每一個日常。
+                    {t('heroText1')}<br />{t('heroText2')}
                 </p>
             </div>
 
             {/* 輪播切換：‹ 01 / 03 › ●○○ */}
             <div className="absolute right-[5%] bottom-[26px] z-10 flex items-center gap-2 text-[10px] tracking-[.15em] text-white">
-                <button onClick={() => changeHeroVideo(-1)} aria-label="上一支影片" className="text-[22px]">‹</button>
+                <button onClick={() => changeHeroVideo(-1)} aria-label={t('prevVideo')} className="text-[22px]">‹</button>
                 <span>0{heroIndex + 1}　/　0{HERO_VIDEOS.length}</span>
-                <button onClick={() => changeHeroVideo(1)} aria-label="下一支影片" className="text-[22px]">›</button>
+                <button onClick={() => changeHeroVideo(1)} aria-label={t('nextVideo')} className="text-[22px]">›</button>
                 <span>　{HERO_VIDEOS.map((_, videoIndex) => videoIndex === heroIndex ? '●' : '○').join('　')}</span>
             </div>
         </section>
@@ -62,7 +65,7 @@ function Home() {
                         max-[760px]:flex-wrap max-[760px]:gap-3 max-[760px]:text-[7px] max-[760px]:tracking-[.08em]">
             <span>MADE FOR YOUR EVERYDAY</span>
             <i className="size-[3px] rounded-full bg-[#a9a198]"></i>
-            <span>天然質地・自在生活</span>
+            <span>{t('tagline')}</span>
             <i className="size-[3px] rounded-full bg-[#a9a198]"></i>
             <span>LESS, BUT BETTER</span>
         </div>
@@ -72,7 +75,7 @@ function Home() {
             {LOOKS.map((look) => (
                 <div key={look.code}
                    className="relative mb-[72px] block aspect-[2/1] w-full overflow-hidden bg-stone max-[760px]:mb-12">
-                    <img src={look.img} alt={look.alt} className="size-full object-cover object-[center_42%]" />
+                    <img src={look.img} alt={t(look.alt)} className="size-full object-cover object-[center_42%]" />
                 </div>
             ))}
         </section>
@@ -80,12 +83,12 @@ function Home() {
         {/* 秋冬預告 */}
         <section className="relative h-[min(63vw,760px)] min-h-[510px] overflow-hidden text-white
                             max-[760px]:h-[68vh] max-[760px]:min-h-[500px]">
-            <img src="/img/campaign.jpg" alt="KINU 2026 秋冬系列形象照"
+            <img src="/img/campaign.jpg" alt={t('campaignAlt')}
                  className="size-full object-cover brightness-[.65] saturate-[.72]" />
             <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
                 <span className="text-[10px] tracking-[.25em]">COMING SOON</span>
-                <h2 className="my-5 text-[clamp(36px,5vw,66px)] font-medium leading-[1.25] tracking-[.08em]">KINU 2026<br />秋冬系列</h2>
-                <p className="mb-2.5 text-base tracking-[.2em]">即將販售</p>
+                <h2 className="my-5 text-[clamp(36px,5vw,66px)] font-medium leading-[1.25] tracking-[.08em]">KINU 2026<br />{t('campaignTitle')}</h2>
+                <p className="mb-2.5 text-base tracking-[.2em]">{t('onSaleSoon')}</p>
                 <strong className="text-xs font-normal tracking-[.2em]">2026.10.15</strong>
             </div>
         </section>

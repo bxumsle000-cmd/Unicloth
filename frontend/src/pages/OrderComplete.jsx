@@ -1,10 +1,5 @@
 import { Link, Navigate, useLocation } from "react-router-dom";
-import { money, fmtDate, SHIPPING_OPTIONS, PAYMENT_OPTIONS } from "../js/kinu.js";
-
-/** 後端回的代碼（例如 HOME）→ 中文（宅配） */
-function optionLabel(options, value) {
-    return options.find((o) => o.value === value)?.label ?? value;
-}
+import { money, fmtDate } from "../js/kinu.js";
 
 /** 一列：左邊項目名，右邊內容 */
 function Row({ label, children }) {
@@ -41,9 +36,9 @@ function OrderComplete() {
                     <Row label="下單時間">{fmtDate(order.createdAt)} {String(order.createdAt).slice(11, 16)}</Row>
                     <Row label="收件人">{order.receiverName}</Row>
                     <Row label="手機">{order.receiverPhone}</Row>
-                    <Row label="配送方式">{optionLabel(SHIPPING_OPTIONS, order.shippingMethod)}</Row>
+                    <Row label="配送方式">{order.shippingMethod === "HOME" ? "宅配" : "超商取貨"}</Row>
                     <Row label={order.shippingMethod === "HOME" ? "宅配地址" : "超商門市"}>{order.shippingAddress}</Row>
-                    <Row label="付款方式">{optionLabel(PAYMENT_OPTIONS, order.paymentMethod)}</Row>
+                    <Row label="付款方式">{order.paymentMethod === "CREDIT" ? "信用卡" : order.paymentMethod === "ATM" ? "ATM 轉帳" : "貨到付款"}</Row>
 
                     <div className="mt-5 flex items-baseline justify-between border-t border-[#e5e0d8] pt-5">
                         <span className="text-[14px] tracking-[.1em]">實付金額</span>

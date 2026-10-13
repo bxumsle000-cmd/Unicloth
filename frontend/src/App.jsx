@@ -11,9 +11,11 @@ import Checkout from "./pages/Checkout.jsx";
 import OrderComplete from "./pages/OrderComplete.jsx";
 import Search from "./pages/Search.jsx";
 import Orders from "./pages/Orders.jsx";
+import { LanguageProvider } from "./component/LanguageProvider.jsx";
 
 function App(){
     return (
+        <LanguageProvider>
         <BrowserRouter>
         <div className="flex min-h-screen flex-col">
             <Header/>
@@ -34,6 +36,7 @@ function App(){
             <Footer/>
         </div>
         </BrowserRouter>
+        </LanguageProvider>
             )
 }
 

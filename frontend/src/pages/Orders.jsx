@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { api, toast, money, imgSrc, fmtDate, SHIPPING_OPTIONS, PAYMENT_OPTIONS } from "../js/kinu.js";
+import { api, toast, money, imgSrc, fmtDate } from "../js/kinu.js";
 
 // 後端回的訂單狀態（OrderStatus）→ 中文
 const ORDER_STATUS_LABELS = {
@@ -13,11 +13,6 @@ const ORDER_STATUS_LABELS = {
 
 // 篩選分頁籤：依 ORDER_STATUS_LABELS 的順序
 const STATUS_TABS = Object.entries(ORDER_STATUS_LABELS).map(([value, label]) => ({ value, label }));
-
-/** 後端回的代碼（例如 HOME）→ 中文（宅配） */
-function optionLabel(options, value) {
-    return options.find((o) => o.value === value)?.label ?? value;
-}
 
 /** 一列：左邊項目名，右邊內容 */
 function Row({ label, children }) {
@@ -54,7 +49,6 @@ function Orders() {
         <div className="px-[5.5%] pt-[38px] pb-[90px]
                         max-[760px]:px-[4%] max-[760px]:pt-[26px] max-[760px]:pb-[70px]">
             {/* 標題區 */}
-            <div className="mb-2 text-[10px] tracking-[.22em] text-[#76716c]">ORDERS</div>
             <h1 className="mb-3 text-[clamp(24px,3vw,34px)] font-medium tracking-[.08em]">我的訂單</h1>
             <div className="mb-8 text-[11px] tracking-[.06em] text-[#76716c]">共 {orderList.length} 筆訂單</div>
 
@@ -72,12 +66,7 @@ function Orders() {
             {shownOrderList.length === 0 ? (
                 /* 沒有訂單 */
                 <div className="flex min-h-[40vh] flex-col items-center justify-center gap-5 border-t border-[#e5e0d8] text-center">
-                    <p className="text-[15px] tracking-[.06em] text-[#76716c]">目前沒有訂單</p>
-                    <Link to="/"
-                          className="border border-black px-8 py-3 text-[12px] tracking-[.18em]
-                                     transition-colors hover:bg-black hover:text-white">
-                        去逛逛
-                    </Link>
+                    <p className="text-[15px] tracking-[.06em] text-[#76716c]">{`目前沒有${ORDER_STATUS_LABELS[statusTab]}訂單`}</p>
                 </div>
             ) : (
                 <div className="flex flex-col gap-6">
@@ -120,9 +109,9 @@ function Orders() {
                             {/* 配送、付款資訊 */}
                             <div className="pt-4">
                                 <Row label="收件人">{order.receiverName}<span className="mx-2">·</span>{order.receiverPhone}</Row>
-                                <Row label="配送方式">{optionLabel(SHIPPING_OPTIONS, order.shippingMethod)}</Row>
+                                <Row label="配送方式">{order.shippingMethod === "HOME" ? "宅配" : "超商取貨"}</Row>
                                 <Row label={order.shippingMethod === "HOME" ? "宅配地址" : "超商門市"}>{order.shippingAddress}</Row>
-                                <Row label="付款方式">{optionLabel(PAYMENT_OPTIONS, order.paymentMethod)}</Row>
+                                <Row label="付款方式">{order.paymentMethod === "CREDIT" ? "信用卡" : order.paymentMethod === "ATM" ? "ATM 轉帳" : "貨到付款"}</Row>
                                 {order.note && <Row label="備註">{order.note}</Row>}
                             </div>
 

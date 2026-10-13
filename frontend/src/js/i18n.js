@@ -1,0 +1,160 @@
+import { createContext, useContext } from 'react'
+
+/** 語言選單的選項：code 對應 DICTIONARY 的 key，htmlLang 給 <html lang> 用 */
+export const LANGUAGES = [
+    { code: 'zh', label: '繁體中文', htmlLang: 'zh-Hant' },
+    { code: 'en', label: 'English', htmlLang: 'en' },
+    { code: 'ja', label: '日本語', htmlLang: 'ja' },
+    { code: 'ko', label: '한국어', htmlLang: 'ko' },
+];
+
+/** 畫面上寫死的文字：每種語言用同一個 key 對應 */
+export const DICTIONARY = {
+    zh: {
+        // Header
+        topBanner: '全館滿 NT$2,500，享免運服務 · 新會員首購 95 折',
+        women: '女裝',
+        men: '男裝',
+        kids: '兒童',
+        menu: '選單',
+        closeMenu: '關閉選單',
+        searchPlaceholder: '搜尋商品',
+        taipei: '台北',
+        wishlist: '收藏',
+        cart: '購物車',
+        coupons: '折價券',
+        orders: '訂單',
+        member: '會員',
+        chooseLanguage: '選擇語言',
+        // Home
+        heroTitle1: '日常，',
+        heroTitle2: '恰好的美。',
+        heroText1: '留一點餘白，給生活更多可能。',
+        heroText2: '以柔軟質地，陪你走過每一個日常。',
+        prevVideo: '上一支影片',
+        nextVideo: '下一支影片',
+        tagline: '天然質地・自在生活',
+        lookWomen: 'KINU 秋日女裝穿搭',
+        lookMen: 'KINU 秋日男裝穿搭',
+        lookKids: 'KINU 秋冬衣著系列',
+        campaignAlt: 'KINU 2026 秋冬系列形象照',
+        campaignTitle: '秋冬系列',
+        onSaleSoon: '即將販售',
+        // Footer
+        shippingReturns: '配送與退貨',
+        faq: '常見問題',
+        contactUs: '聯絡我們',
+    },
+    en: {
+        // Header
+        topBanner: 'FREE SHIPPING ON ORDERS OVER NT$2,500 · NEW MEMBERS 5% OFF FIRST ORDER',
+        women: 'WOMEN',
+        men: 'MEN',
+        kids: 'KIDS',
+        menu: 'Menu',
+        closeMenu: 'Close menu',
+        searchPlaceholder: 'Search',
+        taipei: 'Taipei',
+        wishlist: 'Wishlist',
+        cart: 'Cart',
+        coupons: 'Coupons',
+        orders: 'Orders',
+        member: 'Account',
+        chooseLanguage: 'Choose language',
+        // Home
+        heroTitle1: 'Everyday,',
+        heroTitle2: 'beautifully.',
+        heroText1: 'Leave a little space, and let life open up.',
+        heroText2: 'Soft textures, with you through every day.',
+        prevVideo: 'Previous video',
+        nextVideo: 'Next video',
+        tagline: 'NATURAL FABRICS · EASY LIVING',
+        lookWomen: 'KINU autumn womenswear look',
+        lookMen: 'KINU autumn menswear look',
+        lookKids: 'KINU autumn/winter collection',
+        campaignAlt: 'KINU 2026 autumn/winter campaign',
+        campaignTitle: 'AUTUMN / WINTER',
+        onSaleSoon: 'Available soon',
+        // Footer
+        shippingReturns: 'Shipping & Returns',
+        faq: 'FAQ',
+        contactUs: 'Contact Us',
+    },
+    ja: {
+        // Header
+        topBanner: 'NT$2,500以上のご購入で送料無料 · 新規会員様は初回5%OFF',
+        women: 'ウィメンズ',
+        men: 'メンズ',
+        kids: 'キッズ',
+        menu: 'メニュー',
+        closeMenu: 'メニューを閉じる',
+        searchPlaceholder: '商品を検索',
+        taipei: '台北',
+        wishlist: 'お気に入り',
+        cart: 'カート',
+        coupons: 'クーポン',
+        orders: '注文履歴',
+        member: '会員',
+        chooseLanguage: '言語を選択',
+        // Home
+        heroTitle1: '日常に、',
+        heroTitle2: 'ちょうどいい美しさを。',
+        heroText1: '少しの余白が、暮らしに新しい可能性をくれる。',
+        heroText2: 'やわらかな素材で、毎日に寄り添う。',
+        prevVideo: '前の動画',
+        nextVideo: '次の動画',
+        tagline: '天然素材・自由な暮らし',
+        lookWomen: 'KINU 秋のウィメンズコーディネート',
+        lookMen: 'KINU 秋のメンズコーディネート',
+        lookKids: 'KINU 秋冬コレクション',
+        campaignAlt: 'KINU 2026 秋冬コレクション イメージ',
+        campaignTitle: '秋冬コレクション',
+        onSaleSoon: '近日発売',
+        // Footer
+        shippingReturns: '配送・返品',
+        faq: 'よくある質問',
+        contactUs: 'お問い合わせ',
+    },
+    ko: {
+        // Header
+        topBanner: 'NT$2,500 이상 구매 시 무료 배송 · 신규 회원 첫 구매 5% 할인',
+        women: '여성',
+        men: '남성',
+        kids: '키즈',
+        menu: '메뉴',
+        closeMenu: '메뉴 닫기',
+        searchPlaceholder: '상품 검색',
+        taipei: '타이베이',
+        wishlist: '위시리스트',
+        cart: '장바구니',
+        coupons: '쿠폰',
+        orders: '주문 내역',
+        member: '회원',
+        chooseLanguage: '언어 선택',
+        // Home
+        heroTitle1: '일상에,',
+        heroTitle2: '꼭 알맞은 아름다움.',
+        heroText1: '조금의 여백이 삶에 더 많은 가능성을 줍니다.',
+        heroText2: '부드러운 소재로 매일의 일상을 함께합니다.',
+        prevVideo: '이전 영상',
+        nextVideo: '다음 영상',
+        tagline: '천연 소재・자유로운 생활',
+        lookWomen: 'KINU 가을 여성 코디',
+        lookMen: 'KINU 가을 남성 코디',
+        lookKids: 'KINU 가을/겨울 컬렉션',
+        campaignAlt: 'KINU 2026 가을/겨울 컬렉션 화보',
+        campaignTitle: '가을/겨울 컬렉션',
+        onSaleSoon: '출시 예정',
+        // Footer
+        shippingReturns: '배송 및 반품',
+        faq: '자주 묻는 질문',
+        contactUs: '문의하기',
+    },
+};
+
+export const LanguageContext = createContext(null);
+
+/** 在元件裡用：const { t } = useLanguage(); */
+export function useLanguage() {
+    return useContext(LanguageContext);
+}
