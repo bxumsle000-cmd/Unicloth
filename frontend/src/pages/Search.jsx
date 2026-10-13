@@ -1,9 +1,9 @@
 import { api, toast } from "../js/kinu.js";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import ProductCard from "../component/ProductCard.jsx";
-import SortSelect from "../component/SortSelect.jsx";
-import Pagination from "../component/Pagination.jsx";
+import ProductCard from "../component/product/ProductCard.jsx";
+import SortSelect from "../component/product/SortSelect.jsx";
+import Pagination from "../component/product/Pagination.jsx";
 
 function Search() {
     // 關鍵字從網址讀：/search?keyword=外套

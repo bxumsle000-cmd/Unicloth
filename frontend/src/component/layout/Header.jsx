@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
 import { MdClose, MdMenu } from "react-icons/md";
-import { api } from "../js/kinu.js";
+import { api } from "../../js/kinu.js";
 import MegaMenu from "./MegaMenu.jsx";
 import MobileMenu from "./MobileMenu.jsx";
 import HeaderActions from "./HeaderActions.jsx";
 import {Link} from "react-router-dom";
-import { useLanguage } from "../js/i18n.js";
+import { useLanguage } from "../../js/i18n.js";
 
 function Header () {
     /** 導覽列的三個分類，對應資料庫第 1 層分類的 code */

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { imgSrc } from "../js/kinu.js";
+import { imgSrc } from "../../js/kinu.js";
 
 /**
  * 手機版分類選單：menu 是 Header 抓好的 /api/categories 整棵分類樹

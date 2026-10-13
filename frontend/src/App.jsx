@@ -1,5 +1,5 @@
-import Header from "./component/Header.jsx";
-import Footer from "./component/Footer.jsx";
+import Header from "./component/layout/Header.jsx";
+import Footer from "./component/layout/Footer.jsx";
 import Home from "./pages/Home.jsx";
 import Category from "./pages/Category.jsx";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -11,7 +11,7 @@ import Checkout from "./pages/Checkout.jsx";
 import OrderComplete from "./pages/OrderComplete.jsx";
 import Search from "./pages/Search.jsx";
 import Orders from "./pages/Orders.jsx";
-import { LanguageProvider } from "./component/LanguageProvider.jsx";
+import { LanguageProvider } from "./js/LanguageProvider.jsx";
 
 function App(){
     return (

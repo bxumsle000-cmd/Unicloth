@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { DICTIONARY, LANGUAGES, LanguageContext } from '../js/i18n.js';
+import { DICTIONARY, LANGUAGES, LanguageContext } from './i18n.js';
 
 const STORAGE_KEY = 'kinu-language';
 
