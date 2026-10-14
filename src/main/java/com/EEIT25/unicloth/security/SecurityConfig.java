@@ -1,3 +1,4 @@
+
 package com.EEIT25.unicloth.security;
 
 import com.EEIT25.unicloth.repository.MemberProfileRepository;
@@ -67,6 +68,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST,
                                 "/api/auth/login", "/api/auth/firebase", "/api/auth/register", "/api/auth/logout").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/products/**", "/api/categories/**").permitAll()
+
+                        // 綠界付款結果通知：不需要會員 JWT
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/payments/ecpay/notify").permitAll()
+
                         // 還沒補填資料也要能用：查自己的資料（前端靠它判斷要不要導去補填頁）、補填資料
                         .requestMatchers(HttpMethod.GET, "/api/member/me").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/member/me/complete-profile").authenticated()
