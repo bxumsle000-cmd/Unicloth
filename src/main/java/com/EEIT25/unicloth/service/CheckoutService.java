@@ -12,6 +12,7 @@ import com.EEIT25.unicloth.entity.Product;
 import com.EEIT25.unicloth.entity.ProductVariant;
 import com.EEIT25.unicloth.enums.CouponType;
 import com.EEIT25.unicloth.enums.ProductStatus;
+import com.EEIT25.unicloth.enums.PaymentStatus;
 import com.EEIT25.unicloth.exception.ApiException;
 import com.EEIT25.unicloth.repository.CartItemRepository;
 import com.EEIT25.unicloth.repository.MemberCouponRepository;
@@ -132,6 +133,7 @@ public class CheckoutService {
                 .shippingMethod(request.shippingMethod())
                 .shippingAddress(request.shippingAddress())
                 .paymentMethod(request.paymentMethod())
+                .paymentStatus(request.paymentMethod() == com.EEIT25.unicloth.enums.PaymentMethod.COD ? PaymentStatus.NOT_REQUIRED : PaymentStatus.UNPAID)
                 .note(request.note())
                 .subtotal(subtotal)
                 .discount(discount)

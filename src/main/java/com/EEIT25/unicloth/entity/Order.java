@@ -2,6 +2,7 @@ package com.EEIT25.unicloth.entity;
 
 import com.EEIT25.unicloth.enums.OrderStatus;
 import com.EEIT25.unicloth.enums.PaymentMethod;
+import com.EEIT25.unicloth.enums.PaymentStatus;
 import com.EEIT25.unicloth.enums.ShippingMethod;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -94,6 +95,16 @@ public class Order {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_coupon_id")
     private MemberCoupon memberCoupon;
+
+    // 付款狀態：UNPAID / PAID / FAILED / NOT_REQUIRED（例如貨到付款）
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_status", nullable = false)
+    @Builder.Default
+    private PaymentStatus paymentStatus = PaymentStatus.UNPAID;
+
+    // 綠界交易編號；需符合綠界 MerchantTradeNo 規格且唯一
+    @Column(name = "ecpay_trade_no", length = 20, unique = true)
+    private String ecpayTradeNo;
 
     @Column(name = "paid_at")
     private LocalDateTime paidAt;

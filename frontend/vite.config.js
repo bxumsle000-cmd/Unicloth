@@ -1,3 +1,4 @@
+
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 
@@ -5,6 +6,10 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   plugins: [react()],
   server: {
+    // 固定使用 5173，不自動切換到 5174
+    port: 5173,
+    strictPort: true,
+
     proxy: {
       // /api 開頭的請求轉給 Spring Boot
       '/api': 'http://localhost:8080',

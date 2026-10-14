@@ -67,6 +67,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST,
                                 "/api/auth/login", "/api/auth/firebase", "/api/auth/register", "/api/auth/logout").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/products/**", "/api/categories/**").permitAll()
+                        // 綠界伺服器通知不會帶會員 JWT；實際安全性由 EcpayService 的 CheckMacValue 驗證
+                        .requestMatchers(HttpMethod.POST, "/api/ecpay/callback").permitAll()
                         // 還沒補填資料也要能用：查自己的資料（前端靠它判斷要不要導去補填頁）、補填資料
                         .requestMatchers(HttpMethod.GET, "/api/member/me").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/member/me/complete-profile").authenticated()

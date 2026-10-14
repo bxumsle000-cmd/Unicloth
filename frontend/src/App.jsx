@@ -9,6 +9,7 @@ import Coupons from "./pages/Coupons.jsx";
 import Cart from "./pages/Cart.jsx";
 import Checkout from "./pages/Checkout.jsx";
 import OrderComplete from "./pages/OrderComplete.jsx";
+import PaymentResult from "./pages/PaymentResult.jsx";
 import Search from "./pages/Search.jsx";
 import Orders from "./pages/Orders.jsx";
 import Login from "./pages/Login.jsx";
@@ -34,6 +35,7 @@ function App(){
                 <Route path="/cart" element={<RequireLogin><Cart/></RequireLogin>}/>
                 <Route path="/checkout" element={<RequireLogin><Checkout/></RequireLogin>}/>
                 <Route path="/order-complete" element={<OrderComplete/>}/>
+                <Route path="/payment/result" element={<PaymentResult/>}/>
                 <Route path="/search" element={<Search/>}/>
                 <Route path="/orders" element={<RequireLogin><Orders/></RequireLogin>}/>
                 <Route path="/login" element={<Login/>}/>

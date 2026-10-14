@@ -105,7 +105,28 @@ function Checkout() {
                     cartItemIdList: buyList.map((item) => item.id),
                 },
             });
-            // replace：按「上一頁」不會回到已經結完帳的確認訂單頁
+            // 線上付款（信用卡 / ATM）交由後端產生綠界簽章表單，再自動 POST 到綠界測試站。
+            // 貨到付款維持原本流程，不跳轉綠界。
+            if (form.paymentMethod === "CREDIT" || form.paymentMethod === "ATM") {
+                const payment = await api("/api/ecpay/create-payment", {
+                    method: "POST",
+                    body: { orderNo: order.orderNo },
+                });
+                const formElement = document.createElement("form");
+                formElement.method = "POST";
+                formElement.action = payment.action;
+                Object.entries(payment.fields).forEach(([name, value]) => {
+                    const input = document.createElement("input");
+                    input.type = "hidden";
+                    input.name = name;
+                    input.value = value;
+                    formElement.appendChild(input);
+                });
+                document.body.appendChild(formElement);
+                formElement.submit();
+                return;
+            }
+            // 貨到付款：按「上一頁」不會回到已經結完帳的確認訂單頁
             navigate("/order-complete", { state: { order }, replace: true });
         } catch (e) {
             toast(e.message, true);

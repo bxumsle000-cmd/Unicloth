@@ -12,6 +12,10 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     // 用訂單編號查（例如 UC20260901-8842）
     Optional<Order> findByOrderNo(String orderNo);
 
+    Optional<Order> findByOrderNoAndMemberId(String orderNo, Long memberId);
+
+    Optional<Order> findByEcpayTradeNo(String ecpayTradeNo);
+
     // 產生訂單編號時檢查是否撞號
     boolean existsByOrderNo(String orderNo);
 
