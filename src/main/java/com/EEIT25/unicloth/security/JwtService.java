@@ -1,5 +1,6 @@
 package com.EEIT25.unicloth.security;
 
+import com.EEIT25.unicloth.enums.Department;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -12,7 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 /**
- * JWT 的產生與解析：只負責「token ↔ 會員 id」的轉換，不碰資料庫、也不碰 Spring Security。
+ * JWT 的產生與解析：只負責「token ↔ 會員 id / 員工 id」的轉換，不碰資料庫、也不碰 Spring Security。
  * <p>
  * 一顆 JWT 長這樣：{@code header.payload.signature}（三段用「.」隔開）
  * <ul>
@@ -24,6 +25,11 @@ import java.util.Date;
  */
 @Service
 public class JwtService {
+    // 員工 token 才有的 claim
+    private static final String TYPE_CLAIM = "typ";
+    private static final String STAFF_TYPE = "staff";
+    private static final String DEPARTMENT_CLAIM = "dept";
+
     private final SecretKey key;
     private final long expirationMs;
 
@@ -46,23 +52,89 @@ public class JwtService {
     }
 
     /**
-     * 驗證 token（簽章、是否過期）並取出會員 id。
+     * 員工登入成功後產生 token；員工 id 放在 sub，另外加上：
+     * <ul>
+     *   <li>typ = staff：標記這是員工的 token，會員 token 沒有這一項</li>
+     *   <li>dept = 所屬部門，例如 "PRODUCT"，之後判斷能用哪個部門的 API</li>
+     * </ul>
+     */
+    public String generateStaffToken(Long staffId, Department department) {
+        Date now = new Date();
+        Date expiration = new Date(now.getTime() + expirationMs);
+
+        return Jwts.builder()
+                .subject(String.valueOf(staffId))
+                .claim(TYPE_CLAIM, STAFF_TYPE)
+                .claim(DEPARTMENT_CLAIM, department.name())
+                .issuedAt(now)
+                .expiration(expiration)
+                .signWith(key)
+                .compact();
+    }
+
+    /**
+     * 驗證 token（簽章、是否過期）並取出會員 id；員工的 token 不能當會員用，一樣丟例外。
+     *
+     * @param token 前端帶來的 token（不含 "Bearer " 前綴）
+     * @throws JwtException 簽章錯誤、格式錯誤、已過期、是員工 token 等任何驗證失敗的情況
+     */
+    public Long parseMemberId(String token) throws JwtException {
+        ParsedToken parsed = parse(token);
+        if (parsed.staff()) {
+            throw new MalformedJwtException("這是員工的 token，不是會員的");
+        }
+        return parsed.id();
+    }
+
+    /**
+     * 驗證 token（簽章、是否過期），並分辨是會員還是員工的 token。
+     * 沒有 typ 的就是會員 token（加上員工功能之前發出去的 token 也都沒有 typ，所以不受影響）。
      *
      * @param token 前端帶來的 token（不含 "Bearer " 前綴）
      * @throws JwtException 簽章錯誤、格式錯誤、已過期等任何驗證失敗的情況
      */
-    public Long parseMemberId(String token) throws JwtException {
+    public ParsedToken parse(String token) throws JwtException {
         Claims claims = Jwts.parser()
                 .verifyWith(key)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
 
+        Long id;
         try {
-            return Long.valueOf(claims.getSubject());
+            id = Long.valueOf(claims.getSubject());
         } catch (NumberFormatException e) {
             // 簽章對但 sub 不是數字：不是我們發的格式，一樣當成無效 token
-            throw new MalformedJwtException("token 的 sub 不是會員 id", e);
+            throw new MalformedJwtException("token 的 sub 不是數字 id", e);
         }
+
+        if (!STAFF_TYPE.equals(claims.get(TYPE_CLAIM, String.class))) {
+            return new ParsedToken(id, false, null);
+        }
+        return new ParsedToken(id, true, parseDepartment(claims));
+    }
+
+    /** 從 dept 取出部門；沒有、或是不認識的部門名稱（例如 enum 改名了），都當成無效 token */
+    private Department parseDepartment(Claims claims) {
+        String name = claims.get(DEPARTMENT_CLAIM, String.class);
+        if (name == null) {
+            throw new MalformedJwtException("員工 token 缺少部門資料");
+        }
+
+        try {
+            return Department.valueOf(name);
+        } catch (IllegalArgumentException e) {
+            throw new MalformedJwtException("員工 token 裡有不認識的部門：" + name, e);
+        }
+    }
+
+    /**
+     * 解析完的 token 內容
+     *
+     * @param id         會員 id 或員工 id（看 staff）
+     * @param staff      true = 員工 token；false = 會員 token
+     * @param department 員工所屬部門；會員 token 是 null
+     */
+    public record ParsedToken(Long id, boolean staff, Department department) {
     }
 }

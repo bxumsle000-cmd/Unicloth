@@ -1,5 +1,6 @@
 package com.EEIT25.unicloth.security;
 
+import com.EEIT25.unicloth.enums.Department;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -71,6 +72,50 @@ class JwtServiceTest {
     @Test
     void 亂七八糟的字串_解析失敗() {
         assertThatThrownBy(() -> service(60_000).parseMemberId("not-a-jwt"))
+                .isInstanceOf(JwtException.class);
+    }
+
+    @Test
+    void 員工token解回來_是員工而且部門一樣() {
+        JwtService jwt = service(60_000);
+
+        String token = jwt.generateStaffToken(5L, Department.MKT);
+        JwtService.ParsedToken parsed = jwt.parse(token);
+
+        assertThat(parsed.staff()).isTrue();
+        assertThat(parsed.id()).isEqualTo(5L);
+        assertThat(parsed.department()).isEqualTo(Department.MKT);
+    }
+
+    @Test
+    void 會員token_parse出來不是員工() {
+        JwtService jwt = service(60_000);
+
+        JwtService.ParsedToken parsed = jwt.parse(jwt.generateToken(42L));
+
+        assertThat(parsed.staff()).isFalse();
+        assertThat(parsed.id()).isEqualTo(42L);
+    }
+
+    @Test
+    void 員工token不能當會員token用() {
+        JwtService jwt = service(60_000);
+        String token = jwt.generateStaffToken(5L, Department.SYS);
+
+        assertThatThrownBy(() -> jwt.parseMemberId(token))
+                .isInstanceOf(JwtException.class);
+    }
+
+    @Test
+    void 員工token裡有不認識的部門_解析失敗() {
+        String token = Jwts.builder()
+                .subject("5")
+                .claim("typ", "staff")
+                .claim("dept", "NOT_A_DEPT")
+                .signWith(Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8)))
+                .compact();
+
+        assertThatThrownBy(() -> service(60_000).parse(token))
                 .isInstanceOf(JwtException.class);
     }
 
