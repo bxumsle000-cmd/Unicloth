@@ -6,7 +6,11 @@ import com.EEIT25.unicloth.entity.Payment;
 import com.EEIT25.unicloth.enums.OrderStatus;
 import com.EEIT25.unicloth.enums.PaymentMethod;
 import com.EEIT25.unicloth.enums.PaymentStatus;
+import com.EEIT25.unicloth.repository.OrderRepository;
 import com.EEIT25.unicloth.repository.PaymentRepository;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.LockModeType;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,12 +25,18 @@ import java.time.format.DateTimeParseException;
 import java.util.Map;
 
 /**
- * 綠界 AIO 付款結果通知處理服務。
+ * Unicloth 綠界 AIO 付款結果通知服務。
  *
- * 驗證通知內容，成功付款後更新付款紀錄及訂單。
+ * 功能：
+ * 1. 驗證 CheckMacValue
+ * 2. 驗證商店、交易編號及金額
+ * 3. 先鎖定訂單，再鎖定付款紀錄
+ * 4. 防止重複付款通知
+ * 5. 成功付款後更新 Payment 和 Order
  *
- * 目前僅處理付款成功通知。
- * 付款失敗、逾時、退款等流程後續另行實作。
+ * 注意：
+ * 付款失敗、逾時、退款和庫存回復
+ * 需要另外完成。
  */
 @Slf4j
 @Service
@@ -35,6 +45,8 @@ public class EcpayCallbackService {
 
     private final EcpayService ecpayService;
     private final PaymentRepository paymentRepository;
+    private final OrderRepository orderRepository;
+    private final EntityManager entityManager;
 
     @Value("${ecpay.merchant-id}")
     private String merchantId;
@@ -43,17 +55,17 @@ public class EcpayCallbackService {
             DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
 
     /**
-     * 接收並處理綠界付款通知。
+     * 處理綠界付款通知。
      *
-     * 所有必要驗證完成，並成功提交資料庫交易後，
-     * Controller 才能回傳 1|OK。
+     * 只有驗證通過且資料庫交易提交成功後，
+     * Controller 才可以回傳 1|OK。
      */
     @Transactional
     public String handleNotification(
             Map<String, String> params
     ) {
 
-        // 1. 確認通知資料存在
+        // 1. 檢查通知資料
         if (params == null || params.isEmpty()) {
             throw new IllegalArgumentException(
                     "綠界通知資料不可為空"
@@ -62,27 +74,29 @@ public class EcpayCallbackService {
 
         // 2. 驗證 CheckMacValue
         if (!ecpayService.verifyCheckMacValue(params)) {
-            log.warn("ECPay callback checksum verification failed");
+
+            log.warn("ECPay CheckMacValue verification failed");
 
             throw new IllegalArgumentException(
                     "綠界付款通知檢查碼錯誤"
             );
         }
 
-        // 3. 驗證特店編號
-        String receivedMerchantId = params.get("MerchantID");
+        // 3. 驗證 MerchantID
+        String receivedMerchantId =
+                requireValue(params, "MerchantID");
 
         if (!merchantId.equals(receivedMerchantId)) {
             throw new IllegalArgumentException(
-                    "綠界特店編號不正確"
+                    "綠界特店編號不一致"
             );
         }
 
-        // 4. 取得商店交易編號
+        // 4. 取得交易編號
         String merchantTradeNo =
                 requireValue(params, "MerchantTradeNo");
 
-        // 5. 驗證交易金額格式
+        // 5. 驗證金額格式
         int tradeAmount;
 
         try {
@@ -91,15 +105,46 @@ public class EcpayCallbackService {
             );
         } catch (NumberFormatException ex) {
             throw new IllegalArgumentException(
-                    "綠界交易金額格式錯誤",
+                    "付款金額格式錯誤",
                     ex
             );
         }
 
-        // 6. 取得付款結果
+        if (tradeAmount <= 0) {
+            throw new IllegalArgumentException(
+                    "付款金額必須大於零"
+            );
+        }
+
+        // 6. 取得付款結果及付款方式
         String rtnCode = requireValue(params, "RtnCode");
 
-        // 7. 鎖定付款紀錄，避免同一筆通知並發處理
+        String receivedPaymentType =
+                requireValue(params, "PaymentType");
+
+        // 7. 先查詢付款紀錄，取得所屬訂單 ID
+        // 此時還沒有鎖定付款紀錄
+        Payment paymentReference = paymentRepository
+                .findByMerchantTradeNo(merchantTradeNo)
+                .orElseThrow(() ->
+                        new IllegalArgumentException(
+                                "找不到對應的付款紀錄"
+                        )
+                );
+
+        Long orderId = paymentReference.getOrder().getId();
+
+        // 8. 先鎖定訂單
+        // 和 EcpayService 建立付款時使用相同的鎖定順序
+        Order order = orderRepository
+                .findByIdForUpdate(orderId)
+                .orElseThrow(() ->
+                        new IllegalArgumentException(
+                                "找不到對應的訂單"
+                        )
+                );
+
+        // 9. 再鎖定付款紀錄
         Payment payment = paymentRepository
                 .findByMerchantTradeNoForUpdate(merchantTradeNo)
                 .orElseThrow(() ->
@@ -108,23 +153,32 @@ public class EcpayCallbackService {
                         )
                 );
 
-        Order order = payment.getOrder();
+        // 10. 強制重新讀取付款紀錄
+        // 避免 JPA 第一層快取保留鎖定前的舊狀態
+        entityManager.refresh(
+                payment,
+                LockModeType.PESSIMISTIC_WRITE
+        );
 
-        // 8. 核對付款紀錄與訂單金額
+        // 11. 再次確認付款紀錄仍屬於同一張訂單
+        if (!order.getId().equals(payment.getOrder().getId())) {
+            throw new IllegalStateException(
+                    "付款紀錄與訂單關聯不一致"
+            );
+        }
+
+        // 12. 核對資料庫實際付款金額
         if (payment.getAmount() == null
-                || payment.getAmount() != tradeAmount
+                || payment.getAmount().intValue() != tradeAmount
                 || order.getTotal() == null
-                || order.getTotal() != tradeAmount) {
+                || order.getTotal().intValue() != tradeAmount) {
 
             throw new IllegalArgumentException(
                     "綠界付款金額與訂單金額不一致"
             );
         }
 
-        // 9. 確認付款方式
-        String receivedPaymentType =
-                requireValue(params, "PaymentType");
-
+        // 13. 核對付款方式
         if (!isExpectedPaymentType(
                 payment.getPaymentMethod(),
                 receivedPaymentType)) {
@@ -134,32 +188,33 @@ public class EcpayCallbackService {
             );
         }
 
-        // 10. 廠商後台模擬通知不可視為實際付款
+        // 14. 判斷是否為綠界後台的模擬付款通知
+        // SimulatePaid=1 只是測試 ReturnURL，
+        // 不能當成真正付款成功
         if ("1".equals(params.get("SimulatePaid"))) {
-            log.warn(
-                    "ECPay simulated notification received: {}",
+
+            log.info(
+                    "ECPay simulated callback received: {}",
                     merchantTradeNo
             );
 
-            // 驗證過的測試通知可確認收到，
-            // 但絕對不更新訂單為已付款。
             return "1|OK";
         }
 
-        // 11. 非付款成功通知，不標記為 PAID
+        // 15. 非付款成功通知
         if (!"1".equals(rtnCode)) {
 
             log.warn(
-                    "ECPay non-success result, tradeNo={}, code={}",
+                    "ECPay non-success callback: tradeNo={}, code={}",
                     merchantTradeNo,
                     rtnCode
             );
 
-            // 暫時保留待付款狀態，供後續對帳。
+            // 暫時不更新狀態，留待後續對帳或失敗處理
             return "1|OK";
         }
 
-        // 12. 檢查綠界交易編號
+        // 16. 取得綠界交易編號
         String ecpayTradeNo =
                 requireValue(params, "TradeNo");
 
@@ -169,7 +224,7 @@ public class EcpayCallbackService {
             );
         }
 
-        // 13. 檢查付款時間
+        // 17. 解析付款時間
         LocalDateTime paidAt;
 
         try {
@@ -184,28 +239,35 @@ public class EcpayCallbackService {
             );
         }
 
-        // 14. 重複通知：同一筆已完成交易不再更新
+        // 18. 如果已經付款成功，檢查是否為重複通知
         if (payment.getStatus() == PaymentStatus.PAID) {
 
-            if (!ecpayTradeNo.equals(
-                    payment.getEcpayTradeNo())) {
+            if (!ecpayTradeNo.equals(payment.getEcpayTradeNo())
+                    || order.getPaidAt() == null) {
 
                 throw new IllegalStateException(
-                        "已付款交易的綠界交易編號不一致"
+                        "已付款交易資料不一致，需要人工對帳"
                 );
             }
 
+            log.info(
+                    "ECPay duplicate paid callback: {}",
+                    merchantTradeNo
+            );
+
+            // 同一筆合法付款通知重複送達
+            // 不再修改資料庫
             return "1|OK";
         }
 
-        // 15. 取消或失敗的交易不可重新標記為成功
+        // 19. 只允許 PENDING 更新為 PAID
         if (payment.getStatus() != PaymentStatus.PENDING) {
             throw new IllegalStateException(
                     "此付款紀錄目前不可更新為已付款"
             );
         }
 
-        // 16. 已取消的訂單不應自動恢復付款完成
+        // 20. 已取消的訂單不能自動改成已付款
         if (order.getStatus() == OrderStatus.CANCELLED) {
 
             log.error(
@@ -214,28 +276,34 @@ public class EcpayCallbackService {
             );
 
             throw new IllegalStateException(
-                    "訂單已取消，需要人工確認付款"
+                    "訂單已取消，需要人工確認"
             );
         }
 
-        // 17. 避免其他交易已完成同一張訂單付款
+        // 21. 防止同張訂單被不同交易重複付款
         if (order.getPaidAt() != null) {
+
+            log.error(
+                    "Duplicate payment for order: {}",
+                    order.getOrderNo()
+            );
+
             throw new IllegalStateException(
-                    "此訂單已有付款紀錄，需要人工對帳"
+                    "此訂單已有付款成功紀錄，需要人工對帳"
             );
         }
 
-        // 18. 更新付款紀錄
+        // 22. 更新付款紀錄
         payment.setStatus(PaymentStatus.PAID);
         payment.setEcpayTradeNo(ecpayTradeNo);
         payment.setPaidAt(paidAt);
 
-        // 19. 更新訂單付款時間
+        // 23. 更新訂單付款時間
         order.setPaidAt(paidAt);
 
-        // 20. JPA 會在交易提交時儲存變更
+        // 24. JPA 會在交易提交時儲存修改
         log.info(
-                "ECPay payment verified: orderNo={}, merchantTradeNo={}",
+                "ECPay payment verified: orderNo={}, tradeNo={}",
                 order.getOrderNo(),
                 merchantTradeNo
         );
@@ -244,7 +312,7 @@ public class EcpayCallbackService {
     }
 
     /**
-     * 取得必要的通知欄位。
+     * 取得必要欄位。
      */
     private String requireValue(
             Map<String, String> params,
@@ -263,7 +331,7 @@ public class EcpayCallbackService {
     }
 
     /**
-     * 確認綠界回傳的付款方式與訂單一致。
+     * 確認付款方式一致。
      */
     private boolean isExpectedPaymentType(
             PaymentMethod method,

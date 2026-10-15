@@ -37,13 +37,11 @@ import java.util.UUID;
  *
  * 功能：
  * 1. 驗證訂單及會員身分
- * 2. 建立付款紀錄
- * 3. 產生綠界付款參數
- * 4. 計算及驗證 CheckMacValue
- *
- * 注意：
- * 付款成功通知及更新訂單狀態，
- * 將由後續的通知處理服務實作。
+ * 2. 鎖定訂單，避免並發建立付款
+ * 3. 建立付款紀錄
+ * 4. 產生綠界付款參數
+ * 5. 計算及驗證 CheckMacValue
+ * 6. 設定付款後返回 KINU 網站
  */
 @Service
 @RequiredArgsConstructor
@@ -74,6 +72,10 @@ public class EcpayService {
     @Value("${ecpay.return-url}")
     private String returnUrl;
 
+    // 新增：綠界付款後返回 KINU 的網址
+    @Value("${ecpay.client-back-url}")
+    private String clientBackUrl;
+
     /**
      * 取得綠界測試付款 API 網址。
      */
@@ -84,56 +86,61 @@ public class EcpayService {
     /**
      * 建立綠界付款請求。
      *
-     * 此方法僅建立付款紀錄和付款參數，
-     * 不代表已經付款成功。
+     * 使用資料庫交易鎖，防止同一張訂單
+     * 同時建立多筆 PENDING 付款紀錄。
      */
     @Transactional
-    public Map<String, String> createPayment(
-            String orderNo
-    ) {
+    public Map<String, String> createPayment(String orderNo) {
 
-        // 1. 取得目前登入會員
+        // 1. 取得登入會員
         Member member = currentMember.require();
 
-        // 2. 查詢訂單
-        Order order = orderRepository.findByOrderNo(orderNo)
+        // 2. 檢查訂單編號
+        if (orderNo == null || orderNo.isBlank()) {
+            throw ApiException.badRequest("訂單編號不可為空");
+        }
+
+        // 3. 鎖定訂單
+        Order order = orderRepository
+                .findByOrderNoForUpdate(orderNo)
                 .orElseThrow(() ->
                         ApiException.notFound("找不到此訂單")
                 );
 
-        // 3. 驗證訂單是否屬於目前會員
+        // 4. 確認訂單屬於目前會員
         if (!order.getMember().getId().equals(member.getId())) {
             throw ApiException.notFound("找不到此訂單");
         }
 
-        // 4. 確認訂單尚未付款
+        // 5. 確認尚未付款
         if (order.getPaidAt() != null) {
             throw ApiException.conflict("此訂單已經付款完成");
         }
 
-        // 5. 確認訂單仍可付款
+        // 6. 確認訂單狀態
         if (order.getStatus() != OrderStatus.PENDING) {
             throw ApiException.conflict("目前訂單狀態無法付款");
         }
 
-        // 6. 只允許信用卡及 ATM 使用綠界
+        // 7. 確認付款方式
         PaymentMethod paymentMethod = order.getPaymentMethod();
 
         if (paymentMethod != PaymentMethod.CREDIT
                 && paymentMethod != PaymentMethod.ATM) {
+
             throw ApiException.badRequest(
                     "此付款方式不支援綠界金流"
             );
         }
 
-        // 7. 取得資料庫中的真正訂單金額
+        // 8. 取得訂單實際金額
         Integer amount = order.getTotal();
 
         if (amount == null || amount <= 0) {
             throw ApiException.badRequest("訂單付款金額不正確");
         }
 
-        // 8. 暫時避免同張訂單重複發起待付款交易
+        // 9. 檢查是否有尚未完成的付款紀錄
         List<Payment> pendingPayments =
                 paymentRepository.findByOrderIdAndStatus(
                         order.getId(),
@@ -146,10 +153,23 @@ public class EcpayService {
             );
         }
 
-        // 9. 產生綠界唯一交易編號
+        // 10. 檢查是否已經有付款成功紀錄
+        List<Payment> paidPayments =
+                paymentRepository.findByOrderIdAndStatus(
+                        order.getId(),
+                        PaymentStatus.PAID
+                );
+
+        if (!paidPayments.isEmpty()) {
+            throw ApiException.conflict(
+                    "此訂單已有付款成功紀錄"
+            );
+        }
+
+        // 11. 產生綠界交易編號
         String merchantTradeNo = generateMerchantTradeNo();
 
-        // 10. 建立付款紀錄
+        // 12. 建立付款紀錄
         Payment payment = Payment.builder()
                 .order(order)
                 .merchantTradeNo(merchantTradeNo)
@@ -160,7 +180,7 @@ public class EcpayService {
 
         paymentRepository.save(payment);
 
-        // 11. 建立綠界付款參數
+        // 13. 建立綠界付款參數
         Map<String, String> params = new LinkedHashMap<>();
 
         params.put("MerchantID", merchantId);
@@ -180,9 +200,13 @@ public class EcpayService {
 
         params.put("ItemName", "Unicloth Clothing Order");
 
+        // 綠界伺服器通知 Spring Boot
         params.put("ReturnURL", returnUrl);
 
-        // 根據原本的付款方式選擇綠界付款方式
+        // 新增：綠界顯示「返回商店」按鈕
+        params.put("ClientBackURL", clientBackUrl);
+
+        // 指定付款方式
         params.put(
                 "ChoosePayment",
                 paymentMethod == PaymentMethod.CREDIT
@@ -190,25 +214,22 @@ public class EcpayService {
                         : "ATM"
         );
 
-        // 指定 SHA256 檢查碼
+        // SHA256
         params.put("EncryptType", "1");
 
-        // 12. 計算 CheckMacValue
+        // 14. 計算檢查碼
+        // ClientBackURL 也會參與 CheckMacValue 計算
         params.put(
                 "CheckMacValue",
                 generateCheckMacValue(params)
         );
 
-        // 13. 回傳表單資料
+        // 15. 回傳付款參數
         return params;
     }
 
     /**
-     * 產生 20 字元的交易編號。
-     *
-     * UC + UUID 前 18 碼
-     *
-     * 實際唯一性由資料庫 UNIQUE 約束保護。
+     * 產生 20 字元的商店交易編號。
      */
     private String generateMerchantTradeNo() {
 
@@ -230,15 +251,14 @@ public class EcpayService {
     }
 
     /**
-     * 計算綠界 AIO CheckMacValue。
+     * 產生綠界 SHA256 CheckMacValue。
      *
      * 1. 排除 CheckMacValue
-     * 2. 依照參數名稱排序
-     * 3. 前後加入 HashKey、HashIV
+     * 2. 依參數名稱排序
+     * 3. 加入 HashKey 和 HashIV
      * 4. URL Encode
-     * 5. 轉為小寫
+     * 5. 特殊字元轉換
      * 6. SHA256
-     * 7. 轉為大寫
      */
     public String generateCheckMacValue(
             Map<String, String> params
@@ -268,13 +288,12 @@ public class EcpayService {
 
         query.append("&HashIV=").append(hashIv);
 
-        // URL Encode
         String encoded = URLEncoder.encode(
                 query.toString(),
                 StandardCharsets.UTF_8
         );
 
-        // 符合綠界 AIO 的 URL Encode 轉換規則
+        // 綠界 AIO URL Encode 轉換規則
         encoded = encoded
                 .replace("%2D", "-")
                 .replace("%5F", "_")
@@ -315,15 +334,15 @@ public class EcpayService {
     }
 
     /**
-     * 驗證綠界回傳資料的 CheckMacValue。
-     *
-     * 實際通知處理時還必須核對：
-     * MerchantID、MerchantTradeNo、TradeAmt、
-     * RtnCode，以及付款紀錄狀態。
+     * 驗證綠界回傳的 CheckMacValue。
      */
     public boolean verifyCheckMacValue(
             Map<String, String> params
     ) {
+
+        if (params == null) {
+            return false;
+        }
 
         String receivedMac = params.get("CheckMacValue");
 
