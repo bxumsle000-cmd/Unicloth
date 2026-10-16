@@ -3,6 +3,7 @@ package com.EEIT25.unicloth.repository;
 
 import com.EEIT25.unicloth.entity.Order;
 import com.EEIT25.unicloth.enums.OrderStatus;
+import com.EEIT25.unicloth.enums.PaymentMethod;
 
 import jakarta.persistence.LockModeType;
 
@@ -11,6 +12,7 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,6 +32,10 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     // 後台依狀態篩選
     List<Order> findByStatusOrderByCreatedAtDesc(OrderStatus status);
+
+    // 逾時未付款排程用：某個付款方式、還沒付款、在 createdBefore 之前建立的訂單
+    List<Order> findByStatusAndPaidAtIsNullAndPaymentMethodAndCreatedAtBefore(
+            OrderStatus status, PaymentMethod paymentMethod, LocalDateTime createdBefore);
 
     /**
      * 綠界建立付款時使用。

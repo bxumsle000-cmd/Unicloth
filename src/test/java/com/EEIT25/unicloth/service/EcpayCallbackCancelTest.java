@@ -171,15 +171,44 @@ class EcpayCallbackCancelTest {
     }
 
     @Test
-    void ATM非成功代碼_不取消訂單() {
+    void 信用卡訂單用電子支付付款成功_寫入paid_at() {
+        Payment payment = checkoutAndCreatePayment(PaymentMethod.CREDIT);
+
+        // 跟綠界測試環境「測試付款請點此」實際送來的一樣：DigitalPayment_iPASS MONEY
+        Map<String, String> params = new HashMap<>();
+        params.put("MerchantID", merchantId);
+        params.put("MerchantTradeNo", payment.getMerchantTradeNo());
+        params.put("TradeAmt", String.valueOf(payment.getAmount()));
+        params.put("RtnCode", "1");
+        params.put("RtnMsg", "交易成功");
+        params.put("PaymentType", "DigitalPayment_iPASS MONEY");
+        params.put("TradeNo", "2610161230275060");
+        params.put("PaymentDate", "2026/10/16 12:30:33");
+        params.put("SimulatePaid", "0");
+        params.put("CheckMacValue", ecpayService.generateCheckMacValue(params));
+
+        String result = ecpayCallbackService.handleNotification(params);
+        flushAndClear();
+
+        assertEquals("1|OK", result);
+        Payment paid = paymentRepository.findById(payment.getId()).orElseThrow();
+        assertEquals(PaymentStatus.PAID, paid.getStatus());
+        assertEquals("2610161230275060", paid.getEcpayTradeNo());
+        assertEquals(LocalDateTime.of(2026, 10, 16, 12, 30, 33),
+                orderRepository.findById(payment.getOrder().getId()).orElseThrow().getPaidAt());
+    }
+
+    @Test
+    void ATM付款失敗_跟信用卡一樣取消訂單() {
+        int stockBefore = variant.getStock();
         Payment payment = checkoutAndCreatePayment(PaymentMethod.ATM);
 
-        ecpayCallbackService.handleNotification(failedNotification(payment, "ATM_TAISHIN", "2"));
+        ecpayCallbackService.handleNotification(failedNotification(payment, "ATM_TAISHIN", "10100058"));
         flushAndClear();
 
         Order order = orderRepository.findById(payment.getOrder().getId()).orElseThrow();
-        assertEquals(OrderStatus.PENDING, order.getStatus());
-        assertEquals(PaymentStatus.PENDING, paymentRepository.findById(payment.getId()).orElseThrow().getStatus());
-        assertNotNull(memberCouponRepository.findById(memberCoupon.getId()).orElseThrow().getUsedAt());
+        assertEquals(OrderStatus.CANCELLED, order.getStatus());
+        assertEquals(stockBefore, productVariantRepository.findById(variant.getId()).orElseThrow().getStock());
+        assertNull(memberCouponRepository.findById(memberCoupon.getId()).orElseThrow().getUsedAt());
     }
 }

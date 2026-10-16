@@ -62,5 +62,28 @@ services:
         -Q "IF DB_ID('Unicloth') IS NULL CREATE DATABASE Unicloth;"
     restart: "no"                     # 跑完就結束，不要重啟
 
+  # --------------------------------------------------------------------------
+  # 綠界付款通知用的 HTTPS 網址（Cloudflare Quick Tunnel）
+  #
+  # 綠界的伺服器連不到你電腦的 localhost，所以用 tunnel 開一個對外網址，
+  # 轉到你電腦上的 ecpay-callback-proxy.cjs（8787），再由它轉給 Spring Boot（8080）。
+  # 不用自己安裝 cloudflared。
+  #
+  # 網址每次啟動都會變，但不用手動設定：
+  # Spring Boot 每次建立付款都會問 tunnel 目前的網址（EcpayReturnUrlResolver）。
+  # 想自己看網址：docker compose logs tunnel
+  # --------------------------------------------------------------------------
+  tunnel:
+    image: cloudflare/cloudflared:2026.9.3
+    container_name: unicloth-tunnel
+    # host.docker.internal = 你自己的電腦（從容器裡看出去）
+    # --metrics：開查詢介面，http://127.0.0.1:20241/quicktunnel 會回傳目前網址
+    command: tunnel --no-autoupdate --metrics 0.0.0.0:20241 --url http://host.docker.internal:8787
+    ports:
+      - "127.0.0.1:20241:20241"   # 只開給本機，外面連不到
+    extra_hosts:
+      - "host.docker.internal:host-gateway"   # Linux 的 Docker 沒有內建這個名稱，加上才通用
+    restart: unless-stopped
+
 volumes:
   mssql-data:

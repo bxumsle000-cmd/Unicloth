@@ -73,6 +73,15 @@ public class EcpayCallbackService {
             );
         }
 
+        // 收到通知就先記一筆，之後查「通知有沒有進來、內容是什麼」比較容易
+        log.info(
+                "ECPay notification received: tradeNo={}, RtnCode={}, PaymentType={}, SimulatePaid={}",
+                params.get("MerchantTradeNo"),
+                params.get("RtnCode"),
+                params.get("PaymentType"),
+                params.get("SimulatePaid")
+        );
+
         // 2. 驗證 CheckMacValue
         if (!ecpayService.verifyCheckMacValue(params)) {
 
@@ -355,9 +364,15 @@ public class EcpayCallbackService {
     ) {
 
         if (method == PaymentMethod.CREDIT) {
+            // 綠界的信用卡付款頁同時提供電子支付（iPASS MONEY、全支付、綠界Pay 等），
+            // 顧客選了也算正常付款，回傳的是 DigitalPayment_xxx
+            // （測試環境的「測試付款請點此」就是模擬 DigitalPayment_iPASS MONEY）
             return receivedType.equalsIgnoreCase("Credit")
                     || receivedType.regionMatches(
                             true, 0, "Credit_", 0, 7
+                    )
+                    || receivedType.regionMatches(
+                            true, 0, "DigitalPayment_", 0, 15
                     );
         }
 

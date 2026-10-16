@@ -50,6 +50,7 @@ public class EcpayService {
     private final OrderRepository orderRepository;
     private final PaymentRepository paymentRepository;
     private final CurrentMember currentMember;
+    private final EcpayReturnUrlResolver ecpayReturnUrlResolver;
 
     private static final ZoneId TAIWAN_ZONE =
             ZoneId.of("Asia/Taipei");
@@ -68,9 +69,6 @@ public class EcpayService {
 
     @Value("${ecpay.api-url}")
     private String apiUrl;
-
-    @Value("${ecpay.return-url}")
-    private String returnUrl;
 
     // 新增：綠界付款後返回 KINU 的網址
     @Value("${ecpay.client-back-url}")
@@ -201,7 +199,8 @@ public class EcpayService {
         params.put("ItemName", "Unicloth Clothing Order");
 
         // 綠界伺服器通知 Spring Boot
-        params.put("ReturnURL", returnUrl);
+        // 網址會自動用 docker-compose 的 tunnel 目前的網址（見 EcpayReturnUrlResolver）
+        params.put("ReturnURL", ecpayReturnUrlResolver.resolve());
 
         // 新增：綠界顯示「返回商店」按鈕
         params.put("ClientBackURL", clientBackUrl);
