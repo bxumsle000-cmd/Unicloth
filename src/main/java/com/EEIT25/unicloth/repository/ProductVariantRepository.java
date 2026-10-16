@@ -44,4 +44,12 @@ public interface ProductVariantRepository extends JpaRepository<ProductVariant, 
             WHERE v.id = :variantId AND v.stock >= :qty
             """)
     int deductStock(@Param("variantId") Long variantId, @Param("qty") int qty);
+
+    /** 取消訂單時把庫存加回去（OrderService.cancelOrder 使用） */
+    @Modifying
+    @Query("""
+            UPDATE ProductVariant v SET v.stock = v.stock + :qty
+            WHERE v.id = :variantId
+            """)
+    int restoreStock(@Param("variantId") Long variantId, @Param("qty") int qty);
 }

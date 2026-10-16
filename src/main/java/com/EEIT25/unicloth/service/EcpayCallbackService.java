@@ -33,10 +33,10 @@ import java.util.Map;
  * 3. 先鎖定訂單，再鎖定付款紀錄
  * 4. 防止重複付款通知
  * 5. 成功付款後更新 Payment 和 Order
+ * 6. 信用卡付款失敗時取消訂單（OrderService.cancelOrder）
  *
  * 注意：
- * 付款失敗、逾時、退款和庫存回復
- * 需要另外完成。
+ * ATM 逾時未付款和退款需要另外完成。
  */
 @Slf4j
 @Service
@@ -46,6 +46,7 @@ public class EcpayCallbackService {
     private final EcpayService ecpayService;
     private final PaymentRepository paymentRepository;
     private final OrderRepository orderRepository;
+    private final OrderService orderService;
     private final EntityManager entityManager;
 
     @Value("${ecpay.merchant-id}")
@@ -210,7 +211,22 @@ public class EcpayCallbackService {
                     rtnCode
             );
 
-            // 暫時不更新狀態，留待後續對帳或失敗處理
+
+            // 信用卡付款失敗：訂單還在待付款才取消，並還原庫存與折價券
+            // （已付款、已取消或已出貨的訂單不動，避免誤取消）
+            if (payment.getStatus() == PaymentStatus.PENDING
+                    && order.getStatus() == OrderStatus.PENDING
+                    && order.getPaidAt() == null) {
+
+                orderService.cancelOrder(order.getId());
+
+                log.info(
+                        "Order cancelled by ECPay failed payment: orderNo={}, tradeNo={}",
+                        order.getOrderNo(),
+                        merchantTradeNo
+                );
+            }
+
             return "1|OK";
         }
 
