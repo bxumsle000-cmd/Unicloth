@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * 逾時未付款自動取消的排程。<br>
  * 顧客跳到綠界後直接關掉頁面，綠界不會發任何通知，
- * 訂單會一直停在 PENDING、庫存和折價券也被鎖住，所以定時檢查並取消。<br>
+ * 訂單會一直停在 UNPAID（未付款）、庫存和折價券也被鎖住，所以定時檢查並取消。<br>
  * 只處理信用卡和 ATM（走綠界的訂單），貨到付款不受影響。
  */
 @Slf4j
@@ -50,7 +50,7 @@ public class OrderTimeoutScheduler {
     private void cancelExpired(PaymentMethod paymentMethod, LocalDateTime createdBefore) {
         List<Order> expiredOrderList = orderRepository
                 .findByStatusAndPaidAtIsNullAndPaymentMethodAndCreatedAtBefore(
-                        OrderStatus.PENDING, paymentMethod, createdBefore);
+                        OrderStatus.UNPAID, paymentMethod, createdBefore);
 
         for (Order order : expiredOrderList) {
             // 每張訂單各自一個交易：一張失敗（例如剛好在這時候付款成功）不影響其他張

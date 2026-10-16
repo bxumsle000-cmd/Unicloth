@@ -136,7 +136,8 @@ class EcpayCallbackCancelTest {
         int stockBefore = variant.getStock();
         Payment payment = checkoutAndCreatePayment(PaymentMethod.CREDIT);
 
-        // 結帳後：庫存扣 2、券已使用
+        // 結帳後：未付款、庫存扣 2、券已使用
+        assertEquals(OrderStatus.UNPAID, orderRepository.findById(payment.getOrder().getId()).orElseThrow().getStatus());
         assertEquals(stockBefore - 2, productVariantRepository.findById(variant.getId()).orElseThrow().getStock());
         assertNotNull(memberCouponRepository.findById(memberCoupon.getId()).orElseThrow().getUsedAt());
 
@@ -194,8 +195,10 @@ class EcpayCallbackCancelTest {
         Payment paid = paymentRepository.findById(payment.getId()).orElseThrow();
         assertEquals(PaymentStatus.PAID, paid.getStatus());
         assertEquals("2610161230275060", paid.getEcpayTradeNo());
-        assertEquals(LocalDateTime.of(2026, 10, 16, 12, 30, 33),
-                orderRepository.findById(payment.getOrder().getId()).orElseThrow().getPaidAt());
+        Order order = orderRepository.findById(payment.getOrder().getId()).orElseThrow();
+        assertEquals(LocalDateTime.of(2026, 10, 16, 12, 30, 33), order.getPaidAt());
+        // 付款成功：未付款 → 訂單確認中
+        assertEquals(OrderStatus.PENDING, order.getStatus());
     }
 
     @Test

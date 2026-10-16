@@ -11,6 +11,8 @@ import com.EEIT25.unicloth.entity.OrderItem;
 import com.EEIT25.unicloth.entity.Product;
 import com.EEIT25.unicloth.entity.ProductVariant;
 import com.EEIT25.unicloth.enums.CouponType;
+import com.EEIT25.unicloth.enums.OrderStatus;
+import com.EEIT25.unicloth.enums.PaymentMethod;
 import com.EEIT25.unicloth.enums.ProductStatus;
 import com.EEIT25.unicloth.exception.ApiException;
 import com.EEIT25.unicloth.repository.CartItemRepository;
@@ -123,9 +125,14 @@ public class CheckoutService {
         } while (orderRepository.existsByOrderNo(orderNo));
 
         // 8. 存訂單主檔
+        //    貨到付款直接進入「訂單確認中」；信用卡 / ATM 要等綠界通知付款成功，先是「未付款」
+        OrderStatus status = request.paymentMethod() == PaymentMethod.COD
+                ? OrderStatus.PENDING
+                : OrderStatus.UNPAID;
         Order order = orderRepository.save(Order.builder()
                 .orderNo(orderNo)
                 .member(member)
+                .status(status)
                 .receiverName(request.receiverName())
                 .receiverPhone(request.receiverPhone())
                 .receiverEmail(request.receiverEmail())

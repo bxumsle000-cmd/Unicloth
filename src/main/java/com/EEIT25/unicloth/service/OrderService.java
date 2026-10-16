@@ -60,11 +60,11 @@ public class OrderService {
             return;
         }
 
-        // 3. 只有「還沒付款、還沒出貨」的訂單可以取消
+        // 3. 只有「未付款」的訂單可以取消
         if (order.getPaidAt() != null) {
             throw ApiException.conflict("此訂單已付款，不能直接取消");
         }
-        if (order.getStatus() != OrderStatus.PENDING) {
+        if (order.getStatus() != OrderStatus.UNPAID) {
             throw ApiException.conflict("目前訂單狀態無法取消");
         }
 

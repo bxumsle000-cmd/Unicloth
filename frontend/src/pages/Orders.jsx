@@ -4,6 +4,7 @@ import { api, toast, money, imgSrc, fmtDate } from "../js/kinu.js";
 
 // 後端回的訂單狀態（OrderStatus）→ 中文
 const ORDER_STATUS_LABELS = {
+    UNPAID: "未付款",
     PENDING: "訂單確認中",
     SHIPPED: "已出貨",
     DELIVERED: "已送達",

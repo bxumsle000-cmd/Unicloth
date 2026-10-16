@@ -224,7 +224,7 @@ public class EcpayCallbackService {
             // 信用卡付款失敗：訂單還在待付款才取消，並還原庫存與折價券
             // （已付款、已取消或已出貨的訂單不動，避免誤取消）
             if (payment.getStatus() == PaymentStatus.PENDING
-                    && order.getStatus() == OrderStatus.PENDING
+                    && order.getStatus() == OrderStatus.UNPAID
                     && order.getPaidAt() == null) {
 
                 orderService.cancelOrder(order.getId());
@@ -323,8 +323,9 @@ public class EcpayCallbackService {
         payment.setEcpayTradeNo(ecpayTradeNo);
         payment.setPaidAt(paidAt);
 
-        // 23. 更新訂單付款時間
+        // 23. 更新訂單付款時間，狀態從「未付款」進入「訂單確認中」
         order.setPaidAt(paidAt);
+        order.setStatus(OrderStatus.PENDING);
 
         // 24. JPA 會在交易提交時儲存修改
         log.info(

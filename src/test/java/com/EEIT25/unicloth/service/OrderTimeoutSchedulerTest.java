@@ -65,7 +65,7 @@ class OrderTimeoutSchedulerTest {
                 .orElseThrow(() -> new IllegalStateException("資料庫沒有可結帳的商品，無法測試"));
     }
 
-    /** 結帳買 1 件，回傳訂單 id */
+    /** 結帳買 1 件，回傳訂單 id（信用卡 / ATM 建立後是 UNPAID，貨到付款是 PENDING） */
     private Long checkout(PaymentMethod paymentMethod) {
         Long cartItemId = cartItemRepository.save(CartItem.builder()
                 .member(member).variant(variant).qty(1).build()).getId();
@@ -109,7 +109,7 @@ class OrderTimeoutSchedulerTest {
 
         orderTimeoutScheduler.cancelExpiredOrders();
 
-        assertEquals(OrderStatus.PENDING, statusOf(orderId));
+        assertEquals(OrderStatus.UNPAID, statusOf(orderId));
     }
 
     @Test
@@ -119,7 +119,7 @@ class OrderTimeoutSchedulerTest {
 
         orderTimeoutScheduler.cancelExpiredOrders();
 
-        assertEquals(OrderStatus.PENDING, statusOf(orderId));
+        assertEquals(OrderStatus.UNPAID, statusOf(orderId));
     }
 
     @Test

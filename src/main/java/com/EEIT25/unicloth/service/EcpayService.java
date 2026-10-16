@@ -115,8 +115,8 @@ public class EcpayService {
             throw ApiException.conflict("此訂單已經付款完成");
         }
 
-        // 6. 確認訂單狀態
-        if (order.getStatus() != OrderStatus.PENDING) {
+        // 6. 確認訂單狀態：只有「未付款」的訂單可以付款
+        if (order.getStatus() != OrderStatus.UNPAID) {
             throw ApiException.conflict("目前訂單狀態無法付款");
         }
 
