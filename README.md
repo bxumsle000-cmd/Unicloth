@@ -13,6 +13,12 @@ docker compose down -v
 docker compose up -d
 ```
 
+> `docker compose up -d` 會啟動兩個容器：
+> - `unicloth-db`：SQL Server 資料庫
+> - `unicloth-tunnel`：綠界付款通知用的對外 HTTPS 網址（不用另外安裝 cloudflared，詳見 [README-ECPAY.md](README-ECPAY.md)）
+>
+> ⚠️ `docker compose down -v` 會**清空整個資料庫**，只有第一次或想整組重來時才用。
+
 ```bash
 # Windows PowerShell / cmd
 .\mvnw.cmd spring-boot:run
@@ -92,3 +98,25 @@ http://localhost:5173/
 - 伺服器名稱中間是 **逗號** `,` 不是冒號 `:`（SSMS 的寫法）。
 - 連線後展開「資料庫」→ `Unicloth` → 「資料表」，就能看到 `categories`、`products`、`members`、`orders` 等表。
 - 這組帳密同時寫在 `application.properties`。
+
+## 4. 綠界付款測試
+
+> 前提：**Docker、Spring Boot、React 前端都要先跑起來**（照上面的步驟）。
+> 只是逛網站、加購物車、貨到付款的話，不需要這一段。
+
+要測信用卡 / ATM 付款，**另外開一個終端機**，在專案資料夾執行：
+
+```bash
+node ecpay-callback-proxy.cjs
+```
+
+看到「綠界付款通知專用入口已啟動」就成功了，**這個視窗不要關**。
+沒開的話，綠界那邊可以付款，但資料庫收不到付款結果，訂單會一直是「未付款」，30 分鐘後被自動取消。
+
+注意事項：
+
+- **不用設定 `ECPAY_RETURN_URL`**，後端會自動抓 `unicloth-tunnel` 目前的網址。
+- 綠界頁面上的橘色「測試付款請點此」會開新分頁，在新分頁按「交易成功」，**原本的綠界頁面不要關**。
+- 付款成功後，`payments.status` 會變成 `PAID`、`orders.paid_at` 會有付款時間、訂單狀態從「未付款」變成「訂單確認中」。
+
+完整步驟、訂單狀態說明、常見問題請看 [README-ECPAY.md](README-ECPAY.md)。
