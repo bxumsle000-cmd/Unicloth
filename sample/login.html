@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>KINU 後台登入</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- 跟前台 frontend/index.html 用同一套色票和字型 -->
+    <style type="text/tailwindcss">
+        @theme {
+            --color-paper: #F6F5F2;
+            --color-cream: #F0EBE3;
+            --color-stone: #D9CFC7;
+            --color-muted: #76716c;
+            --color-line: #dfd9d2;
+            --font-kinu: 'DM Sans', 'Noto Sans TC', sans-serif;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-paper font-kinu text-[#111]">
+
+<div class="flex min-h-screen items-center justify-center px-4 py-12">
+    <div class="w-full max-w-[420px] border border-line bg-white px-8 py-10 max-[480px]:px-5">
+
+        <div class="mb-2 text-center text-[10px] tracking-[.22em] text-muted">KINU ADMIN</div>
+        <h1 class="mb-8 text-center text-[26px] font-medium tracking-[.08em]">員工登入</h1>
+
+        <!-- 部門分頁：按鈕由下面的 JS 依照 DEPARTMENTS 產生 -->
+        <div class="mb-2 text-[11px] tracking-[.12em] text-muted">選擇部門</div>
+        <div id="deptTabs" class="mb-6 grid grid-cols-3 gap-2"></div>
+
+        <form id="loginForm" class="flex flex-col gap-4" novalidate>
+            <label class="flex flex-col gap-1.5">
+                <span class="text-[11px] tracking-[.12em] text-muted">帳號</span>
+                <input id="account" type="text" autocomplete="username"
+                       class="border border-line bg-paper px-3 py-2.5 text-[14px] outline-none focus:border-black">
+            </label>
+            <label class="flex flex-col gap-1.5">
+                <span class="text-[11px] tracking-[.12em] text-muted">密碼</span>
+                <input id="password" type="password" autocomplete="current-password"
+                       class="border border-line bg-paper px-3 py-2.5 text-[14px] outline-none focus:border-black">
+            </label>
+
+            <!-- 錯誤 / 成功訊息，平常隱藏 -->
+            <p id="message" class="hidden text-[12px] tracking-[.04em]"></p>
+
+            <button type="submit"
+                    class="mt-2 border border-black bg-black px-4 py-3 text-[12px] tracking-[.12em] text-white transition-opacity hover:opacity-80">
+                登入
+            </button>
+        </form>
+
+        <!-- 開發用：測試帳號提示，接上後端後要拿掉 -->
+        <div class="mt-8 border-t border-line pt-4 text-[11px] leading-6 tracking-[.04em] text-muted">
+            測試帳號（密碼都是 1234）：<br>
+            product01（商品部）、order01（訂單物流）、cs01（客服）<br>
+            mkt01（行銷）、sys01（系統管理）、multi01（商品部＋行銷）
+        </div>
+    </div>
+</div>
+
+<script>
+    // 五個部門：key 是程式用的代號，name 是畫面上顯示的名字
+    const DEPARTMENTS = [
+        { key: 'product', name: '商品部' },
+        { key: 'order',   name: '訂單物流' },
+        { key: 'cs',      name: '客服' },
+        { key: 'mkt',     name: '行銷' },
+        { key: 'sys',     name: '系統管理' },
+    ];
+
+    // 假資料：之後換成呼叫後端登入 API
+    const FAKE_ACCOUNTS = [
+        { account: 'product01', password: '1234', departments: ['product'] },
+        { account: 'order01',   password: '1234', departments: ['order'] },
+        { account: 'cs01',      password: '1234', departments: ['cs'] },
+        { account: 'mkt01',     password: '1234', departments: ['mkt'] },
+        { account: 'sys01',     password: '1234', departments: ['sys'] },
+        { account: 'multi01',   password: '1234', departments: ['product', 'mkt'] },
+    ];
+
+    const tabsEl = document.getElementById('deptTabs');
+    const messageEl = document.getElementById('message');
+
+    // 記住上次選的部門；瀏覽器不給用 localStorage 時就預設第一個
+    let selectedDept = DEPARTMENTS[0].key;
+    try {
+        const saved = localStorage.getItem('adminLastDept');
+        if (DEPARTMENTS.some(d => d.key === saved)) selectedDept = saved;
+    } catch (e) {}
+
+    // 畫出部門按鈕，被選到的那個是黑底白字
+    function renderTabs() {
+        tabsEl.innerHTML = '';
+        DEPARTMENTS.forEach(dept => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.textContent = dept.name;
+            const active = dept.key === selectedDept;
+            btn.className = 'border px-2 py-2 text-[12px] tracking-[.08em] transition-colors '
+                + (active ? 'border-black bg-black text-white' : 'border-line bg-white text-[#111] hover:border-black');
+            btn.addEventListener('click', () => {
+                selectedDept = dept.key;
+                hideMessage();
+                renderTabs();
+            });
+            tabsEl.appendChild(btn);
+        });
+    }
+
+    function showMessage(text, isError) {
+        messageEl.textContent = text;
+        messageEl.className = 'text-[12px] tracking-[.04em] ' + (isError ? 'text-[#b0413e]' : 'text-[#2f6b3a]');
+    }
+
+    function hideMessage() {
+        messageEl.className = 'hidden';
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', event => {
+        event.preventDefault(); // 不要讓表單真的送出、重新整理頁面
+
+        const account = document.getElementById('account').value.trim();
+        const password = document.getElementById('password').value;
+        const deptName = DEPARTMENTS.find(d => d.key === selectedDept).name;
+
+        if (!account || !password) {
+            showMessage('請輸入帳號和密碼', true);
+            return;
+        }
+
+        const user = FAKE_ACCOUNTS.find(u => u.account === account && u.password === password);
+        if (!user) {
+            showMessage('帳號或密碼錯誤', true);
+            return;
+        }
+        // 密碼對，但不屬於選的部門：講清楚，避免員工以為是密碼打錯
+        if (!user.departments.includes(selectedDept)) {
+            showMessage('此帳號不屬於「' + deptName + '」，請改選其他部門', true);
+            return;
+        }
+
+        try {
+            localStorage.setItem('adminLastDept', selectedDept);
+            sessionStorage.setItem('adminUser', account); // 讓下一頁知道是誰登入
+        } catch (e) {}
+
+        // 各部門的首頁；還沒做的部門先顯示訊息
+        const DEPT_PAGES = { sys: 'sys.html', product: 'product.html', order: 'order.html' };
+        if (DEPT_PAGES[selectedDept]) {
+            window.location.href = DEPT_PAGES[selectedDept];
+            return;
+        }
+        showMessage('登入成功，將進入「' + deptName + '」首頁（尚未製作）', false);
+    });
+
+    renderTabs();
+</script>
+</body>
+</html>

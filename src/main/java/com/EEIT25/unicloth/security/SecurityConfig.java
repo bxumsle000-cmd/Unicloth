@@ -13,6 +13,7 @@ import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
@@ -30,6 +31,7 @@ import java.nio.charset.StandardCharsets;
  *   <li>每個請求先經過 {@link JwtAuthFilter}，有帶有效 token 就標記身分</li>
  *   <li>看商品、看分類、登入（含 Google 登入）、註冊不用登入；其餘 /api/** 一律要登入</li>
  *   <li>登入了但還沒補填個人資料：只能查自己的資料、補填資料，其他 /api/** 回 403</li>
+ *   <li>/api/admin/** 只有員工 token 能用（員工登入除外），/api/admin/部門/** 還要屬於該部門（ADMIN 管理者例外，所有部門都能進）；員工 token 也不能用會員的 API</li>
  *   <li>/api 以外（圖片、影片、Swagger、/error）都放行</li>
  *   <li>未登入打到要登入的 API → 401、沒補填資料 → 403，body 跟其他錯誤一樣是 ErrorResponse 格式的 JSON</li>
  * </ul>
@@ -45,6 +47,7 @@ public class SecurityConfig {
     /** 跟 GlobalExceptionHandler 回的格式一樣，前端 kinu.js 會讀 message 顯示 */
     private static final String UNAUTHORIZED_BODY = "{\"code\":401,\"message\":\"尚未登入或登入已失效\"}";
     private static final String PROFILE_REQUIRED_BODY = "{\"code\":403,\"message\":\"請先填寫會員資料\"}";
+    private static final String FORBIDDEN_BODY = "{\"code\":403,\"message\":\"沒有權限使用這個功能\"}";
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -58,25 +61,37 @@ public class SecurityConfig {
                 .formLogin(form -> form.disable())
                 .httpBasic(basic -> basic.disable())
 
-                // 沒登入 → 401；登入了但授權規則不通過（目前只有「沒補填資料」這種情況）→ 403
+                // 沒登入 → 401；登入了但授權規則不通過（會員沒補填資料、身分不對）→ 403
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(unauthorizedEntryPoint())
-                        .accessDeniedHandler(profileRequiredHandler()))
+                        .accessDeniedHandler(accessDeniedHandler()))
 
                 // 授權規則：由上往下比對，第一條符合的生效，所以「放行」要寫在「要登入」前面
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST,
                                 "/api/auth/login", "/api/auth/firebase", "/api/auth/register", "/api/auth/logout").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/admin/auth/login").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/products/**", "/api/categories/**").permitAll()
 
                         // 綠界付款結果通知：不需要會員 JWT
                         .requestMatchers(HttpMethod.POST,
                                 "/api/payments/ecpay/notify").permitAll()
 
+                        // 後台：每個部門的 API 只有該部門的員工能用；ADMIN（管理者）可以進所有部門
+                        .requestMatchers("/api/admin/product/**").hasAnyRole("PRODUCT", "ADMIN")
+                        .requestMatchers("/api/admin/order/**").hasAnyRole("ORDER", "ADMIN")
+                        .requestMatchers("/api/admin/cs/**").hasAnyRole("CS", "ADMIN")
+                        .requestMatchers("/api/admin/mkt/**").hasAnyRole("MKT", "ADMIN")
+                        .requestMatchers("/api/admin/admin/**").hasRole("ADMIN")
+                        // 其他後台 API（不分部門的）：只要是員工就能用
+                        // 這些都要寫在 /api/** 前面，不然會先被下面的會員規則攔走
+                        .requestMatchers("/api/admin/**").hasRole("STAFF")
+
                         // 還沒補填資料也要能用：查自己的資料（前端靠它判斷要不要導去補填頁）、補填資料
-                        .requestMatchers(HttpMethod.GET, "/api/member/me").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/api/member/me/complete-profile").authenticated()
-                        // 新增的 API 只要放在 /api 底下，預設就是要登入「而且」補填過資料
+                        // 用 hasRole("MEMBER") 而不是 authenticated()：員工 token 也算「已登入」，但不能用會員功能
+                        .requestMatchers(HttpMethod.GET, "/api/member/me").hasRole("MEMBER")
+                        .requestMatchers(HttpMethod.PUT, "/api/member/me/complete-profile").hasRole("MEMBER")
+                        // 新增的 API 只要放在 /api 底下，預設就是要登入「而且」補填過資料（員工 token 在這裡也會被擋）
                         .requestMatchers("/api/**").access(profileCompleted())
                         // 圖片、影片、Swagger、/error 等
                         .anyRequest().permitAll()
@@ -104,13 +119,23 @@ public class SecurityConfig {
         };
     }
 
-    /** 登入了但還沒補填資料時的回應：403 + JSON */
-    private AccessDeniedHandler profileRequiredHandler() {
+    /**
+     * 登入了但授權規則不通過時的回應：403 + JSON。分兩種情況：
+     * <ul>
+     *   <li>會員打會員 API 被擋 → 只可能是還沒補填資料</li>
+     *   <li>其他（會員打後台、員工打會員 API）→ 沒有權限</li>
+     * </ul>
+     */
+    private AccessDeniedHandler accessDeniedHandler() {
         return (request, response, accessDeniedException) -> {
+            var auth = SecurityContextHolder.getContext().getAuthentication();
+            boolean memberOnMemberApi = auth != null && auth.getPrincipal() instanceof Long
+                    && !request.getRequestURI().startsWith("/api/admin/");
+
             response.setStatus(403);
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-            response.getWriter().write(PROFILE_REQUIRED_BODY);
+            response.getWriter().write(memberOnMemberApi ? PROFILE_REQUIRED_BODY : FORBIDDEN_BODY);
         };
     }
 

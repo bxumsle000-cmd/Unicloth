@@ -23,7 +23,8 @@ import java.util.List;
  * <ol>
  *   <li>讀 {@code Authorization: Bearer <token>}</li>
  *   <li>沒帶、格式不對、驗證失敗（過期、被竄改）→ 什麼都不做，直接放行</li>
- *   <li>驗證成功 → 把會員 id 放進 SecurityContext，之後 {@link CurrentMember} 就能取得</li>
+ *   <li>驗證成功、是會員 token → 把會員 id 放進 SecurityContext，之後 {@link CurrentMember} 就能取得</li>
+ *   <li>驗證成功、是員工 token → 放 {@link StaffPrincipal}，之後 {@link CurrentStaff} 就能取得</li>
  * </ol>
  * 這個 Filter 本身<b>從不</b>回 401，它只負責「辨識身分」；「要不要擋」交給 {@link SecurityConfig} 的授權規則，
  * 這樣看商品這些不用登入的 API 才能正常放行。
@@ -46,8 +47,16 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         if (token != null) {
             try {
-                Long memberId = jwtService.parseMemberId(token);
-                setAuthenticated(memberId, request);
+                JwtService.ParsedToken parsed = jwtService.parse(token);
+                if (parsed.staff()) {
+                    // ROLE_STAFF：能進後台；ROLE_部門（例如 ROLE_PRODUCT）：能用該部門的 API
+                    setAuthenticated(new StaffPrincipal(parsed.id(), parsed.department()),
+                            List.of(new SimpleGrantedAuthority("ROLE_STAFF"),
+                                    new SimpleGrantedAuthority("ROLE_" + parsed.department().name())),
+                            request);
+                } else {
+                    setAuthenticated(parsed.id(), List.of(new SimpleGrantedAuthority("ROLE_MEMBER")), request);
+                }
             } catch (JwtException e) {
                 // token 無效：不放身分進 SecurityContext，受保護的 API 會因為「未登入」回 401
                 log.debug("JWT 驗證失敗：{}", e.getMessage());
@@ -56,6 +65,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
+
+    // ========================================================================
+    // 小工具：只給上面的 doFilterInternal 用
+    // ========================================================================
 
     /** 從 Authorization header 取出 token；沒帶或不是 Bearer 格式回 null */
     private String extractToken(HttpServletRequest request) {
@@ -66,11 +79,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         return header.substring(BEARER_PREFIX.length()).trim();
     }
 
-    /** 把已驗證的會員 id 放進 SecurityContext（principal 就是會員 id） */
-    private void setAuthenticated(Long memberId, HttpServletRequest request) {
-        // credentials 用不到給 null；目前沒有角色區分，先固定給 ROLE_MEMBER
+    /**
+     * 把已驗證的身分放進 SecurityContext
+     *
+     * @param principal 會員是會員 id（Long）；員工是 {@link StaffPrincipal}
+     */
+    private void setAuthenticated(Object principal, List<SimpleGrantedAuthority> authorityList, HttpServletRequest request) {
+        // credentials 用不到給 null
         UsernamePasswordAuthenticationToken auth = UsernamePasswordAuthenticationToken.authenticated(
-                memberId, null, List.of(new SimpleGrantedAuthority("ROLE_MEMBER")));
+                principal, null, authorityList);
         auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
         // 官方建議：先建一個空的 context 再整個 set 進去

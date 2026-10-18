@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>KINU 後台｜系統管理</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- 跟前台 frontend/index.html 用同一套色票和字型 -->
+    <style type="text/tailwindcss">
+        @theme {
+            --color-paper: #F6F5F2;
+            --color-cream: #F0EBE3;
+            --color-stone: #D9CFC7;
+            --color-muted: #76716c;
+            --color-line: #dfd9d2;
+            --font-kinu: 'DM Sans', 'Noto Sans TC', sans-serif;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-paper font-kinu text-[#111]">
+
+<div class="flex min-h-screen max-[760px]:flex-col">
+
+    <!-- 左邊：側邊選單 -->
+    <aside class="w-[220px] shrink-0 border-r border-line bg-white max-[760px]:w-full max-[760px]:border-r-0 max-[760px]:border-b">
+        <div class="px-6 py-6 max-[760px]:py-4">
+            <div class="text-[10px] tracking-[.22em] text-muted">KINU ADMIN</div>
+            <div class="mt-1 text-[16px] font-medium tracking-[.08em]">系統管理</div>
+        </div>
+        <nav id="sideMenu" class="flex flex-col pb-6 max-[760px]:flex-row max-[760px]:pb-0"></nav>
+    </aside>
+
+    <!-- 右邊：頂部列 + 內容區 -->
+    <div class="flex min-w-0 flex-1 flex-col">
+        <header class="flex items-center justify-end gap-4 border-b border-line bg-white px-8 py-4 max-[760px]:px-4">
+            <span class="text-[12px] tracking-[.06em] text-muted">目前登入：<b id="currentUser" class="font-medium text-[#111]"></b></span>
+            <a href="login.html" class="border border-line px-3 py-1.5 text-[12px] tracking-[.08em] hover:border-black">登出</a>
+        </header>
+
+        <main class="flex-1 px-8 py-8 max-[760px]:px-4">
+
+            <!-- 頁面一：員工帳號 -->
+            <section id="page-staff">
+                <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
+                    <div>
+                        <div class="text-[10px] tracking-[.22em] text-muted">STAFF</div>
+                        <h1 class="text-[24px] font-medium tracking-[.08em]">員工帳號</h1>
+                    </div>
+                    <button id="addBtn" class="border border-black bg-black px-4 py-2.5 text-[12px] tracking-[.12em] text-white hover:opacity-80">
+                        ＋ 新增員工
+                    </button>
+                </div>
+
+                <!-- 篩選列 -->
+                <div class="mb-4 flex flex-wrap gap-3">
+                    <input id="keyword" type="text" placeholder="搜尋帳號或姓名"
+                           class="w-[220px] border border-line bg-white px-3 py-2 text-[13px] outline-none focus:border-black max-[760px]:w-full">
+                    <select id="deptFilter" class="border border-line bg-white px-3 py-2 text-[13px] outline-none focus:border-black">
+                        <option value="">全部部門</option>
+                    </select>
+                    <select id="statusFilter" class="border border-line bg-white px-3 py-2 text-[13px] outline-none focus:border-black">
+                        <option value="">全部狀態</option>
+                        <option value="ACTIVE">啟用中</option>
+                        <option value="DISABLED">已停用</option>
+                    </select>
+                </div>
+
+                <!-- 員工表格：寬度不夠時表格自己橫向捲動，不會撐破整頁 -->
+                <div class="overflow-x-auto border border-line bg-white">
+                    <table class="w-full min-w-[720px] text-left text-[13px]">
+                        <thead class="border-b border-line bg-cream text-[11px] tracking-[.1em] text-muted">
+                            <tr>
+                                <th class="px-4 py-3 font-medium">帳號</th>
+                                <th class="px-4 py-3 font-medium">姓名</th>
+                                <th class="px-4 py-3 font-medium">部門</th>
+                                <th class="px-4 py-3 font-medium">狀態</th>
+                                <th class="px-4 py-3 font-medium">最後登入</th>
+                                <th class="px-4 py-3 text-right font-medium">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="staffRows"></tbody>
+                    </table>
+                </div>
+                <p id="emptyHint" class="hidden py-10 text-center text-[13px] text-muted">沒有符合條件的員工</p>
+            </section>
+
+            <!-- 頁面二：部門權限一覽（只能看） -->
+            <section id="page-perm" class="hidden">
+                <div class="mb-6">
+                    <div class="text-[10px] tracking-[.22em] text-muted">PERMISSIONS</div>
+                    <h1 class="text-[24px] font-medium tracking-[.08em]">部門權限一覽</h1>
+                    <p class="mt-2 text-[12px] tracking-[.04em] text-muted">每個部門能看（view）和能改（edit）的功能。這張表目前寫死在程式裡，只能看不能改。</p>
+                </div>
+                <div class="overflow-x-auto border border-line bg-white">
+                    <table class="w-full min-w-[640px] text-left text-[13px]">
+                        <thead id="permHead" class="border-b border-line bg-cream text-[11px] tracking-[.1em] text-muted"></thead>
+                        <tbody id="permRows"></tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+</div>
+
+<!-- 新增／編輯員工的彈出視窗，平常隱藏 -->
+<div id="modal" class="fixed inset-0 z-40 hidden items-center justify-center bg-black/40 px-4">
+    <div class="w-full max-w-[440px] bg-white px-7 py-7">
+        <h2 id="modalTitle" class="mb-6 text-[18px] font-medium tracking-[.08em]"></h2>
+        <form id="staffForm" class="flex flex-col gap-4" novalidate>
+            <label class="flex flex-col gap-1.5">
+                <span class="text-[11px] tracking-[.12em] text-muted">帳號</span>
+                <input id="fAccount" type="text" class="border border-line bg-paper px-3 py-2.5 text-[14px] outline-none focus:border-black disabled:text-muted">
+            </label>
+            <label class="flex flex-col gap-1.5">
+                <span class="text-[11px] tracking-[.12em] text-muted">姓名</span>
+                <input id="fName" type="text" class="border border-line bg-paper px-3 py-2.5 text-[14px] outline-none focus:border-black">
+            </label>
+            <div class="flex flex-col gap-1.5">
+                <span class="text-[11px] tracking-[.12em] text-muted">部門（可複選）</span>
+                <div id="fDepts" class="grid grid-cols-3 gap-2"></div>
+            </div>
+            <p id="formError" class="hidden text-[12px] text-[#b0413e]"></p>
+            <div class="mt-2 flex justify-end gap-2">
+                <button type="button" id="cancelBtn" class="border border-line px-4 py-2.5 text-[12px] tracking-[.12em] hover:border-black">取消</button>
+                <button type="submit" class="border border-black bg-black px-4 py-2.5 text-[12px] tracking-[.12em] text-white hover:opacity-80">儲存</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 畫面下方的提示訊息 -->
+<div id="toast" class="pointer-events-none fixed bottom-8 left-1/2 z-50 -translate-x-1/2 bg-[#111] px-6 py-3 text-[13px] tracking-[.06em] text-white opacity-0 transition-opacity"></div>
+
+<script>
+    // ===== 設定 =====
+    const DEPARTMENTS = [
+        { key: 'product', name: '商品部' },
+        { key: 'order',   name: '訂單物流' },
+        { key: 'cs',      name: '客服' },
+        { key: 'mkt',     name: '行銷' },
+        { key: 'sys',     name: '系統管理' },
+    ];
+
+    // 部門 → 權限清單（跟之前討論的規劃一致）
+    const DEPT_PERMISSIONS = {
+        product: ['product:view', 'product:edit'],
+        order:   ['order:view', 'order:edit', 'payment:view'],
+        cs:      ['ticket:view', 'ticket:edit', 'member:view', 'member:edit', 'order:view'],
+        mkt:     ['coupon:view', 'coupon:edit', 'dashboard:view'],
+        sys:     ['staff:view', 'staff:edit'],
+    };
+
+    // 權限表要顯示的功能（列）
+    const FEATURES = [
+        { key: 'product',   name: '商品／分類／庫存' },
+        { key: 'order',     name: '訂單' },
+        { key: 'payment',   name: '付款紀錄' },
+        { key: 'ticket',    name: '客服單' },
+        { key: 'member',    name: '會員' },
+        { key: 'coupon',    name: '折價券' },
+        { key: 'dashboard', name: '數據儀表板' },
+        { key: 'staff',     name: '員工帳號' },
+    ];
+
+    const MENU = [
+        { key: 'staff', name: '員工帳號' },
+        { key: 'perm',  name: '部門權限一覽' },
+    ];
+
+    // ===== 假資料：之後換成呼叫後端 API =====
+    let staffList = [
+        { account: 'sys01',     name: '林雅婷', departments: ['sys'],            status: 'ACTIVE',   lastLogin: '2026-10-15 09:12' },
+        { account: 'sys02',     name: '黃志明', departments: ['sys'],            status: 'ACTIVE',   lastLogin: '2026-10-14 18:40' },
+        { account: 'product01', name: '陳怡君', departments: ['product'],        status: 'ACTIVE',   lastLogin: '2026-10-15 10:03' },
+        { account: 'order01',   name: '王建宏', departments: ['order'],          status: 'ACTIVE',   lastLogin: '2026-10-13 14:22' },
+        { account: 'cs01',      name: '張淑芬', departments: ['cs'],             status: 'ACTIVE',   lastLogin: '2026-10-15 08:55' },
+        { account: 'mkt01',     name: '李家豪', departments: ['mkt'],            status: 'ACTIVE',   lastLogin: '2026-10-12 11:30' },
+        { account: 'multi01',   name: '吳佩珊', departments: ['product', 'mkt'], status: 'ACTIVE',   lastLogin: '2026-10-14 16:08' },
+        { account: 'cs02',      name: '劉冠廷', departments: ['cs'],             status: 'DISABLED', lastLogin: '2026-08-30 17:45' },
+    ];
+
+    // 目前登入的人：從登入頁帶過來，直接打開這頁時預設 sys01
+    let me = 'sys01';
+    try { me = sessionStorage.getItem('adminUser') || 'sys01'; } catch (e) {}
+    document.getElementById('currentUser').textContent = me;
+
+    const deptName = key => DEPARTMENTS.find(d => d.key === key).name;
+
+    // ===== 側邊選單：切換頁面 =====
+    let currentPage = 'staff';
+
+    function renderMenu() {
+        const nav = document.getElementById('sideMenu');
+        nav.innerHTML = '';
+        MENU.forEach(item => {
+            const a = document.createElement('button');
+            a.type = 'button';
+            a.textContent = item.name;
+            const active = item.key === currentPage;
+            a.className = 'px-6 py-3 text-left text-[13px] tracking-[.08em] border-l-2 max-[760px]:border-l-0 max-[760px]:border-b-2 max-[760px]:px-4 '
+                + (active ? 'border-black bg-paper font-medium' : 'border-transparent text-muted hover:text-[#111]');
+            a.addEventListener('click', () => { currentPage = item.key; showPage(); });
+            nav.appendChild(a);
+        });
+    }
+
+    function showPage() {
+        document.getElementById('page-staff').classList.toggle('hidden', currentPage !== 'staff');
+        document.getElementById('page-perm').classList.toggle('hidden', currentPage !== 'perm');
+        renderMenu();
+    }
+
+    // ===== 員工表格 =====
+    function renderStaff() {
+        const keyword = document.getElementById('keyword').value.trim().toLowerCase();
+        const dept = document.getElementById('deptFilter').value;
+        const status = document.getElementById('statusFilter').value;
+
+        const rows = staffList.filter(s =>
+            (!keyword || s.account.toLowerCase().includes(keyword) || s.name.includes(keyword)) &&
+            (!dept || s.departments.includes(dept)) &&
+            (!status || s.status === status)
+        );
+
+        const tbody = document.getElementById('staffRows');
+        tbody.innerHTML = '';
+        rows.forEach(s => {
+            const isMe = s.account === me;
+            const tr = document.createElement('tr');
+            tr.className = 'border-b border-line last:border-b-0' + (s.status === 'DISABLED' ? ' text-muted' : '');
+            tr.innerHTML = `
+                <td class="px-4 py-3">${s.account}${isMe ? ' <span class="ml-1 text-[11px] text-muted">（你）</span>' : ''}</td>
+                <td class="px-4 py-3">${s.name}</td>
+                <td class="px-4 py-3">${s.departments.map(d => `<span class="mr-1 inline-block border border-line bg-paper px-2 py-0.5 text-[11px]">${deptName(d)}</span>`).join('')}</td>
+                <td class="px-4 py-3">${s.status === 'ACTIVE'
+                    ? '<span class="text-[#2f6b3a]">● 啟用中</span>'
+                    : '<span class="text-[#b0413e]">● 已停用</span>'}</td>
+                <td class="px-4 py-3 text-muted">${s.lastLogin}</td>
+                <td class="px-4 py-3 text-right whitespace-nowrap"></td>`;
+
+            // 操作按鈕：不能改自己的帳號（避免把自己加進其他部門拿到權限）
+            const actions = tr.lastElementChild;
+            if (isMe) {
+                actions.innerHTML = '<span class="text-[11px] text-muted">不能修改自己的帳號</span>';
+            } else {
+                actions.append(
+                    makeButton('編輯', () => openModal(s)),
+                    makeButton('重設密碼', () => toast(`已重設 ${s.account} 的密碼（假的，尚未接後端）`)),
+                    makeButton(s.status === 'ACTIVE' ? '停用' : '啟用', () => toggleStatus(s))
+                );
+            }
+            tbody.appendChild(tr);
+        });
+        document.getElementById('emptyHint').classList.toggle('hidden', rows.length > 0);
+    }
+
+    function makeButton(text, onClick) {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.textContent = text;
+        b.className = 'ml-2 border border-line px-2.5 py-1 text-[12px] hover:border-black';
+        b.addEventListener('click', onClick);
+        return b;
+    }
+
+    function toggleStatus(s) {
+        s.status = s.status === 'ACTIVE' ? 'DISABLED' : 'ACTIVE';
+        toast(`${s.account} 已${s.status === 'ACTIVE' ? '啟用' : '停用'}`);
+        renderStaff();
+    }
+
+    // ===== 新增／編輯視窗 =====
+    let editing = null; // null 表示新增，否則是正在編輯的那位員工
+
+    function openModal(staff) {
+        editing = staff;
+        document.getElementById('modalTitle').textContent = staff ? '編輯員工' : '新增員工';
+        const accountInput = document.getElementById('fAccount');
+        accountInput.value = staff ? staff.account : '';
+        accountInput.disabled = !!staff; // 帳號建立後不能改
+        document.getElementById('fName').value = staff ? staff.name : '';
+
+        const box = document.getElementById('fDepts');
+        box.innerHTML = '';
+        DEPARTMENTS.forEach(d => {
+            const checked = staff && staff.departments.includes(d.key);
+            box.insertAdjacentHTML('beforeend', `
+                <label class="flex cursor-pointer items-center gap-2 border border-line px-2 py-2 text-[12px] has-[:checked]:border-black">
+                    <input type="checkbox" value="${d.key}" ${checked ? 'checked' : ''} class="accent-black">${d.name}
+                </label>`);
+        });
+
+        document.getElementById('formError').classList.add('hidden');
+        const modal = document.getElementById('modal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+
+    function closeModal() {
+        const modal = document.getElementById('modal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+
+    function showFormError(text) {
+        const el = document.getElementById('formError');
+        el.textContent = text;
+        el.classList.remove('hidden');
+    }
+
+    document.getElementById('staffForm').addEventListener('submit', e => {
+        e.preventDefault();
+        const account = document.getElementById('fAccount').value.trim();
+        const name = document.getElementById('fName').value.trim();
+        const departments = [...document.querySelectorAll('#fDepts input:checked')].map(i => i.value);
+
+        if (!account || !name) return showFormError('請填寫帳號和姓名');
+        if (departments.length === 0) return showFormError('至少要選一個部門');
+
+        if (editing) {
+            editing.name = name;
+            editing.departments = departments;
+            toast(`已更新 ${account}`);
+        } else {
+            if (staffList.some(s => s.account === account)) return showFormError('這個帳號已經有人用了');
+            staffList.push({ account, name, departments, status: 'ACTIVE', lastLogin: '—' });
+            toast(`已新增 ${account}，預設密碼 1234（假的）`);
+        }
+        closeModal();
+        renderStaff();
+    });
+
+    document.getElementById('addBtn').addEventListener('click', () => openModal(null));
+    document.getElementById('cancelBtn').addEventListener('click', closeModal);
+    // 點視窗外面的灰色區域也能關閉
+    document.getElementById('modal').addEventListener('click', e => { if (e.target.id === 'modal') closeModal(); });
+
+    // ===== 權限一覽表 =====
+    function renderPermissions() {
+        document.getElementById('permHead').innerHTML =
+            '<tr><th class="px-4 py-3 font-medium">功能</th>'
+            + DEPARTMENTS.map(d => `<th class="px-4 py-3 text-center font-medium">${d.name}</th>`).join('')
+            + '</tr>';
+
+        document.getElementById('permRows').innerHTML = FEATURES.map(f => {
+            const cells = DEPARTMENTS.map(d => {
+                const perms = DEPT_PERMISSIONS[d.key];
+                if (perms.includes(f.key + ':edit')) return '<td class="px-4 py-3 text-center">可修改</td>';
+                if (perms.includes(f.key + ':view')) return '<td class="px-4 py-3 text-center text-muted">只能看</td>';
+                return '<td class="px-4 py-3 text-center text-stone">—</td>';
+            }).join('');
+            return `<tr class="border-b border-line last:border-b-0"><td class="px-4 py-3">${f.name}</td>${cells}</tr>`;
+        }).join('');
+    }
+
+    // ===== 提示訊息 =====
+    let toastTimer;
+    function toast(text) {
+        const el = document.getElementById('toast');
+        el.textContent = text;
+        el.classList.remove('opacity-0');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => el.classList.add('opacity-0'), 2200);
+    }
+
+    // ===== 初始化 =====
+    DEPARTMENTS.forEach(d => {
+        document.getElementById('deptFilter').insertAdjacentHTML('beforeend', `<option value="${d.key}">${d.name}</option>`);
+    });
+    ['keyword', 'deptFilter', 'statusFilter'].forEach(id => {
+        document.getElementById(id).addEventListener('input', renderStaff);
+    });
+
+    showPage();
+    renderStaff();
+    renderPermissions();
+</script>
+</body>
+</html>
