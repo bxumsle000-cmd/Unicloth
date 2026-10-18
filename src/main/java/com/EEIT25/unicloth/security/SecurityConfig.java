@@ -31,7 +31,7 @@ import java.nio.charset.StandardCharsets;
  *   <li>每個請求先經過 {@link JwtAuthFilter}，有帶有效 token 就標記身分</li>
  *   <li>看商品、看分類、登入（含 Google 登入）、註冊不用登入；其餘 /api/** 一律要登入</li>
  *   <li>登入了但還沒補填個人資料：只能查自己的資料、補填資料，其他 /api/** 回 403</li>
- *   <li>/api/admin/** 只有員工 token 能用（員工登入除外），/api/admin/部門/** 還要屬於該部門；員工 token 也不能用會員的 API</li>
+ *   <li>/api/admin/** 只有員工 token 能用（員工登入除外），/api/admin/部門/** 還要屬於該部門（ADMIN 管理者例外，所有部門都能進）；員工 token 也不能用會員的 API</li>
  *   <li>/api 以外（圖片、影片、Swagger、/error）都放行</li>
  *   <li>未登入打到要登入的 API → 401、沒補填資料 → 403，body 跟其他錯誤一樣是 ErrorResponse 格式的 JSON</li>
  * </ul>
@@ -77,12 +77,12 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST,
                                 "/api/payments/ecpay/notify").permitAll()
 
-                        // 後台：每個部門的 API 只有該部門的員工能用
-                        .requestMatchers("/api/admin/product/**").hasRole("PRODUCT")
-                        .requestMatchers("/api/admin/order/**").hasRole("ORDER")
-                        .requestMatchers("/api/admin/cs/**").hasRole("CS")
-                        .requestMatchers("/api/admin/mkt/**").hasRole("MKT")
-                        .requestMatchers("/api/admin/sys/**").hasRole("SYS")
+                        // 後台：每個部門的 API 只有該部門的員工能用；ADMIN（管理者）可以進所有部門
+                        .requestMatchers("/api/admin/product/**").hasAnyRole("PRODUCT", "ADMIN")
+                        .requestMatchers("/api/admin/order/**").hasAnyRole("ORDER", "ADMIN")
+                        .requestMatchers("/api/admin/cs/**").hasAnyRole("CS", "ADMIN")
+                        .requestMatchers("/api/admin/mkt/**").hasAnyRole("MKT", "ADMIN")
+                        .requestMatchers("/api/admin/admin/**").hasRole("ADMIN")
                         // 其他後台 API（不分部門的）：只要是員工就能用
                         // 這些都要寫在 /api/** 前面，不然會先被下面的會員規則攔走
                         .requestMatchers("/api/admin/**").hasRole("STAFF")

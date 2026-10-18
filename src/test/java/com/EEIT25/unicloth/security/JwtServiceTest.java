@@ -100,7 +100,7 @@ class JwtServiceTest {
     @Test
     void 員工token不能當會員token用() {
         JwtService jwt = service(60_000);
-        String token = jwt.generateStaffToken(5L, Department.SYS);
+        String token = jwt.generateStaffToken(5L, Department.ADMIN);
 
         assertThatThrownBy(() -> jwt.parseMemberId(token))
                 .isInstanceOf(JwtException.class);
@@ -110,7 +110,6 @@ class JwtServiceTest {
     void 員工token裡有不認識的部門_解析失敗() {
         String token = Jwts.builder()
                 .subject("5")
-                .claim("typ", "staff")
                 .claim("dept", "NOT_A_DEPT")
                 .signWith(Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8)))
                 .compact();

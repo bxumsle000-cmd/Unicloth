@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -67,6 +66,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+    // ========================================================================
+    // 小工具：只給上面的 doFilterInternal 用
+    // ========================================================================
+
     /** 從 Authorization header 取出 token；沒帶或不是 Bearer 格式回 null */
     private String extractToken(HttpServletRequest request) {
         String header = request.getHeader(HttpHeaders.AUTHORIZATION);
@@ -81,7 +84,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
      *
      * @param principal 會員是會員 id（Long）；員工是 {@link StaffPrincipal}
      */
-    private void setAuthenticated(Object principal, List<? extends GrantedAuthority> authorityList, HttpServletRequest request) {
+    private void setAuthenticated(Object principal, List<SimpleGrantedAuthority> authorityList, HttpServletRequest request) {
         // credentials 用不到給 null
         UsernamePasswordAuthenticationToken auth = UsernamePasswordAuthenticationToken.authenticated(
                 principal, null, authorityList);

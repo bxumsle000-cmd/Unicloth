@@ -69,6 +69,7 @@ class SecurityConfigTest {
         @PostMapping("/api/admin/auth/login") String adminLogin() { return "ok"; }
         @GetMapping("/api/admin/product/items") String adminProductItems() { return "product-items"; }
         @GetMapping("/api/admin/mkt/coupons") String adminMktCoupons() { return "mkt-coupons"; }
+        @GetMapping("/api/admin/admin/staff") String adminAdminStaff() { return "admin-staff"; }
         /** 回傳 CurrentStaff 認為的「現在是哪個員工」 */
         @GetMapping("/api/admin/whoami") Long adminWhoami() { return currentStaff.getCurrentId(); }
     }
@@ -104,6 +105,23 @@ class SecurityConfigTest {
     void 部門API_別的部門的員工_403沒有權限() throws Exception {
         // staffToken 是商品部，不能用行銷的 API
         mockMvc.perform(get("/api/admin/mkt/coupons").header("Authorization", "Bearer " + staffToken(3L)))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message").value("沒有權限使用這個功能"));
+    }
+
+    @Test
+    void 部門API_ADMIN員工_所有部門都能用() throws Exception {
+        String token = jwtService.generateStaffToken(5L, Department.ADMIN);
+
+        for (String path : new String[]{"/api/admin/product/items", "/api/admin/mkt/coupons", "/api/admin/admin/staff"}) {
+            mockMvc.perform(get(path).header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk());
+        }
+    }
+
+    @Test
+    void ADMIN的API_其他部門的員工_403沒有權限() throws Exception {
+        mockMvc.perform(get("/api/admin/admin/staff").header("Authorization", "Bearer " + staffToken(3L)))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.message").value("沒有權限使用這個功能"));
     }

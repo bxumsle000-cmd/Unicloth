@@ -17,7 +17,7 @@ public enum Department {
     ORDER("訂單物流"),
     CS("客服"),
     MKT("行銷"),
-    SYS("系統管理");
+    ADMIN("管理者");
 
     // 畫面上顯示的中文
     private final String label;
