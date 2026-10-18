@@ -53,7 +53,8 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 class CheckoutCouponConcurrencyTest {
 
-    @Autowired CheckoutService checkoutService;
+    @Autowired
+    CheckoutService checkoutService;
     @Autowired CartItemRepository cartItemRepository;
     @Autowired ProductVariantRepository productVariantRepository;
     @Autowired CouponRepository couponRepository;

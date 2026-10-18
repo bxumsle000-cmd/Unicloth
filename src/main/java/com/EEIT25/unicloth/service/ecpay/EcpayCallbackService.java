@@ -1,5 +1,5 @@
 
-package com.EEIT25.unicloth.service;
+package com.EEIT25.unicloth.service.ecpay;
 
 import com.EEIT25.unicloth.entity.Order;
 import com.EEIT25.unicloth.entity.Payment;
@@ -9,6 +9,7 @@ import com.EEIT25.unicloth.enums.PaymentStatus;
 import com.EEIT25.unicloth.repository.OrderRepository;
 import com.EEIT25.unicloth.repository.PaymentRepository;
 
+import com.EEIT25.unicloth.service.OrderService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
 

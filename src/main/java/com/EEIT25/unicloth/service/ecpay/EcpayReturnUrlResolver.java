@@ -1,4 +1,4 @@
-package com.EEIT25.unicloth.service;
+package com.EEIT25.unicloth.service.ecpay;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

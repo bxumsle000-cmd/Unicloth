@@ -3,7 +3,6 @@ package com.EEIT25.unicloth.service;
 import com.EEIT25.unicloth.dto.checkout.CheckoutRequest;
 import com.EEIT25.unicloth.entity.CartItem;
 import com.EEIT25.unicloth.entity.Member;
-import com.EEIT25.unicloth.entity.Order;
 import com.EEIT25.unicloth.entity.ProductVariant;
 import com.EEIT25.unicloth.enums.OrderStatus;
 import com.EEIT25.unicloth.enums.PaymentMethod;
@@ -37,8 +36,10 @@ import static org.mockito.Mockito.when;
 @Transactional
 class OrderTimeoutSchedulerTest {
 
-    @Autowired OrderTimeoutScheduler orderTimeoutScheduler;
-    @Autowired CheckoutService checkoutService;
+    @Autowired
+    OrderTimeoutScheduler orderTimeoutScheduler;
+    @Autowired
+    CheckoutService checkoutService;
     @Autowired OrderRepository orderRepository;
     @Autowired CartItemRepository cartItemRepository;
     @Autowired ProductVariantRepository productVariantRepository;

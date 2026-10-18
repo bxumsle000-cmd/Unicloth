@@ -31,7 +31,8 @@ class AuthServiceFirebaseLoginTest {
 
     private static final String ID_TOKEN = "fake-firebase-id-token";
 
-    @Autowired AuthService authService;
+    @Autowired
+    AuthService authService;
     @Autowired MemberRepository memberRepository;
     @Autowired JwtService jwtService;
 

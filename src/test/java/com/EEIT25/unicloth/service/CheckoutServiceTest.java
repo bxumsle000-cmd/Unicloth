@@ -47,7 +47,8 @@ import static org.mockito.Mockito.when;
 @Transactional
 class CheckoutServiceTest {
 
-    @Autowired CheckoutService checkoutService;
+    @Autowired
+    CheckoutService checkoutService;
     @Autowired OrderRepository orderRepository;
     @Autowired OrderItemRepository orderItemRepository;
     @Autowired CartItemRepository cartItemRepository;

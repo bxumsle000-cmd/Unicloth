@@ -31,7 +31,8 @@ import static org.mockito.Mockito.when;
 @Transactional
 class SupportTicketServiceTest {
 
-    @Autowired SupportTicketService supportTicketService;
+    @Autowired
+    SupportTicketService supportTicketService;
     @Autowired SupportTicketRepository supportTicketRepository;
     @Autowired MemberRepository memberRepository;
     @Autowired EntityManager em;

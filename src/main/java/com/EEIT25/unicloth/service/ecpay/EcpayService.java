@@ -1,5 +1,5 @@
 
-package com.EEIT25.unicloth.service;
+package com.EEIT25.unicloth.service.ecpay;
 
 import com.EEIT25.unicloth.entity.Member;
 import com.EEIT25.unicloth.entity.Order;

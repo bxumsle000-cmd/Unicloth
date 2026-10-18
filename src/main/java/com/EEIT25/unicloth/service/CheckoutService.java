@@ -10,7 +10,6 @@ import com.EEIT25.unicloth.entity.Order;
 import com.EEIT25.unicloth.entity.OrderItem;
 import com.EEIT25.unicloth.entity.Product;
 import com.EEIT25.unicloth.entity.ProductVariant;
-import com.EEIT25.unicloth.enums.CouponType;
 import com.EEIT25.unicloth.enums.OrderStatus;
 import com.EEIT25.unicloth.enums.PaymentMethod;
 import com.EEIT25.unicloth.enums.ProductStatus;

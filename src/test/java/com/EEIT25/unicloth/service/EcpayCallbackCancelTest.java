@@ -22,6 +22,8 @@ import com.EEIT25.unicloth.repository.OrderRepository;
 import com.EEIT25.unicloth.repository.PaymentRepository;
 import com.EEIT25.unicloth.repository.ProductVariantRepository;
 import com.EEIT25.unicloth.security.CurrentMember;
+import com.EEIT25.unicloth.service.ecpay.EcpayCallbackService;
+import com.EEIT25.unicloth.service.ecpay.EcpayService;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,9 +50,12 @@ import static org.mockito.Mockito.when;
 @Transactional
 class EcpayCallbackCancelTest {
 
-    @Autowired CheckoutService checkoutService;
-    @Autowired EcpayService ecpayService;
-    @Autowired EcpayCallbackService ecpayCallbackService;
+    @Autowired
+    CheckoutService checkoutService;
+    @Autowired
+    EcpayService ecpayService;
+    @Autowired
+    EcpayCallbackService ecpayCallbackService;
     @Autowired OrderRepository orderRepository;
     @Autowired PaymentRepository paymentRepository;
     @Autowired CartItemRepository cartItemRepository;

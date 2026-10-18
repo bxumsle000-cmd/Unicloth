@@ -1,6 +1,5 @@
 package com.EEIT25.unicloth.service;
 
-import com.EEIT25.unicloth.dto.order.OrderItemResponse;
 import com.EEIT25.unicloth.dto.order.OrderResponse;
 import com.EEIT25.unicloth.entity.Member;
 import com.EEIT25.unicloth.entity.MemberCoupon;

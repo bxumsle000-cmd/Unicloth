@@ -31,7 +31,8 @@ import static org.mockito.Mockito.when;
 @Transactional
 class WishlistServiceTest {
 
-    @Autowired WishlistService wishlistService;
+    @Autowired
+    WishlistService wishlistService;
     @Autowired WishlistItemRepository wishlistItemRepository;
     @Autowired ProductRepository productRepository;
     @Autowired MemberRepository memberRepository;

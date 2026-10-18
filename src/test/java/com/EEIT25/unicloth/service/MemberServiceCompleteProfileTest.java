@@ -29,7 +29,8 @@ import static org.mockito.Mockito.when;
 @Transactional
 class MemberServiceCompleteProfileTest {
 
-    @Autowired MemberService memberService;
+    @Autowired
+    MemberService memberService;
     @Autowired MemberRepository memberRepository;
     @Autowired MemberProfileRepository memberProfileRepository;
 

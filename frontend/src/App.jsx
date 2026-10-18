@@ -16,11 +16,16 @@ import CompleteProfile from "./pages/CompleteProfile.jsx";
 import ProfileGuard from "./component/ProfileGuard.jsx";
 import RequireLogin from "./component/RequireLogin.jsx";
 import { LanguageProvider } from "./js/LanguageProvider.jsx";
+import AdminLogin from "./pages/admin/AdminLogin.jsx";
+import ProductHome from "./pages/admin/ProductHome.jsx";
+import OrderHome from "./pages/admin/OrderHome.jsx";
+import CsHome from "./pages/admin/CsHome.jsx";
+import MktHome from "./pages/admin/MktHome.jsx";
+import AdminHome from "./pages/admin/AdminHome.jsx";
 
-function App(){
+// 前台：上面 Header、下面 Footer，中間依網址換頁
+function StoreLayout(){
     return (
-        <LanguageProvider>
-        <BrowserRouter>
         <div className="flex min-h-screen flex-col">
             <Header/>
             <main className="flex-1">
@@ -43,6 +48,34 @@ function App(){
             </main>
             <Footer/>
         </div>
+    )
+}
+
+// 後台：不套前台的 Header / Footer / ProfileGuard
+// 這裡的 path 是接在 /admin/ 後面的，例如 "login" 就是 /admin/login
+function AdminLayout(){
+    return (
+        <Routes>
+            <Route path="login" element={<AdminLogin/>}/>
+            {/* 各部門首頁：路徑跟後端 API 一樣用部門代號小寫（/api/admin/product/...） */}
+            <Route path="product" element={<ProductHome/>}/>
+            <Route path="order" element={<OrderHome/>}/>
+            <Route path="cs" element={<CsHome/>}/>
+            <Route path="mkt" element={<MktHome/>}/>
+            <Route path="admin" element={<AdminHome/>}/>
+        </Routes>
+    )
+}
+
+function App(){
+    return (
+        <LanguageProvider>
+        <BrowserRouter>
+        <Routes>
+            {/* /admin 開頭的網址交給 AdminLayout，其他都交給前台 StoreLayout */}
+            <Route path="/admin/*" element={<AdminLayout/>}/>
+            <Route path="*" element={<StoreLayout/>}/>
+        </Routes>
         </BrowserRouter>
         </LanguageProvider>
             )
