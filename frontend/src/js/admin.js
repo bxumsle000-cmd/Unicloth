@@ -13,25 +13,10 @@ export const DEPARTMENTS = [
     { key: 'ADMIN',   name: '管理者' },
 ];
 
-/** 部門首頁的網址，例如 PRODUCT → /admin/product */
-export function deptHomePath(deptKey) {
-    return '/admin/' + deptKey.toLowerCase();
-}
-
-const ADMIN_TOKEN_KEY = 'adminToken';
-const ADMIN_NAME_KEY = 'adminName';
-const ADMIN_DEPT_KEY = 'adminDept';
-
-/** 員工登入成功時存 token、姓名、部門（下一頁顯示「XXX 您好」、決定進哪個部門用） */
-export function setAdminSession({ token, name, department }) {
-    try {
-        localStorage.setItem(ADMIN_TOKEN_KEY, token);
-        localStorage.setItem(ADMIN_NAME_KEY, name);
-        localStorage.setItem(ADMIN_DEPT_KEY, department);
-    } catch {
-        // 不能存就只是重新整理後要再登入一次
-    }
-}
+// 員工登入資料存在 localStorage 的 key；AdminLogin.jsx 登入成功時存，下面的 function 讀、刪
+export const ADMIN_TOKEN_KEY = 'adminToken';
+export const ADMIN_NAME_KEY = 'adminName';
+export const ADMIN_DEPT_KEY = 'adminDept';
 
 /** 讀員工 token；沒登入、或瀏覽器不讓用 localStorage 時回 null */
 export function getAdminToken() {

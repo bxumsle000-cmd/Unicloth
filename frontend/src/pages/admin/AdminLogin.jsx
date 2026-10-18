@@ -1,67 +1,50 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { DEPARTMENTS, deptHomePath, setAdminSession } from "../../js/admin.js";
+import { ADMIN_DEPT_KEY, ADMIN_NAME_KEY, ADMIN_TOKEN_KEY, DEPARTMENTS } from "../../js/admin.js";
+import { api, toast } from "../../js/kinu.js";
 
-const LAST_DEPT_KEY = 'adminLastDept';
-
-// 記住上次選的部門；瀏覽器不給用 localStorage、或存的值不認得時就預設第一個
-function loadLastDept() {
-    try {
-        const saved = localStorage.getItem(LAST_DEPT_KEY);
-        if (DEPARTMENTS.some(dept => dept.key === saved)) return saved;
-    } catch {
-        // 不能讀就用預設
-    }
-    return DEPARTMENTS[0].key;
-}
+// 測試用員工帳號（資料來自 db/migration 的 V5、V8），密碼都是 Test1234；只在開發模式（npm run dev）顯示在畫面上
+const TEST_ACCOUNTS = { PRODUCT: 'product01', ORDER: 'order01', CS: 'cs01', MKT: 'mkt01', ADMIN: 'sys01' };
+const TEST_PASSWORD = 'Test1234';
 
 function AdminLogin() {
     const navigate = useNavigate();
-    const [selectedDept, setSelectedDept] = useState(loadLastDept);
-    const [account, setAccount] = useState('');
-    const [password, setPassword] = useState('');
-    // 錯誤 / 成功訊息；null 表示不顯示
-    const [message, setMessage] = useState(null);
+    // 每次進來都預設第一個部門
+    const [selectedDept, setSelectedDept] = useState(DEPARTMENTS[0].key);
     // 登入中先把按鈕鎖住，避免連按送出好幾次
     const [loading, setLoading] = useState(false);
-
-    function selectDept(deptKey) {
-        setSelectedDept(deptKey);
-        setMessage(null);
-    }
 
     async function handleSubmit(event) {
         event.preventDefault(); // 不要讓表單真的送出、重新整理頁面
 
-        const trimmedAccount = account.trim();
+        // 送出時才從表單讀帳號密碼，不用每打一個字就存進 state
+        const formData = new FormData(event.target);
+        const trimmedAccount = formData.get('account').trim();
+        const password = formData.get('password');
         if (!trimmedAccount || !password) {
-            setMessage({ text: '請輸入帳號和密碼', isError: true });
+            toast('請輸入帳號和密碼', true);
             return;
         }
 
         setLoading(true);
         try {
-            // 不用 kinu.js 的 api()：它會自動帶上會員的 token，後台登入不需要
-            const res = await fetch('/api/admin/auth/login', {
+            // 帳密錯、停用、部門不對，後端都會回 message，api() 會把它丟成 Error
+            const data = await api('/api/admin/auth/login', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ account: trimmedAccount, password, department: selectedDept }),
+                body: { account: trimmedAccount, password, department: selectedDept },
             });
-            const data = await res.json().catch(() => null);
-            if (!res.ok) {
-                // 帳密錯、停用、部門不對，後端都會回 message
-                throw new Error(data?.message || '連線發生問題（' + res.status + '），請稍後再試');
-            }
-
-            setAdminSession(data);
+            // 存 token、姓名、部門（下一頁顯示「XXX 您好」、決定進哪個部門用）
             try {
-                localStorage.setItem(LAST_DEPT_KEY, selectedDept);
+                localStorage.setItem(ADMIN_TOKEN_KEY, data.token);
+                localStorage.setItem(ADMIN_NAME_KEY, data.name);
+                localStorage.setItem(ADMIN_DEPT_KEY, data.department);
             } catch {
-                // 不能存就下次再選一次
+                // 不能存就只是重新整理後要再登入一次
             }
-            navigate(deptHomePath(data.department));
+            // 進該部門首頁，例如 PRODUCT → /admin/product
+            navigate('/admin/' + data.department.toLowerCase());
         } catch (e) {
-            setMessage({ text: e.message, isError: true });
+            toast(e.message, true);
             setLoading(false);
         }
     }
@@ -77,7 +60,7 @@ function AdminLogin() {
                     <div className="mb-2 text-[11px] tracking-[.12em] text-muted">選擇部門</div>
                     <div className="mb-6 grid grid-cols-3 gap-2">
                         {DEPARTMENTS.map(dept => (
-                            <button key={dept.key} type="button" onClick={() => selectDept(dept.key)}
+                            <button key={dept.key} type="button" onClick={() => setSelectedDept(dept.key)}
                                     className={'border px-2 py-2 text-[12px] tracking-[.08em] transition-colors '
                                         + (dept.key === selectedDept
                                             ? 'border-black bg-black text-white'
@@ -90,22 +73,14 @@ function AdminLogin() {
                     <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
                         <label className="flex flex-col gap-1.5">
                             <span className="text-[11px] tracking-[.12em] text-muted">帳號</span>
-                            <input type="text" autoComplete="username" value={account}
-                                   onChange={e => setAccount(e.target.value)}
+                            <input type="text" name="account" autoComplete="username"
                                    className="border border-line bg-paper px-3 py-2.5 text-[14px] outline-none focus:border-black"/>
                         </label>
                         <label className="flex flex-col gap-1.5">
                             <span className="text-[11px] tracking-[.12em] text-muted">密碼</span>
-                            <input type="password" autoComplete="current-password" value={password}
-                                   onChange={e => setPassword(e.target.value)}
+                            <input type="password" name="password" autoComplete="current-password"
                                    className="border border-line bg-paper px-3 py-2.5 text-[14px] outline-none focus:border-black"/>
                         </label>
-
-                        {message && (
-                            <p className={'text-[12px] tracking-[.04em] ' + (message.isError ? 'text-[#b0413e]' : 'text-[#2f6b3a]')}>
-                                {message.text}
-                            </p>
-                        )}
 
                         <button type="submit" disabled={loading}
                                 className="mt-2 border border-black bg-black px-4 py-3 text-[12px] tracking-[.12em] text-white
@@ -113,6 +88,17 @@ function AdminLogin() {
                             {loading ? '登入中…' : '登入'}
                         </button>
                     </form>
+
+                    {import.meta.env.DEV && (
+                        <div className="mt-8 border-t border-line pt-5 text-[11px] tracking-[.06em] text-muted">
+                            <div className="mb-2">測試帳號（密碼都是 {TEST_PASSWORD}，部門要選對）</div>
+                            <ul className="grid grid-cols-2 gap-x-4 gap-y-1">
+                                {DEPARTMENTS.map(dept => (
+                                    <li key={dept.key}>{dept.name}：{TEST_ACCOUNTS[dept.key]}</li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

@@ -56,13 +56,13 @@ function StoreLayout(){
 function AdminLayout(){
     return (
         <Routes>
-            <Route path="/admin/login" element={<AdminLogin/>}/>
+            <Route path="login" element={<AdminLogin/>}/>
             {/* 各部門首頁：路徑跟後端 API 一樣用部門代號小寫（/api/admin/product/...） */}
-            <Route path="/admin/product" element={<ProductHome/>}/>
-            <Route path="/admin/order" element={<OrderHome/>}/>
-            <Route path="/admin/cs" element={<CsHome/>}/>
-            <Route path="/admin/mkt" element={<MktHome/>}/>
-            <Route path="/admin/admin" element={<AdminHome/>}/>
+            <Route path="product" element={<ProductHome/>}/>
+            <Route path="order" element={<OrderHome/>}/>
+            <Route path="cs" element={<CsHome/>}/>
+            <Route path="mkt" element={<MktHome/>}/>
+            <Route path="admin" element={<AdminHome/>}/>
         </Routes>
     )
 }
@@ -73,7 +73,7 @@ function App(){
         <BrowserRouter>
         <Routes>
             {/* /admin 開頭的網址交給 AdminLayout，其他都交給前台 StoreLayout */}
-            <Route path="*" element={<AdminLayout/>}/>
+            <Route path="/admin/*" element={<AdminLayout/>}/>
             <Route path="*" element={<StoreLayout/>}/>
         </Routes>
         </BrowserRouter>
