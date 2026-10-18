@@ -10,7 +10,7 @@ import {
   SHIPPING_FEE,
   SHIPPING_OPTIONS,
   PAYMENT_OPTIONS,
-} from "../js/kinu.js";
+} from "../../js/kinu.js";
 
 const inputClass =
   "w-full border-b border-[#d6d0c7] bg-transparent py-2 text-[14px] tracking-[.04em] outline-none focus:border-black";

@@ -3,8 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { CiHeart } from "react-icons/ci";
 import { IoHeart } from "react-icons/io5";
 import { HiArrowLongRight } from "react-icons/hi2";
-import { api, getToken, toast, money, imgSrc, FREE_SHIPPING_THRESHOLD, SHIPPING_FEE } from "../js/kinu.js";
-import Accordion from "../component/product/Accordion.jsx";
+import { api, getToken, toast, money, imgSrc, FREE_SHIPPING_THRESHOLD, SHIPPING_FEE } from "../../js/kinu.js";
+import Accordion from "../../component/product/Accordion.jsx";
 
 function ProductDetail() {
     const slug = useParams().slug;

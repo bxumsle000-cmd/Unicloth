@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { CiHeart } from "react-icons/ci";
-import {api, toast} from "../js/kinu.js";
-import WishListCard from "../component/WishListCard.jsx";
+import {api, toast} from "../../js/kinu.js";
+import WishListCard from "../../component/WishListCard.jsx";
 
 function Wishlist(){
     const  [wishlist,setWishlist] = useState([])

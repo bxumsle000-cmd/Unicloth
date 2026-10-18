@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { api, toast, money, imgSrc, fmtDate } from "../js/kinu.js";
+import { api, toast, money, imgSrc, fmtDate } from "../../js/kinu.js";
 
 // 後端回的訂單狀態（OrderStatus）→ 中文
 const ORDER_STATUS_LABELS = {

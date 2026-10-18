@@ -1,5 +1,5 @@
 import { Link, Navigate, useLocation } from "react-router-dom";
-import { money, fmtDate } from "../js/kinu.js";
+import { money, fmtDate } from "../../js/kinu.js";
 
 /** 一列：左邊項目名，右邊內容 */
 function Row({ label, children }) {

@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { HiArrowLongRight } from "react-icons/hi2";
-import { api, toast, money, fmtDate, FREE_SHIPPING_THRESHOLD, SHIPPING_FEE } from "../js/kinu.js";
-import CartItem from "../component/CartItem.jsx";
+import { api, toast, money, fmtDate, FREE_SHIPPING_THRESHOLD, SHIPPING_FEE } from "../../js/kinu.js";
+import CartItem from "../../component/CartItem.jsx";
 
 function Cart() {
     const [cartItemList, setCartItemList] = useState(null);

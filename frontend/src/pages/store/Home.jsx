@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useLanguage } from '../js/i18n.js';
+import { useLanguage } from '../../js/i18n.js';
 
 /** 主視覺輪播的三支影片 */
 const HERO_VIDEOS = ['/video/hero-01.mp4', '/video/hero-02.mp4', '/video/hero-03.mp4'];

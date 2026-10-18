@@ -1,18 +1,18 @@
 import Header from "./component/layout/Header.jsx";
 import Footer from "./component/layout/Footer.jsx";
-import Home from "./pages/Home.jsx";
-import Category from "./pages/Category.jsx";
+import Home from "./pages/store/Home.jsx";
+import Category from "./pages/store/Category.jsx";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Wishlist from "./pages/Wishlist.jsx";
-import ProductDetail from "./pages/ProductDetail.jsx";
-import Coupons from "./pages/Coupons.jsx";
-import Cart from "./pages/Cart.jsx";
-import Checkout from "./pages/Checkout.jsx";
-import OrderComplete from "./pages/OrderComplete.jsx";
-import Search from "./pages/Search.jsx";
-import Orders from "./pages/Orders.jsx";
-import Login from "./pages/Login.jsx";
-import CompleteProfile from "./pages/CompleteProfile.jsx";
+import Wishlist from "./pages/store/Wishlist.jsx";
+import ProductDetail from "./pages/store/ProductDetail.jsx";
+import Coupons from "./pages/store/Coupons.jsx";
+import Cart from "./pages/store/Cart.jsx";
+import Checkout from "./pages/store/Checkout.jsx";
+import OrderComplete from "./pages/store/OrderComplete.jsx";
+import Search from "./pages/store/Search.jsx";
+import Orders from "./pages/store/Orders.jsx";
+import Login from "./pages/store/Login.jsx";
+import CompleteProfile from "./pages/store/CompleteProfile.jsx";
 import ProfileGuard from "./component/ProfileGuard.jsx";
 import RequireLogin from "./component/RequireLogin.jsx";
 import { LanguageProvider } from "./js/LanguageProvider.jsx";
@@ -56,13 +56,13 @@ function StoreLayout(){
 function AdminLayout(){
     return (
         <Routes>
-            <Route path="login" element={<AdminLogin/>}/>
+            <Route path="/admin/login" element={<AdminLogin/>}/>
             {/* 各部門首頁：路徑跟後端 API 一樣用部門代號小寫（/api/admin/product/...） */}
-            <Route path="product" element={<ProductHome/>}/>
-            <Route path="order" element={<OrderHome/>}/>
-            <Route path="cs" element={<CsHome/>}/>
-            <Route path="mkt" element={<MktHome/>}/>
-            <Route path="admin" element={<AdminHome/>}/>
+            <Route path="/admin/product" element={<ProductHome/>}/>
+            <Route path="/admin/order" element={<OrderHome/>}/>
+            <Route path="/admin/cs" element={<CsHome/>}/>
+            <Route path="/admin/mkt" element={<MktHome/>}/>
+            <Route path="/admin/admin" element={<AdminHome/>}/>
         </Routes>
     )
 }
@@ -73,7 +73,7 @@ function App(){
         <BrowserRouter>
         <Routes>
             {/* /admin 開頭的網址交給 AdminLayout，其他都交給前台 StoreLayout */}
-            <Route path="/admin/*" element={<AdminLayout/>}/>
+            <Route path="*" element={<AdminLayout/>}/>
             <Route path="*" element={<StoreLayout/>}/>
         </Routes>
         </BrowserRouter>

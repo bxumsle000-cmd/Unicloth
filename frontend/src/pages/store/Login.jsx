@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { api, setToken, toast } from "../js/kinu.js";
-import { firebaseReady, signInWithGoogle } from "../js/firebase.js";
+import { api, setToken, toast } from "../../js/kinu.js";
+import { firebaseReady, signInWithGoogle } from "../../js/firebase.js";
 
 function Login() {
     // 登入中先把按鈕鎖住，避免連按跳出好幾個視窗
