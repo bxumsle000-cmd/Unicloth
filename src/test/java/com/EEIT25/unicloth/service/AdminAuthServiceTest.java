@@ -100,6 +100,23 @@ class AdminAuthServiceTest {
     }
 
     @Test
+    void 管理者選其他部門_可以登入_回傳選的部門_token還是ADMIN() {
+        Staff admin01 = Staff.builder()
+                .id(1L)
+                .account("admin01")
+                .passwordHash(PASSWORD_HASH)
+                .name("管理者")
+                .department(Department.ADMIN)
+                .build();
+        when(staffRepository.findByAccount("admin01")).thenReturn(Optional.of(admin01));
+
+        StaffLoginResponse response = adminAuthService.login(new StaffLoginRequest("admin01", "Test1234", Department.PRODUCT));
+
+        assertThat(response.department()).isEqualTo(Department.PRODUCT);
+        assertThat(jwtService.parse(response.token()).department()).isEqualTo(Department.ADMIN);
+    }
+
+    @Test
     void 密碼錯又選錯部門_先回密碼錯誤_不透露部門資訊() {
         assertStatus(new StaffLoginRequest("product01", "wrong", Department.MKT),
                 HttpStatus.UNAUTHORIZED, "帳號或密碼錯誤");

@@ -36,8 +36,11 @@ public class StaffService {
     /** 員工列表：依篩選條件查詢並分頁，條件都沒帶就是全部員工 */
     @Transactional
     public Page<StaffResponse> getStaff(StaffFilterRequest filter, Pageable pageable){
+        // keyword 不能傳 null：Hibernate 第一次遇到 null 會把它 cast 成 varchar 並快取，之後中文關鍵字都查不到
+        // 空字串 LIKE '%%' 會比對到全部，效果跟不篩一樣
+        String keyword = filter.keyword() == null ? "" : filter.keyword().trim();
         Page<StaffResponse> staffPage = staffRepository.findByFilter(
-                filter.keyword(),filter.department(),filter.status(),pageable);
+                keyword,filter.department(),filter.status(),pageable);
 
         return staffPage;
     }
