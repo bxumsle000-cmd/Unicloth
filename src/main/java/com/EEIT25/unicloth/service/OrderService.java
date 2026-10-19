@@ -20,6 +20,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+/**
+ * 訂單相關服務<br>
+ * - {@link #getOrders()}：會員中心的「我的訂單」<br><br>
+ * - {@link #cancelOrder(Long)}：取消未付款的訂單，把庫存、折價券還回去
+ */
 @Service
 @RequiredArgsConstructor
 public class OrderService {
@@ -29,6 +34,7 @@ public class OrderService {
     private final PaymentRepository paymentRepository;
     private final CurrentMember currentMember;
 
+    /** 我的訂單：登入會員的所有訂單，最新的排前面，每張帶訂單明細 */
     @Transactional(readOnly = true)
     public List<OrderResponse> getOrders (){
         Member member = currentMember.require();

@@ -18,6 +18,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * 折價券相關服務<br>
+ * Coupon 是券的種類（例如 新會員 100 元折價券），MemberCoupon 是「某會員持有的一張」，有自己的到期時間和使用時間。<br>
+ * - {@link #getMyCoupons()}：會員中心的「我的折價券」<br><br>
+ * - {@link #getUsableCoupons(int)}：結帳時可選的券，順便算出每張這次能折多少<br><br>
+ * - {@link #grantTo(GrantCouponRequest)}：發一張券給指定會員
+ */
 @Service
 @RequiredArgsConstructor
 public class CouponService {
@@ -26,6 +33,7 @@ public class CouponService {
     private final CurrentMember currentMember;
     private final CouponRepository couponRepository;
 
+    /** 我的折價券：登入會員持有的所有券（含已使用、已過期），快到期的排前面 */
     @Transactional
     public List<CouponResponse> getMyCoupons(){
         Member member = currentMember.require();
@@ -33,6 +41,11 @@ public class CouponService {
                 .stream().map(memberCoupon -> CouponResponse.from(memberCoupon))
                 .toList();
     }
+
+    /**
+     * 結帳時可選的折價券：只留未使用、未過期的，快到期的排前面。<br>
+     * 沒達到最低消費的券也會回傳（前端顯示但不能選），每張都算好這次的小計能折多少。
+     */
     @Transactional
     public List<UsableCouponResponse>  getUsableCoupons(int subtotal){
         Member member = currentMember.require();
@@ -48,6 +61,10 @@ public class CouponService {
                 .toList();
     }
 
+    /**
+     * 發一張折價券給指定會員。<br>
+     * 停止發放（isActive = false）的券不能發；到期時間 = 現在 + 這種券的有效天數。
+     */
     @Transactional
     public void grantTo(GrantCouponRequest request){
         Member member = memberRepository.findById(request.memberId())

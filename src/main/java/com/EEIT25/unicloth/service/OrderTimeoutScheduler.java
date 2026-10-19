@@ -47,6 +47,10 @@ public class OrderTimeoutScheduler {
         cancelExpired(PaymentMethod.ATM, now.minusMinutes(atmTimeoutMinutes));
     }
 
+    /**
+     * 找出某種付款方式、在 createdBefore 之前建立、還沒付款的訂單，一張一張取消。<br>
+     * 取消的細節（還原庫存、折價券）在 {@link OrderService#cancelOrder(Long)}。
+     */
     private void cancelExpired(PaymentMethod paymentMethod, LocalDateTime createdBefore) {
         List<Order> expiredOrderList = orderRepository
                 .findByStatusAndPaidAtIsNullAndPaymentMethodAndCreatedAtBefore(

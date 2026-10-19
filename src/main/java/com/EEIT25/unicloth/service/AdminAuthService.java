@@ -17,7 +17,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 
 /**
- * 後台員工的認證服務（跟會員的 {@link AuthService} 分開）
+ * 後台員工的認證服務<br>
+ * 跟會員的 {@link AuthService} 分開，員工 token 裡多帶部門，後台路徑用部門擋權限。<br>
+ * - {@link #login(StaffLoginRequest)}：員工登入，發員工 JWT<br><br>
+ * - {@link #changePassword(ChangePasswordRequest)}：員工改自己的密碼
  */
 @Service
 @RequiredArgsConstructor
@@ -28,7 +31,7 @@ public class AdminAuthService {
     private final CurrentStaff currentStaff;
 
     /**
-     * 員工登入：檢查帳號密碼 → 帳號是否停用 → 是否屬於選的部門，通過後更新最後登入時間並發員工 JWT。
+     * 員工登入：檢查帳號密碼 → 帳號是否停用 → 是否屬於選的部門，通過後更新最後登入時間並發員工 JWT。<br>
      * 帳號或密碼錯都回同一句，不透露是哪個錯；密碼對了才說「不屬於這個部門」，避免員工以為是密碼打錯。
      */
     @Transactional
@@ -58,7 +61,7 @@ public class AdminAuthService {
 
     /**
      * 員工改自己的密碼（每個部門都能用）：舊密碼要對，新密碼不能跟舊的一樣。<br>
-     * 改誰的密碼一律從 {@link CurrentStaff} 拿，不讓前端傳帳號，不然就能改到別人的
+     * 改誰的密碼一律從 {@link CurrentStaff} 拿，不讓前端傳帳號，不然就能改到別人的。
      */
     @Transactional
     public void changePassword(ChangePasswordRequest request) {

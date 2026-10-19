@@ -7,6 +7,6 @@ import jakarta.validation.constraints.Size;
  * @param name 新的員工姓名；長度上限跟 staff.name 欄位一樣是 50
  */
 public record ChangeStaffNameRequest(
-        @NotBlank @Size(max = 50, message = "姓名最多 50 字") String name
+        @NotBlank String name
 ) {
 }

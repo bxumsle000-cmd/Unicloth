@@ -17,6 +17,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 
+/**
+ * 後台員工管理相關服務（給 ADMIN 用）<br>
+ * 帳號建立後不能改，改姓名、重設密碼、停用都用帳號指定員工；員工自己改密碼在 {@link AdminAuthService}。<br>
+ * - {@link #getStaff(StaffFilterRequest, Pageable)}：員工列表，可篩選關鍵字 / 部門 / 狀態，分頁<br><br>
+ * - {@link #createNewStaff(CreateNewStaffRequest)}：新增員工，回傳臨時密碼<br><br>
+ * - {@link #changeName(String, String)}：改員工姓名<br><br>
+ * - {@link #resetPassword(String)}：員工忘記密碼時重設，回傳臨時密碼<br><br>
+ * - {@link #disable(String)}：停用員工帳號
+ */
 @Service
 @RequiredArgsConstructor
 public class StaffService {
@@ -24,7 +33,7 @@ public class StaffService {
     private final CurrentStaff currentStaff;
     private final StaffRepository staffRepository;
 
-
+    /** 員工列表：依篩選條件查詢並分頁，條件都沒帶就是全部員工 */
     @Transactional
     public Page<StaffResponse> getStaff(StaffFilterRequest filter, Pageable pageable){
         Page<StaffResponse> staffPage = staffRepository.findByFilter(
@@ -33,7 +42,7 @@ public class StaffService {
         return staffPage;
     }
 
-    /** 改員工姓名 */
+    /** 改員工姓名，前後空白會先去掉 */
     @Transactional
     public void changeName(String account, String name) {
         Staff staff = findStaff(account);
@@ -41,8 +50,8 @@ public class StaffService {
     }
 
     /**
-     * 管理者幫員工重設密碼（員工忘記密碼時用）：產生一組亂數臨時密碼，DB 存 BCrypt 雜湊，
-     * 明碼只在這次回傳給管理者，之後就查不到了
+     * 管理者幫員工重設密碼（員工忘記密碼時用）：產生一組亂數臨時密碼，DB 存 BCrypt 雜湊。<br>
+     * 明碼只在這次回傳給管理者，之後就查不到了。
      */
     @Transactional
     public String resetPassword(String account) {
@@ -54,7 +63,7 @@ public class StaffService {
 
     /**
      * 停用員工帳號，停用後不能登入，舊 token 也會被 {@link CurrentStaff#require()} 擋下。<br>
-     * 不能停用自己；呼叫的人一定是還在用的 ADMIN，又不能停用自己，所以不會發生「ADMIN 全被停用」
+     * 不能停用自己；呼叫的人一定是還在用的 ADMIN，又不能停用自己，所以不會發生「ADMIN 全被停用」。
      */
     @Transactional
     public void disable(String account) {
@@ -65,6 +74,10 @@ public class StaffService {
         staff.setStatus(StaffStatus.DISABLED);
     }
 
+    /**
+     * 新增員工：帳號不能重複，狀態預設是 ACTIVE。<br>
+     * 密碼不用傳，跟 {@link #resetPassword(String)} 一樣由系統產生亂數臨時密碼，明碼只在這次回傳給管理者。
+     */
     @Transactional
     public String createNewStaff(CreateNewStaffRequest request){
         if(staffRepository.existsByAccount(request.account())){
@@ -84,12 +97,13 @@ public class StaffService {
         return tempPassword ;
     }
 
-
+    /** 用帳號找員工，找不到回 404 */
     private Staff findStaff(String account) {
         return staffRepository.findByAccount(account)
                 .orElseThrow(() -> ApiException.notFound("找不到此員工帳號"));
     }
 
+    /** 產生 10 碼亂數臨時密碼；字元表拿掉了容易看錯的 0/O、1/l/I */
     private String randomPassword() {
         String PASSWORD_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
         SecureRandom RANDOM = new SecureRandom();
