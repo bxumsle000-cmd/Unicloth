@@ -49,6 +49,7 @@ public class AdminAuthService {
                 staff.getId(),
                 jwtService.generateStaffToken(staff.getId(), staff.getDepartment()),
                 staff.getName(),
-                staff.getDepartment());
+                staff.getDepartment(),
+                staff.getAccount());
     }
 }

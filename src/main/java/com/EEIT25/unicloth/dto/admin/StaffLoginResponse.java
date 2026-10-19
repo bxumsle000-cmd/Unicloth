@@ -12,6 +12,7 @@ public record StaffLoginResponse(
         Long staffId,
         String token,
         String name,
-        Department department
+        Department department,
+        String account
 ) {
 }
