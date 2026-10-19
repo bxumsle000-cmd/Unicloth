@@ -7,6 +7,7 @@ import com.EEIT25.unicloth.enums.Department;
 import com.EEIT25.unicloth.enums.StaffStatus;
 import com.EEIT25.unicloth.exception.ApiException;
 import com.EEIT25.unicloth.repository.StaffRepository;
+import com.EEIT25.unicloth.security.CurrentStaff;
 import com.EEIT25.unicloth.security.JwtProperties;
 import com.EEIT25.unicloth.security.JwtService;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,7 +34,8 @@ class AdminAuthServiceTest {
 
     private final StaffRepository staffRepository = mock(StaffRepository.class);
     private final JwtService jwtService = new JwtService(new JwtProperties(SECRET, 60_000));
-    private final AdminAuthService adminAuthService = new AdminAuthService(staffRepository, PASSWORD_ENCODER, jwtService);
+    private final CurrentStaff currentStaff = mock(CurrentStaff.class);
+    private final AdminAuthService adminAuthService = new AdminAuthService(staffRepository, PASSWORD_ENCODER, jwtService, currentStaff);
 
     private Staff product01;
 
