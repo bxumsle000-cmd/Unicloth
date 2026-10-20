@@ -8,14 +8,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Optional;
 
-public interface ProductRepository
-        extends JpaRepository<Product, Long> {
-
+public interface ProductRepository extends JpaRepository<Product, Long> {
     boolean existsBySlug(String slug);
 
     /**
@@ -24,132 +21,68 @@ public interface ProductRepository
      */
     boolean existsBySlugEndingWith(String suffix);
 
-    /**
-     * 分類 id 在清單內、且狀態符合的商品。
-     */
-    Page<Product> findByCategoryIdInAndStatus(
-            Collection<Long> categoryIds,
-            ProductStatus status,
-            Pageable pageable
-    );
+    /** 分類 id 在清單內、且狀態符合的商品（分頁）*/
+    Page<Product> findByCategoryIdInAndStatus(Collection<Long> categoryIds, ProductStatus status, Pageable pageable);
 
     /**
-     * 分類商品與篩選。
+     * 分類商品 + 篩選（分頁）。每個條件都是「沒帶就不篩」：<br>
+     * - 價格：minPrice / maxPrice 是 null → (NULL IS NULL OR …) 永遠成立，等於沒這個條件<br>
+     * - 顏色 / 尺寸：清單不能寫 :colors IS NULL（Hibernate 會把清單展開），所以另外傳布林旗標：
+     *   allColors = true 表示不篩顏色；這時 colors 只是佔位值，不會被用到<br>
+     * - filterSku = false（顏色、尺寸都沒選）→ 整段 EXISTS 跳過<br>
+     * 顏色和尺寸放在同一個 EXISTS：選黑色 + M，要同一個 SKU 是黑色 M 號才算。
      */
     @Query("""
             SELECT p FROM Product p
-            WHERE p.category.id IN :categoryIds
-              AND p.status = :status
-              AND (
-                    :minPrice IS NULL
-                    OR p.price >= :minPrice
-              )
-              AND (
-                    :maxPrice IS NULL
-                    OR p.price <= :maxPrice
-              )
-              AND (
-                    :filterSku = false
-                    OR EXISTS (
-                        SELECT v.id
-                        FROM ProductVariant v
-                        WHERE v.product = p
-                          AND (
-                                :allColors = true
-                                OR v.color IN :colors
-                          )
-                          AND (
-                                :allSizes = true
-                                OR v.size IN :sizes
-                          )
-                    )
-              )
+            WHERE p.category.id IN :categoryIds AND p.status = :status
+              AND (:minPrice IS NULL OR p.price >= :minPrice)
+              AND (:maxPrice IS NULL OR p.price <= :maxPrice)
+              AND (:filterSku = false OR EXISTS (
+                    SELECT v.id FROM ProductVariant v
+                    WHERE v.product = p
+                      AND (:allColors = true OR v.color IN :colors)
+                      AND (:allSizes = true OR v.size IN :sizes)))
             """)
-    Page<Product> findByFilter(
-            Collection<Long> categoryIds,
-            ProductStatus status,
-            Integer minPrice,
-            Integer maxPrice,
-            boolean filterSku,
-            boolean allColors,
-            Collection<String> colors,
-            boolean allSizes,
-            Collection<String> sizes,
-            Pageable pageable
-    );
+    Page<Product> findByFilter(Collection<Long> categoryIds, ProductStatus status,
+                               Integer minPrice, Integer maxPrice,
+                               boolean filterSku,
+                               boolean allColors, Collection<String> colors,
+                               boolean allSizes, Collection<String> sizes,
+                               Pageable pageable);
 
-    /**
-     * 依 slug 查詢上架中的商品。
-     */
+    /** 上架中的商品（依 slug） */
     @Query("""
             SELECT p
             FROM Product p
             WHERE p.slug = :slug
-              AND p.status =
-                  com.EEIT25.unicloth.enums.ProductStatus.ON_SALE
+              AND p.status = com.EEIT25.unicloth.enums.ProductStatus.ON_SALE
             """)
-    Optional<Product> findOnSaleBySlug(
-            @Param("slug")
-            String slug
-    );
+    Optional<Product> findOnSaleBySlug(@Param("slug") String slug);
+
+    /** 狀態符合、名稱包含關鍵字的商品（分頁），不分大小寫；LIKE 的 % _ 由 Spring 自動跳脫 */
+    Page<Product> findByStatusAndNameContainingIgnoreCase(ProductStatus status, String name, Pageable pageable);
 
     /**
-     * 前台用商品名稱搜尋。
-     */
-    Page<Product> findByStatusAndNameContainingIgnoreCase(
-            ProductStatus status,
-            String name,
-            Pageable pageable
-    );
-
-    /**
-     * 後台商品列表。
-     *
-     * keyword 空白時查全部。
-     * status 是 null 時不限商品狀態。
+     * 後台商品列表。keyword 空白時查全部；status 是 null 時不限商品狀態。
      */
     @Query("""
             SELECT p
             FROM Product p
-            WHERE (
-                :keyword = ''
-                OR LOWER(p.name)
-                    LIKE LOWER(
-                        CONCAT('%', :keyword, '%')
-                    )
-                OR LOWER(p.slug)
-                    LIKE LOWER(
-                        CONCAT('%', :keyword, '%')
-                    )
-            )
-            AND (
-                :status IS NULL
-                OR p.status = :status
-            )
+            WHERE (:keyword = ''
+                OR LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                OR LOWER(p.slug) LIKE LOWER(CONCAT('%', :keyword, '%')))
+              AND (:status IS NULL OR p.status = :status)
             """)
-    Page<Product> findAdminProducts(
-            @Param("keyword")
-            String keyword,
-
-            @Param("status")
-            ProductStatus status,
-
-            Pageable pageable
-    );
+    Page<Product> findAdminProducts(@Param("keyword") String keyword,
+                                    @Param("status") ProductStatus status,
+                                    Pageable pageable);
 
     /**
      * 將已到預定時間的上架商品改為下架。
-     *
-     * 同時清除已執行的下架時間，
-     * 避免商品重新上架後又被舊時間下架。
-     *
-     * 回傳實際下架的商品數量。
-     * 必須由有 @Transactional 的服務呼叫。
+     * 同時清除已執行的下架時間，避免商品重新上架後又被舊時間下架。
+     * 回傳實際下架的商品數量。必須由有 @Transactional 的服務呼叫。
      */
-    @Modifying(
-            flushAutomatically = true,
-            clearAutomatically = true
-    )
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("""
             UPDATE Product p
             SET p.status = :offShelfStatus,
@@ -158,14 +91,7 @@ public interface ProductRepository
               AND p.scheduledOffAt IS NOT NULL
               AND p.scheduledOffAt <= :now
             """)
-    int offShelfDueProducts(
-            @Param("now")
-            LocalDateTime now,
-
-            @Param("onSaleStatus")
-            ProductStatus onSaleStatus,
-
-            @Param("offShelfStatus")
-            ProductStatus offShelfStatus
-    );
+    int offShelfDueProducts(@Param("now") LocalDateTime now,
+                            @Param("onSaleStatus") ProductStatus onSaleStatus,
+                            @Param("offShelfStatus") ProductStatus offShelfStatus);
 }

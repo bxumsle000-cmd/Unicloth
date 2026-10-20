@@ -17,9 +17,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import java.time.LocalDateTime;
 
+/**
+ * 商品
+ */
 @Entity
 @Table(name = "products")
 @Getter
@@ -28,11 +30,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class Product {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // 網址用的字串 id，例如 women-487396
     @Column(nullable = false, unique = true)
     private String slug;
 
@@ -46,26 +48,33 @@ public class Product {
     @Column
     private String description;
 
+    // 售價
     @Column(nullable = false)
     private Integer price;
 
+    // 原價；有值且 > price 就顯示特價
     @Column(name = "orig_price")
     private Integer origPrice;
 
+    // 新品標籤（欄位叫 newArrival 是為了避開 Lombok 對 isXxx 布林欄位的奇怪命名）
     @Column(name = "is_new", nullable = false)
     private boolean newArrival;
 
+    // 首頁熱門
     @Column(name = "is_hot", nullable = false)
     private boolean hot;
 
+    // 主圖（列表縮圖）；各顏色的圖在 ProductVariant.url
     @Column(name = "image_url")
     private String imageUrl;
 
+    // 存成大寫字串，例如 ON_SALE
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
     private ProductStatus status = ProductStatus.ON_SALE;
 
+    // 預定自動下架時間；null 代表未排程
     @Column(name = "scheduled_off_at")
     private LocalDateTime scheduledOffAt;
 
@@ -75,7 +84,6 @@ public class Product {
      */
     public void setStatus(ProductStatus status) {
         this.status = status;
-
         if (status == ProductStatus.OFF_SHELF) {
             this.scheduledOffAt = null;
         }
