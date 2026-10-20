@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { MdCheck, MdContentCopy } from "react-icons/md";
-import { toast } from "../../js/kinu.js";
+import { toast } from "../../../js/kinu.js";
 
 /** 顯示臨時密碼 + 複製按鈕（新增員工、重設密碼共用） */
 function TempPassword({ account, password }) {
