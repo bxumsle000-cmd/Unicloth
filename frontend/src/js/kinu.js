@@ -3,11 +3,12 @@
  * 失敗時丟出 Error，message 是後端 ErrorResponse 的 message（例如「不能超過庫存數量」）。
  * 用法：const cart = await api('/api/cart');
  *       await api('/api/cart', { method: 'POST', body: { variantId: 1, qty: 1 } });
- * 有登入（localStorage 有 token）就自動帶上 Authorization header。
+ * 有登入（localStorage 有 token）就自動帶上 Authorization header；
+ * 要用別的 token（例如後台員工 token）就傳 options.token，見 admin.js 的 adminApi()。
  */
 export async function api(path, options = {}) {
     const opt = { method: options.method || 'GET', headers: {} };
-    const token = getToken();
+    const token = options.token ?? getToken();
     if (token) {
         opt.headers['Authorization'] = 'Bearer ' + token;
     }

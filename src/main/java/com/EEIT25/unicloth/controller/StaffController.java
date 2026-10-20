@@ -60,4 +60,11 @@ public class StaffController {
     public void disable(@PathVariable String account) {
         staffService.disable(account);
     }
+
+    /** 重新啟用員工帳號 */
+    @PatchMapping("/{account}/enable")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void enable(@PathVariable String account) {
+        staffService.enable(account);
+    }
 }

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ADMIN_DEPT_KEY, ADMIN_NAME_KEY, ADMIN_TOKEN_KEY, DEPARTMENTS } from "../../js/admin.js";
+import { ADMIN_ACCOUNT_KEY, ADMIN_DEPT_KEY, ADMIN_NAME_KEY, ADMIN_TOKEN_KEY, DEPARTMENTS } from "../../js/admin.js";
 import { api, toast } from "../../js/kinu.js";
 
 // 測試用員工帳號（資料來自 db/migration 的 V5、V8），密碼都是 Test1234；只在開發模式（npm run dev）顯示在畫面上
@@ -31,16 +31,14 @@ function AdminLogin() {
             // 帳密錯、停用、部門不對，後端都會回 message，api() 會把它丟成 Error
             const data = await api('/api/admin/auth/login', {
                 method: 'POST',
-                body: { account: trimmedAccount, password, department: selectedDept },
+                body: { account: trimmedAccount, password: password, department: selectedDept },
             });
-            // 存 token、姓名、部門（下一頁顯示「XXX 您好」、決定進哪個部門用）
-            try {
-                localStorage.setItem(ADMIN_TOKEN_KEY, data.token);
-                localStorage.setItem(ADMIN_NAME_KEY, data.name);
-                localStorage.setItem(ADMIN_DEPT_KEY, data.department);
-            } catch {
-                // 不能存就只是重新整理後要再登入一次
-            }
+            // 存 token、姓名、部門、帳號（下一頁顯示「XXX 您好」、決定進哪個部門用）
+            // 瀏覽器不讓存時會丟錯，由下面的 catch 顯示錯誤、留在登入頁
+            localStorage.setItem(ADMIN_TOKEN_KEY, data.token);
+            localStorage.setItem(ADMIN_NAME_KEY, data.name);
+            localStorage.setItem(ADMIN_DEPT_KEY, data.department);
+            localStorage.setItem(ADMIN_ACCOUNT_KEY, data.account);
             // 進該部門首頁，例如 PRODUCT → /admin/product
             navigate('/admin/' + data.department.toLowerCase());
         } catch (e) {

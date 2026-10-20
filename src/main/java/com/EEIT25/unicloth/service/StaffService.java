@@ -19,12 +19,13 @@ import java.security.SecureRandom;
 
 /**
  * 後台員工管理相關服務（給 ADMIN 用）<br>
- * 帳號建立後不能改，改姓名、重設密碼、停用都用帳號指定員工；員工自己改密碼在 {@link AdminAuthService}。<br>
+ * 帳號建立後不能改，改姓名、重設密碼、停用 / 啟用都用帳號指定員工；員工自己改密碼在 {@link AdminAuthService}。<br>
  * - {@link #getStaff(StaffFilterRequest, Pageable)}：員工列表，可篩選關鍵字 / 部門 / 狀態，分頁<br><br>
  * - {@link #createNewStaff(CreateNewStaffRequest)}：新增員工，回傳臨時密碼<br><br>
  * - {@link #changeName(String, String)}：改員工姓名<br><br>
  * - {@link #resetPassword(String)}：員工忘記密碼時重設，回傳臨時密碼<br><br>
- * - {@link #disable(String)}：停用員工帳號
+ * - {@link #disable(String)}：停用員工帳號<br><br>
+ * - {@link #enable(String)}：重新啟用員工帳號
  */
 @Service
 @RequiredArgsConstructor
@@ -77,6 +78,13 @@ public class StaffService {
         staff.setStatus(StaffStatus.DISABLED);
     }
 
+    /** 重新啟用被停用的員工帳號，啟用後就能再登入 */
+    @Transactional
+    public void enable(String account) {
+        Staff staff = findStaff(account);
+        staff.setStatus(StaffStatus.ACTIVE);
+    }
+
     /**
      * 新增員工：帳號不能重複，狀態預設是 ACTIVE。<br>
      * 密碼不用傳，跟 {@link #resetPassword(String)} 一樣由系統產生亂數臨時密碼，明碼只在這次回傳給管理者。
@@ -110,8 +118,8 @@ public class StaffService {
     private String randomPassword() {
         String PASSWORD_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
         SecureRandom RANDOM = new SecureRandom();
-        StringBuilder sb = new StringBuilder(10);
-        for (int i = 0; i < 10; i++) {
+        StringBuilder sb = new StringBuilder(20);
+        for (int i = 0; i < 20; i++) {
             sb.append(PASSWORD_CHARS.charAt(RANDOM.nextInt(PASSWORD_CHARS.length())));
         }
         return sb.toString();
