@@ -48,11 +48,6 @@ docker compose up -d
 ./mvnw spring-boot:run
 ```
 
-執行完可以點擊測試網址
-```bash
-http://localhost:8080/
-```
-
 ## 2. 開啟 React 前端
 
 > 前提：**Docker 和 Spring Boot 都要先跑起來**（照上面的啟動順序）。
