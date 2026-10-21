@@ -10,7 +10,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +25,6 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class Order {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -63,6 +61,14 @@ public class Order {
     // 宅配地址或超商門市名
     @Column(name = "shipping_address", nullable = false)
     private String shippingAddress;
+
+    // 物流商，例如黑貓宅急便
+    @Column(name = "shipping_carrier", length = 50)
+    private String shippingCarrier;
+
+    // 物流追蹤碼
+    @Column(name = "tracking_number", length = 100)
+    private String trackingNumber;
 
     // 存成大寫字串：CREDIT / ATM / COD
     @Enumerated(EnumType.STRING)
@@ -101,11 +107,14 @@ public class Order {
     @Column(name = "shipped_at")
     private LocalDateTime shippedAt;
 
+    // 物流顯示送達的時間
+    @Column(name = "delivered_at")
+    private LocalDateTime deliveredAt;
+
     @Column(name = "completed_at")
     private LocalDateTime completedAt;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
-
 }
