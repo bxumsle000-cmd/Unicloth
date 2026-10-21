@@ -88,10 +88,10 @@ function OrderHome() {
     }
 
     /**
-     * 詳細視窗出貨成功後，只替換清單中對應的那筆資料。
-     * 這樣不用重新查整頁訂單，背景清單也會立刻顯示最新狀態。
+     * 詳細視窗更新訂單後，只替換清單中對應的那筆資料。
+     * 出貨與送達都使用這個函式，因此不必重新查整頁訂單。
      */
-    function handleOrderShipped(updatedOrder) {
+    function handleOrderUpdated(updatedOrder) {
         setOrderPage(currentPage => {
             if (!currentPage) return currentPage;
 
@@ -302,7 +302,7 @@ function OrderHome() {
                 <OrderDetailModal
                     orderId={selectedOrderId}
                     onClose={() => setSelectedOrderId(null)}
-                    onOrderShipped={handleOrderShipped}
+                    onOrderUpdated={handleOrderUpdated}
                 />
             )}
         </div>
