@@ -64,10 +64,11 @@
                         <option value="true">啟用中</option>
                         <option value="false">已停用</option>
                     </select>
+                    <select id="couponTriggerFilter" class="border border-line bg-white px-3 py-2 text-[13px] outline-none focus:border-black"></select>
                 </div>
 
                 <div class="overflow-x-auto border border-line bg-white">
-                    <table class="w-full min-w-[860px] text-left text-[13px]">
+                    <table class="w-full min-w-[960px] text-left text-[13px]">
                         <thead class="border-b border-line bg-cream text-[11px] tracking-[.1em] text-muted">
                             <tr>
                                 <th class="px-4 py-3 font-medium">折扣碼</th>
@@ -75,6 +76,7 @@
                                 <th class="px-4 py-3 font-medium">折扣</th>
                                 <th class="px-4 py-3 font-medium">最低消費</th>
                                 <th class="px-4 py-3 font-medium">有效天數</th>
+                                <th class="px-4 py-3 font-medium">自動發送</th>
                                 <th class="px-4 py-3 font-medium">狀態</th>
                                 <th class="px-4 py-3 text-right font-medium">操作</th>
                             </tr>
@@ -387,10 +389,12 @@
     function renderCoupons() {
         const keyword = $('couponKeyword').value.trim().toLowerCase();
         const activeFilter = $('couponActiveFilter').value;
+        const triggerFilter = $('couponTriggerFilter').value; // '' = 全部；'NONE' = 不自動發送；其他是 AUTO_TRIGGERS 的 key
 
         const rows = couponList.filter(c =>
             (!keyword || c.code.toLowerCase().includes(keyword) || c.title.toLowerCase().includes(keyword)) &&
-            (!activeFilter || String(c.active) === activeFilter)
+            (!activeFilter || String(c.active) === activeFilter) &&
+            (!triggerFilter || (triggerFilter === 'NONE' ? !c.autoTrigger : c.autoTrigger === triggerFilter))
         );
 
         const tbody = $('couponRows');
@@ -400,12 +404,13 @@
             tr.className = 'border-b border-line last:border-b-0' + (c.active ? '' : ' text-muted');
             tr.innerHTML = `
                 <td class="px-4 py-3 font-medium tracking-[.04em]">${c.code}</td>
-                <td class="px-4 py-3">${c.title}${c.autoTrigger
-                    ? ` <span class="ml-1 inline-block border border-black px-1.5 py-0.5 text-[10px] tracking-[.08em]">自動：${AUTO_TRIGGERS[c.autoTrigger].name}</span>`
-                    : ''}</td>
+                <td class="px-4 py-3">${c.title}</td>
                 <td class="px-4 py-3">${discountText(c)}</td>
                 <td class="px-4 py-3">${money(c.minSubtotal)}</td>
                 <td class="px-4 py-3">${c.validDays} 天</td>
+                <td class="px-4 py-3">${c.autoTrigger
+                    ? AUTO_TRIGGERS[c.autoTrigger].name
+                    : '<span class="text-stone">—</span>'}</td>
                 <td class="px-4 py-3">${c.active
                     ? '<span class="text-[#2f6b3a]">● 啟用中</span>'
                     : '<span class="text-[#b0413e]">● 已停用</span>'}</td>
@@ -799,7 +804,9 @@
     }
 
     // ===== 初始化 =====
-    ['couponKeyword', 'couponActiveFilter'].forEach(id => $(id).addEventListener('input', renderCoupons));
+    $('couponTriggerFilter').innerHTML = '<option value="">全部發送方式</option><option value="NONE">不自動發送</option>'
+        + Object.entries(AUTO_TRIGGERS).map(([key, t]) => `<option value="${key}">${t.name}</option>`).join('');
+    ['couponKeyword', 'couponActiveFilter', 'couponTriggerFilter'].forEach(id => $(id).addEventListener('input', renderCoupons));
     $('recordSource').innerHTML = '<option value="">全部來源</option>'
         + Object.entries(SOURCE_NAMES).map(([key, name]) => `<option value="${key}">${name}</option>`).join('');
     ['recordKeyword', 'recordCoupon', 'recordSource', 'recordStatus', 'recordDateFrom', 'recordDateTo'].forEach(id => $(id).addEventListener('input', renderRecords));
