@@ -21,6 +21,11 @@ export const ADMIN_NAME_KEY = 'adminName';
 export const ADMIN_DEPT_KEY = 'adminDept';
 export const ADMIN_ACCOUNT_KEY = 'adminAccount';
 
+/** 讀取目前登入員工的 token。 */
+export function getAdminToken() {
+    return localStorage.getItem(ADMIN_TOKEN_KEY);
+}
+
 /** 後端的 LocalDateTime：2026-10-15T09:12:30 → 2026/10/15 09:12；沒有值（例如還沒登入過）顯示 — */
 export function fmtDateTime(s) {
     return s ? String(s).slice(0, 16).replace('T', ' ').replace(/-/g, '/') : '—';
@@ -28,7 +33,7 @@ export function fmtDateTime(s) {
 
 /** 呼叫後台 API：跟 kinu.js 的 api() 一樣，只是帶的是員工 token */
 export function adminApi(path, options = {}) {
-    return api(path, { ...options, token: localStorage.getItem(ADMIN_TOKEN_KEY) });
+    return api(path, { ...options, token: getAdminToken() });
 }
 
 /** 員工登出：四個都刪掉 */
