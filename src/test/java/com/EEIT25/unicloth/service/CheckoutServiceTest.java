@@ -98,7 +98,6 @@ class CheckoutServiceTest {
                 .value(value)
                 .minSubtotal(minSubtotal)
                 .validDays(7)
-                .signupGift(false)
                 .build());
         return memberCouponRepository.save(MemberCoupon.builder()
                 .member(member)

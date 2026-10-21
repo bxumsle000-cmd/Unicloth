@@ -95,7 +95,6 @@ class EcpayCallbackCancelTest {
                 .value(10)
                 .minSubtotal(0)
                 .validDays(7)
-                .signupGift(false)
                 .build());
         memberCoupon = memberCouponRepository.save(MemberCoupon.builder()
                 .member(member)

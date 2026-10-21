@@ -87,7 +87,6 @@ class CheckoutCouponConcurrencyTest {
                 .value(100)
                 .minSubtotal(0)
                 .validDays(7)
-                .signupGift(false)
                 .build());
         memberCoupon = memberCouponRepository.save(MemberCoupon.builder()
                 .member(member)
