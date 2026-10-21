@@ -11,6 +11,8 @@ export default defineConfig({
       // 圖片、影片放在 Spring Boot 的 static/ 底下
       '/img': 'http://localhost:8080',
       '/video': 'http://localhost:8080',
+      // 後台新上傳的商品圖片
+      '/uploads': 'http://localhost:8080',
     },
   },
 })
