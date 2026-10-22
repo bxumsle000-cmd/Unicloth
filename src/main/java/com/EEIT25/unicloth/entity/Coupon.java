@@ -11,6 +11,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 折價券範本（會員實際持有的券在 MemberCoupon）
@@ -64,4 +65,8 @@ public class Coupon {
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    // 這種券已經發出去的每一張（行銷後台算已發幾張用）
+    @OneToMany(mappedBy = "coupon")
+    private List<MemberCoupon> memberCoupons;
 }

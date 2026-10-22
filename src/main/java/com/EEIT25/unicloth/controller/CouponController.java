@@ -1,8 +1,6 @@
 package com.EEIT25.unicloth.controller;
 
-import com.EEIT25.unicloth.dto.coupon.CouponResponse;
-import com.EEIT25.unicloth.dto.coupon.GrantCouponRequest;
-import com.EEIT25.unicloth.dto.coupon.UsableCouponResponse;
+import com.EEIT25.unicloth.dto.coupon.*;
 import com.EEIT25.unicloth.service.CouponService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
