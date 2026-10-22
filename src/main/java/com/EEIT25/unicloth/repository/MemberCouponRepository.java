@@ -3,13 +3,13 @@ package com.EEIT25.unicloth.repository;
 import com.EEIT25.unicloth.entity.Member;
 import com.EEIT25.unicloth.entity.MemberCoupon;
 import com.EEIT25.unicloth.entity.Order;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,4 +49,27 @@ public interface MemberCouponRepository extends JpaRepository<MemberCoupon, Long
     List<MemberCoupon> findByMember(Member member);
 
     List<MemberCoupon> findByMemberOrderByExpireAtAsc(Member member);
+
+    /**
+     * 行銷後台查看某張折價券的發放紀錄。
+     *
+     * 排序不寫在這裡，改由 Controller 的 PageableDefault 統一處理；
+     * 否則 SQL Server 會收到重複的 received_at 排序欄位。
+     */
+    @Query(
+            value = """
+                    select mc from MemberCoupon mc
+                    join fetch mc.member
+                    left join fetch mc.order
+                    where mc.coupon.id = :couponId
+                    """,
+            countQuery = """
+                    select count(mc) from MemberCoupon mc
+                    where mc.coupon.id = :couponId
+                    """
+    )
+    Page<MemberCoupon> findAdminGrantHistory(
+            @Param("couponId") Long couponId,
+            Pageable pageable
+    );
 }
