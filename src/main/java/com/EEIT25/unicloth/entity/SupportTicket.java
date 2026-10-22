@@ -46,6 +46,18 @@ public class SupportTicket {
     @Column(nullable = false, length = 2000)
     private String message;
 
+    // 客服回覆內容；會員剛建立客服單時尚未回覆，所以允許 null。
+    @Column(length = 2000)
+    private String reply;
+
+    // 最後一次由客服回覆的時間。
+    @Column(name = "replied_at")
+    private LocalDateTime repliedAt;
+
+    // 客服確認問題完成、將狀態改為 RESOLVED 的時間。
+    @Column(name = "resolved_at")
+    private LocalDateTime resolvedAt;
+
     // 存成大寫字串，例如 IN_PROGRESS
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

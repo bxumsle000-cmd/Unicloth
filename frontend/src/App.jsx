@@ -11,6 +11,7 @@ import Checkout from "./pages/store/Checkout.jsx";
 import OrderComplete from "./pages/store/OrderComplete.jsx";
 import Search from "./pages/store/Search.jsx";
 import Orders from "./pages/store/Orders.jsx";
+import Support from "./pages/store/Support.jsx";
 import Login from "./pages/store/Login.jsx";
 import CompleteProfile from "./pages/store/CompleteProfile.jsx";
 import ProfileGuard from "./component/ProfileGuard.jsx";
@@ -41,6 +42,8 @@ function StoreLayout(){
                         <Route path="/order-complete" element={<OrderComplete/>}/>
                         <Route path="/search" element={<Search/>}/>
                         <Route path="/orders" element={<RequireLogin><Orders/></RequireLogin>}/>
+                        {/* 客服單目前必須登入才能建立，規則與後端 SecurityConfig 一致。 */}
+                        <Route path="/support" element={<RequireLogin><Support/></RequireLogin>}/>
                         <Route path="/login" element={<Login/>}/>
                         <Route path="/complete-profile" element={<CompleteProfile/>}/>
                     </Routes>
