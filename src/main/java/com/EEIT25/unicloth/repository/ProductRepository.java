@@ -5,14 +5,21 @@ import com.EEIT25.unicloth.enums.ProductStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-
+import org.springframework.data.repository.query.Param;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
-
     boolean existsBySlug(String slug);
+
+    /**
+     * 檢查商品貨號是否已被使用。
+     * 例如 suffix 傳入 -123456。
+     */
+    boolean existsBySlugEndingWith(String suffix);
 
     /** 分類 id 在清單內、且狀態符合的商品（分頁）*/
     Page<Product> findByCategoryIdInAndStatus(Collection<Long> categoryIds, ProductStatus status, Pageable pageable);
@@ -44,9 +51,47 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
                                Pageable pageable);
 
     /** 上架中的商品（依 slug） */
-    @Query("SELECT p FROM Product p WHERE p.slug = :slug AND p.status = com.EEIT25.unicloth.enums.ProductStatus.ON_SALE")
-    Optional<Product> findOnSaleBySlug(String slug);
+    @Query("""
+            SELECT p
+            FROM Product p
+            WHERE p.slug = :slug
+              AND p.status = com.EEIT25.unicloth.enums.ProductStatus.ON_SALE
+            """)
+    Optional<Product> findOnSaleBySlug(@Param("slug") String slug);
 
     /** 狀態符合、名稱包含關鍵字的商品（分頁），不分大小寫；LIKE 的 % _ 由 Spring 自動跳脫 */
     Page<Product> findByStatusAndNameContainingIgnoreCase(ProductStatus status, String name, Pageable pageable);
+
+    /**
+     * 後台商品列表。keyword 空白時查全部；status 是 null 時不限商品狀態。
+     */
+    @Query("""
+            SELECT p
+            FROM Product p
+            WHERE (:keyword = ''
+                OR LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+                OR LOWER(p.slug) LIKE LOWER(CONCAT('%', :keyword, '%')))
+              AND (:status IS NULL OR p.status = :status)
+            """)
+    Page<Product> findAdminProducts(@Param("keyword") String keyword,
+                                    @Param("status") ProductStatus status,
+                                    Pageable pageable);
+
+    /**
+     * 將已到預定時間的上架商品改為下架。
+     * 同時清除已執行的下架時間，避免商品重新上架後又被舊時間下架。
+     * 回傳實際下架的商品數量。必須由有 @Transactional 的服務呼叫。
+     */
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query("""
+            UPDATE Product p
+            SET p.status = :offShelfStatus,
+                p.scheduledOffAt = null
+            WHERE p.status = :onSaleStatus
+              AND p.scheduledOffAt IS NOT NULL
+              AND p.scheduledOffAt <= :now
+            """)
+    int offShelfDueProducts(@Param("now") LocalDateTime now,
+                            @Param("onSaleStatus") ProductStatus onSaleStatus,
+                            @Param("offShelfStatus") ProductStatus offShelfStatus);
 }
