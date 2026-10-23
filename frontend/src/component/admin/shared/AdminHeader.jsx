@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { IoSettingsOutline } from "react-icons/io5";
 import { MdLockOutline, MdLogout } from "react-icons/md";
-import { ADMIN_ACCOUNT_KEY, ADMIN_NAME_KEY, clearAdminSession } from "../../js/admin.js";
+import { ADMIN_ACCOUNT_KEY, ADMIN_NAME_KEY, clearAdminSession } from "../../../js/admin.js";
 import ChangePasswordModal from "./ChangePasswordModal.jsx";
 
 const itemClass = "flex w-full items-center gap-2 px-4 py-2.5 text-left text-[13px] tracking-[.06em] hover:bg-paper";

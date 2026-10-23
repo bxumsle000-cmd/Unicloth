@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { adminApi } from "../../../js/admin.js";
 import { toast } from "../../../js/kinu.js";
-import Modal from "../Modal.jsx";
+import Modal from "../shared/Modal.jsx";
 
 const inputClass = "border border-line bg-paper px-3 py-2.5 text-[14px] outline-none focus:border-black disabled:text-muted";
 const blackButtonClass = "border border-black bg-black px-4 py-2.5 text-[12px] tracking-[.12em] text-white transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40";

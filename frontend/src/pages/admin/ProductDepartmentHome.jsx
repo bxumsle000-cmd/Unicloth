@@ -1,8 +1,8 @@
 import { useState } from "react";
-import ProductCategoryPanel from "../../component/admin/ProductCategoryPanel.jsx";
-import ProductInventoryPanel from "../../component/admin/ProductInventoryPanel.jsx";
-import ProductSchedulePanel from "../../component/admin/ProductSchedulePanel.jsx";
-import ProductStockWarningPanel from "../../component/admin/ProductStockWarningPanel.jsx";
+import ProductCategoryPanel from "../../component/admin/product/ProductCategoryPanel.jsx";
+import ProductInventoryPanel from "../../component/admin/product/ProductInventoryPanel.jsx";
+import ProductSchedulePanel from "../../component/admin/product/ProductSchedulePanel.jsx";
+import ProductStockWarningPanel from "../../component/admin/product/ProductStockWarningPanel.jsx";
 import ProductHome from "./ProductHome.jsx";
 
 const TABS = [

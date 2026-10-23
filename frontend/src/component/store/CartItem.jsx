@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { money, imgSrc } from "../js/kinu.js";
+import { money, imgSrc } from "../../js/kinu.js";
 
 /**
  * 購物車的一筆：item 是 /api/cart 回來的一筆

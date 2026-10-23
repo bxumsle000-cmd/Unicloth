@@ -12,8 +12,7 @@ import lombok.RequiredArgsConstructor;
 public enum CouponSource {
     MANUAL("手動發券"),
     SIGNUP("自動：註冊禮"),
-    BIRTHDAY("自動：生日禮"),
-    FIRST_ORDER("自動：首購禮");
+    BIRTHDAY("自動：生日禮");
 
     // 畫面上顯示的中文
     private final String label;

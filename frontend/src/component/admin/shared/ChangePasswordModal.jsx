@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { adminApi } from "../../js/admin.js";
-import { toast } from "../../js/kinu.js";
+import { adminApi } from "../../../js/admin.js";
+import { toast } from "../../../js/kinu.js";
 import Modal from "./Modal.jsx";
 
 const inputClass = "border border-line bg-paper px-3 py-2.5 text-[14px] outline-none focus:border-black disabled:text-muted";

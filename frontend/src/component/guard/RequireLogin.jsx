@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { getToken } from "../js/kinu.js";
+import { getToken } from "../../js/kinu.js";
 
 /** 要登入才能看的頁面：沒登入就顯示提示，不畫頁面（頁面一畫就會打 API，被後端回 401） */
 function RequireLogin({ children }) {

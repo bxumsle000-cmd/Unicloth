@@ -1,5 +1,5 @@
-import Header from "./component/layout/Header.jsx";
-import Footer from "./component/layout/Footer.jsx";
+import Header from "./component/store/layout/Header.jsx";
+import Footer from "./component/store/layout/Footer.jsx";
 import Home from "./pages/store/Home.jsx";
 import Category from "./pages/store/Category.jsx";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -14,8 +14,8 @@ import Orders from "./pages/store/Orders.jsx";
 import Support from "./pages/store/Support.jsx";
 import Login from "./pages/store/Login.jsx";
 import CompleteProfile from "./pages/store/CompleteProfile.jsx";
-import ProfileGuard from "./component/ProfileGuard.jsx";
-import RequireLogin from "./component/RequireLogin.jsx";
+import ProfileGuard from "./component/guard/ProfileGuard.jsx";
+import RequireLogin from "./component/guard/RequireLogin.jsx";
 import { LanguageProvider } from "./js/LanguageProvider.jsx";
 import AdminLogin from "./pages/admin/AdminLogin.jsx";
 import ProductDepartmentHome from "./pages/admin/ProductDepartmentHome.jsx";

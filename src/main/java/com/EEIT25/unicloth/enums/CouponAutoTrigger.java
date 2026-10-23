@@ -11,8 +11,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum CouponAutoTrigger {
     SIGNUP("註冊禮"),
-    BIRTHDAY("生日禮"),
-    FIRST_ORDER("首購禮");
+    BIRTHDAY("生日禮");
 
     // 畫面上顯示的中文
     private final String label;

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { api, getToken, clearToken } from "../js/kinu.js";
-import { signOutFirebase } from "../js/firebase.js";
+import { api, getToken, clearToken } from "../../js/kinu.js";
+import { signOutFirebase } from "../../js/firebase.js";
 
 /**
  * 路由守衛：已登入但還沒補填個人資料，又離開了 /complete-profile，就當成不想填，直接登出。

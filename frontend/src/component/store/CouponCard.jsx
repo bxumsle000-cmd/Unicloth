@@ -1,4 +1,4 @@
-import { money, fmtDate } from "../js/kinu.js";
+import { money, fmtDate } from "../../js/kinu.js";
 
 const STATUS_TEXT = { usable: "可使用", used: "已使用", expired: "已過期" };
 

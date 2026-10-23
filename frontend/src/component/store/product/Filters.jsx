@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { sortSizes } from "../../js/kinu.js";
+import { sortSizes } from "../../../js/kinu.js";
 
 /**
  * 篩選選項：filters 是 /api/categories/{code}/filters 回來的 { colors, sizes }<br>

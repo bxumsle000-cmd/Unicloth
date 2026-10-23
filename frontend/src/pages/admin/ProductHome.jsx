@@ -2,9 +2,9 @@ import {
     useEffect,
     useState,
 } from "react";
-import ProductBatchActionBar from "../../component/admin/ProductBatchActionBar.jsx";
-import ProductCreateModal from "../../component/admin/ProductCreateModal.jsx";
-import ProductEditModal from "../../component/admin/ProductEditModal.jsx";
+import ProductBatchActionBar from "../../component/admin/product/ProductBatchActionBar.jsx";
+import ProductCreateModal from "../../component/admin/product/ProductCreateModal.jsx";
+import ProductEditModal from "../../component/admin/product/ProductEditModal.jsx";
 import { getAdminToken } from "../../js/admin.js";
 import { imgSrc, money, toast } from "../../js/kinu.js";
 

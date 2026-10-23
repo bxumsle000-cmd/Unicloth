@@ -1,7 +1,8 @@
 // 行銷首頁（/admin/mkt），內容之後再做
 import { useState } from "react";
-import AdminHeader from "../../component/admin/AdminHeader.jsx";
+import AdminHeader from "../../component/admin/shared/AdminHeader.jsx";
 import SideMenu from "../../component/admin/mkt/SideMenu.jsx";
+import CouponPage from "../../component/admin/mkt/CouponPage.jsx";
 
 function MktHome() {
     // 目前在哪個子頁面，值是 SideMenu 裡 MENU_GROUPS 的 page.key：'coupon' | 'issue' | 'records'
@@ -18,7 +19,7 @@ function MktHome() {
                 <AdminHeader/>
 
                 <main className="flex-1 px-8 py-8 max-[760px]:px-4">
-                    <h1 className="text-[24px] font-medium tracking-[.08em]">行銷</h1>
+                    {currentPage === 'coupon' && <CouponPage/>}
                 </main>
             </div>
         </div>

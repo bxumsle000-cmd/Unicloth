@@ -14,6 +14,12 @@ export const DEPARTMENTS = [
     { key: 'ADMIN',   name: '系統管理' },
 ];
 
+// 折價券的自動發送時機：key 要跟後端 enum CouponAutoTrigger 一樣，name 是畫面上顯示的名字
+export const COUPON_TRIGGERS = [
+    { key: 'SIGNUP',      name: '註冊禮' },
+    { key: 'BIRTHDAY',    name: '生日禮' },
+];
+
 // 員工登入資料存在 localStorage 的 key；AdminLogin.jsx 登入成功時存，用到的地方直接 localStorage.getItem 讀，登出時 clearAdminSession() 刪
 // 不用 try/catch：後台每一頁都要登入，瀏覽器不讓用 localStorage 時本來就不能用，直接出錯比較好查
 export const ADMIN_TOKEN_KEY = 'adminToken';

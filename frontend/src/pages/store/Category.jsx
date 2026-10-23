@@ -1,12 +1,12 @@
 import {api, toast} from "../../js/kinu.js";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import Breadcrumb from "../../component/product/Breadcrumb.jsx";
-import SubCategories from "../../component/product/SubCategories.jsx";
-import Filters from "../../component/product/Filters.jsx";
-import ProductCard from "../../component/product/ProductCard.jsx";
-import SortSelect from "../../component/product/SortSelect.jsx";
-import Pagination from "../../component/product/Pagination.jsx";
+import Breadcrumb from "../../component/store/product/Breadcrumb.jsx";
+import SubCategories from "../../component/store/product/SubCategories.jsx";
+import Filters from "../../component/store/product/Filters.jsx";
+import ProductCard from "../../component/store/product/ProductCard.jsx";
+import SortSelect from "../../component/store/product/SortSelect.jsx";
+import Pagination from "../../component/common/Pagination.jsx";
 
 function Category(){
     const {code} = useParams();

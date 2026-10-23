@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { getAdminToken } from "../../js/admin.js";
-import { money, toast } from "../../js/kinu.js";
+import { getAdminToken } from "../../../js/admin.js";
+import { money, toast } from "../../../js/kinu.js";
 
 const EMPTY_FORM = {
     name: "",

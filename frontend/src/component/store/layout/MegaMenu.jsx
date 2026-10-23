@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { imgSrc } from "../../js/kinu.js";
+import { imgSrc } from "../../../js/kinu.js";
 
 /**
  * 分類下拉選單：top 是 /api/categories 回來的其中一個第 1 層分類（女裝、男裝、兒童）

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { MdLanguage } from "react-icons/md";
-import { LANGUAGES, useLanguage } from "../../js/i18n.js";
+import { LANGUAGES, useLanguage } from "../../../js/i18n.js";
 
 /** 語言選單：點地球打開，選了語言或點選單以外的地方就收起來 */
 function LanguageMenu() {

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { adminApi, fmtDateTime } from "../../js/admin.js";
+import { adminApi, fmtDateTime } from "../../../js/admin.js";
 
 const TICKET_STATUS_LABELS = {
     IN_PROGRESS: "處理中",

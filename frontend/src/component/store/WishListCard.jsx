@@ -1,4 +1,4 @@
-import { money, imgSrc } from "../js/kinu.js";
+import { money, imgSrc } from "../../js/kinu.js";
 import { IoHeart } from "react-icons/io5";
 import {Link} from "react-router-dom";
 

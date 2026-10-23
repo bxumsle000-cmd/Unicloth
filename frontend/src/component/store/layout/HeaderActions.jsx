@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from "react-router-dom";
-import {api, getToken, clearToken} from "../../js/kinu.js";
-import { signOutFirebase } from "../../js/firebase.js";
-import { useLanguage } from "../../js/i18n.js";
+import {api, getToken, clearToken} from "../../../js/kinu.js";
+import { signOutFirebase } from "../../../js/firebase.js";
+import { useLanguage } from "../../../js/i18n.js";
 import LanguageMenu from "./LanguageMenu.jsx";
 
 /** Header 右邊：搜尋、天氣、各功能 */

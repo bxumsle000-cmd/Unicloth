@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { adminApi, fmtDateTime } from "../../js/admin.js";
-import { imgSrc, money } from "../../js/kinu.js";
+import { adminApi, fmtDateTime } from "../../../js/admin.js";
+import { imgSrc, money } from "../../../js/kinu.js";
 
 const ORDER_STATUS_LABELS = {
     UNPAID: "未付款",

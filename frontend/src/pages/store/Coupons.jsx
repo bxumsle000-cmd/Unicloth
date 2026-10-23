@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { api, toast } from "../../js/kinu.js";
-import CouponCard from "../../component/CouponCard.jsx";
+import CouponCard from "../../component/store/CouponCard.jsx";
 
 // 分頁籤：value 對應後端回來的 status
 const TABS = [

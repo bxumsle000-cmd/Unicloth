@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getAdminToken } from "../../js/admin.js";
+import { getAdminToken } from "../../../js/admin.js";
 
 async function adminRequest(path, options = {}) {
     const response = await fetch(path, {

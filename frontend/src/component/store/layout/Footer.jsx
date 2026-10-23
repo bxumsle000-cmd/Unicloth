@@ -1,4 +1,4 @@
-import { useLanguage } from "../../js/i18n.js";
+import { useLanguage } from "../../../js/i18n.js";
 
 function Footer() {
     const { t } = useLanguage();

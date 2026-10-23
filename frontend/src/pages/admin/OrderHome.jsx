@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ADMIN_TOKEN_KEY, adminApi, fmtDateTime } from "../../js/admin.js";
 import { toast } from "../../js/kinu.js";
-import Pagination from "../../component/product/Pagination.jsx";
-import AdminHeader from "../../component/admin/AdminHeader.jsx";
-import OrderDetailModal from "../../component/admin/OrderDetailModal.jsx";
+import Pagination from "../../component/common/Pagination.jsx";
+import AdminHeader from "../../component/admin/shared/AdminHeader.jsx";
+import OrderDetailModal from "../../component/admin/order/OrderDetailModal.jsx";
 
 const filterClass = "border border-line bg-white px-3 py-2 text-[13px] outline-none focus:border-black";
 
