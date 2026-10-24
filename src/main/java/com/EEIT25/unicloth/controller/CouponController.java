@@ -2,9 +2,7 @@ package com.EEIT25.unicloth.controller;
 
 import com.EEIT25.unicloth.dto.coupon.*;
 import com.EEIT25.unicloth.service.CouponService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,11 +21,5 @@ public class CouponController {
     @GetMapping("/usable")
     public List<UsableCouponResponse>  getUsableCoupons(int subtotal){
         return couponService.getUsableCoupons(subtotal);
-    }
-
-    @PostMapping
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void grantTo(@Valid @RequestBody GrantCouponRequest request){
-        couponService.grantTo(request);
     }
 }

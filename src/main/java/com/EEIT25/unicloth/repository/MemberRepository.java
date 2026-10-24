@@ -1,8 +1,11 @@
 package com.EEIT25.unicloth.repository;
 
 import com.EEIT25.unicloth.entity.Member;
+import com.EEIT25.unicloth.enums.MemberStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
@@ -15,4 +18,10 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     // Google 登入用：用 Firebase uid 查會員
     Optional<Member> findByFirebaseUid(String firebaseUid);
+
+    // 後台發券給全部會員：只發給 ACTIVE 的
+    List<Member> findByStatus(MemberStatus status);
+
+    // 後台發券給指定會員：只發給 ACTIVE 的
+    List<Member> findByIdInAndStatus(Collection<Long> ids, MemberStatus status);
 }
