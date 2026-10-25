@@ -20,6 +20,8 @@ import com.EEIT25.unicloth.repository.MemberCouponRepository;
 import com.EEIT25.unicloth.repository.MemberRepository;
 import com.EEIT25.unicloth.security.CurrentStaff;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,7 +38,7 @@ import java.util.List;
  * - {@link #changeActive(Long, boolean)}：啟用／停用折價券<br><br>
  * - {@link #getIssueMembers()}：發券時可以選的會員<br><br>
  * - {@link #grantTo(Long, GrantCouponRequest)}：發券給會員（立即或預約）<br><br>
- * - {@link #getAllSchedules()}：預約發送紀錄<br><br>
+ * - {@link #getSchedules(CouponScheduleStatus, Pageable)}：預約發送紀錄（分頁）<br><br>
  * - {@link #cancelSchedule(Long)}：取消預約發送
  */
 @Service
@@ -198,15 +200,13 @@ public class AdminCouponService {
     }
 
     /**
-     * 預約發送紀錄：所有預約（含已發送、已取消的），預約時間晚的排前面。<br>
-     * 狀態的篩選在前端做。
+     * 預約發送紀錄（含已發送、已取消的），分頁查詢。<br>
+     * status 是 null 就查全部狀態；排序由 pageable 決定（Controller 預設預約時間晚的排前面）。
      */
     @Transactional(readOnly = true)
-    public List<CouponScheduleResponse> getAllSchedules(){
-        return couponScheduleRepository.findAllByOrderByScheduledAtDesc()
-                .stream()
-                .map(schedule -> CouponScheduleResponse.from(schedule))
-                .toList();
+    public Page<CouponScheduleResponse> getSchedules(CouponScheduleStatus status, Pageable pageable){
+        return couponScheduleRepository.findByStatusFilter(status, pageable)
+                .map(schedule -> CouponScheduleResponse.from(schedule));
     }
 
     /** 取消預約：只有還沒發送（PENDING）的能取消 */

@@ -1,28 +1,24 @@
-import { useState } from "react";
 import { MdRefresh } from "react-icons/md";
 import { COUPON_SCHEDULE_STATUSES, fmtDateTime } from "../../../js/admin.js";
+import Pagination from "../../common/Pagination.jsx";
 
 const filterClass = "border border-line bg-white px-3 py-2 text-[13px] outline-none focus:border-black";
 
 /**
- * 預約發送表格：依狀態篩選，等待中的可以取消預約<br>
- * scheduleList 是後端 CouponScheduleResponse 的陣列（全部的預約），篩選在這裡做；取消呼叫 onCancel<br>
+ * 預約發送表格：依狀態篩選、換頁，等待中的可以取消預約<br>
+ * schedulePage 是後端回的分頁物件（content = 這一頁的 CouponScheduleResponse）；
+ * 篩選和分頁都在後端做，這裡只把選的值交給 IssuePage（onChangeStatusFilter、setPage）<br>
  * 排程發送後畫面不會自己更新，按「重新整理」呼叫 onReload 重查
  */
-function ScheduleTable({ scheduleList, onCancel, onReload }) {
-    // 狀態篩選，'' = 不篩；其他是 COUPON_SCHEDULE_STATUSES 的 key
-    const [statusFilter, setStatusFilter] = useState('');
-
-    const filteredSchedules = scheduleList.filter(schedule =>
-        !statusFilter || schedule.status === statusFilter
-    );
+function ScheduleTable({ schedulePage, statusFilter, onChangeStatusFilter, page, setPage, onCancel, onReload }) {
+    const scheduleList = schedulePage.content;
 
     return (
         <div className="mt-10">
             <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
                 <h2 className="text-[16px] font-medium tracking-[.08em]">預約發送紀錄</h2>
                 <div className="flex gap-3">
-                    <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className={filterClass}>
+                    <select value={statusFilter} onChange={(e) => onChangeStatusFilter(e.target.value)} className={filterClass}>
                         <option value="">全部狀態</option>
                         {COUPON_SCHEDULE_STATUSES.map(status => (
                             <option key={status.key} value={status.key}>{status.name}</option>
@@ -50,7 +46,7 @@ function ScheduleTable({ scheduleList, onCancel, onReload }) {
                         </tr>
                     </thead>
                     <tbody>
-                        {filteredSchedules.map(schedule => {
+                        {scheduleList.map(schedule => {
                             const status = COUPON_SCHEDULE_STATUSES.find(scheduleStatus => scheduleStatus.key === schedule.status);
                             return (
                                 <tr key={schedule.id} className="border-b border-line last:border-b-0">
@@ -89,9 +85,11 @@ function ScheduleTable({ scheduleList, onCancel, onReload }) {
                     </tbody>
                 </table>
             </div>
-            {filteredSchedules.length === 0 && (
+            {scheduleList.length === 0 && (
                 <p className="py-10 text-center text-[13px] text-muted">沒有符合條件的預約</p>
             )}
+
+            <Pagination page={page} totalPages={schedulePage.page?.totalPages} setPage={setPage}/>
         </div>
     )
 }

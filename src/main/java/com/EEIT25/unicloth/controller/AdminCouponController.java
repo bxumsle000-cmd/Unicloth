@@ -5,9 +5,15 @@ import com.EEIT25.unicloth.dto.coupon.CouponScheduleResponse;
 import com.EEIT25.unicloth.dto.coupon.CreateCouponRequest;
 import com.EEIT25.unicloth.dto.coupon.GrantCouponRequest;
 import com.EEIT25.unicloth.dto.coupon.UpdateCouponRequest;
+import com.EEIT25.unicloth.enums.CouponScheduleStatus;
 import com.EEIT25.unicloth.service.admin.AdminCouponService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -64,11 +70,17 @@ public class AdminCouponController {
         adminCouponService.grantTo(id, request);
     }
 
-    /** 預約發送紀錄（含已發送、已取消的），篩選在前端做 */
+    /**
+     * 預約發送紀錄（含已發送、已取消的）<br>
+     * status 沒傳就查全部狀態；page 從 0 開始，預設每頁 10 筆，預約時間晚的排前面
+     */
     @GetMapping("/schedules")
-    public List<CouponScheduleResponse> getAllSchedules() {
-        return adminCouponService.getAllSchedules();
+    public Page<CouponScheduleResponse> getSchedules(
+            @RequestParam(required = false) CouponScheduleStatus status,
+            @ParameterObject @PageableDefault(size = 10, sort = "scheduledAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        return adminCouponService.getSchedules(status, pageable);
     }
+
     /** 取消預約發送（只有還沒發送的能取消） */
     @PatchMapping("/schedules/{scheduleId}/cancel")
     @ResponseStatus(HttpStatus.NO_CONTENT)
