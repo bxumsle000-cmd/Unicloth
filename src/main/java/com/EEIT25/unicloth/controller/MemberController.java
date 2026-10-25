@@ -4,7 +4,7 @@ import com.EEIT25.unicloth.dto.member.ChangePasswordRequest;
 import com.EEIT25.unicloth.dto.member.CompleteProfileRequest;
 import com.EEIT25.unicloth.dto.member.MemberResponse;
 import com.EEIT25.unicloth.dto.member.UpdateMemberRequest;
-import com.EEIT25.unicloth.service.MemberService;
+import com.EEIT25.unicloth.service.shop.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

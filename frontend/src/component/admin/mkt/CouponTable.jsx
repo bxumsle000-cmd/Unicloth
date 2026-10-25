@@ -1,16 +1,9 @@
 import { useState } from "react";
-import { COUPON_TRIGGERS } from "../../../js/admin.js";
+import { COUPON_TRIGGERS, discountText } from "../../../js/admin.js";
 import { money } from "../../../js/kinu.js";
 
 const smallButtonClass = "ml-2 border border-line px-2.5 py-1 text-[12px] hover:border-black";
 const filterClass = "border border-line bg-white px-3 py-2 text-[13px] outline-none focus:border-black";
-
-/** 折扣的文字：AMOUNT → 折 100 元；PERCENT → 10% off（打 9 折） */
-function discountText(coupon) {
-    return coupon.type === 'AMOUNT'
-        ? `折 ${coupon.value} 元`
-        : `${coupon.value}% off（打 ${(100 - coupon.value) / 10} 折）`;
-}
 
 /**
  * 折價券篩選列 + 表格<br>

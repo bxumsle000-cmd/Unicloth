@@ -1,7 +1,7 @@
 package com.EEIT25.unicloth.controller;
 
 import com.EEIT25.unicloth.dto.coupon.*;
-import com.EEIT25.unicloth.service.CouponService;
+import com.EEIT25.unicloth.service.shop.CouponService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

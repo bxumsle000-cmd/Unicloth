@@ -2,7 +2,7 @@ package com.EEIT25.unicloth.controller;
 
 import com.EEIT25.unicloth.dto.admin.product.ProductScheduledOffAtResponse;
 import com.EEIT25.unicloth.dto.admin.product.UpdateProductScheduledOffAtRequest;
-import com.EEIT25.unicloth.service.AdminProductScheduleService;
+import com.EEIT25.unicloth.service.admin.AdminProductScheduleService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;

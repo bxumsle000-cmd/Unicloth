@@ -3,6 +3,7 @@ import { useState } from "react";
 import AdminHeader from "../../component/admin/shared/AdminHeader.jsx";
 import SideMenu from "../../component/admin/mkt/SideMenu.jsx";
 import CouponPage from "../../component/admin/mkt/CouponPage.jsx";
+import IssuePage from "../../component/admin/mkt/IssuePage.jsx";
 
 function MktHome() {
     // 目前在哪個子頁面，值是 SideMenu 裡 MENU_GROUPS 的 page.key：'coupon' | 'issue' | 'records'
@@ -20,6 +21,7 @@ function MktHome() {
 
                 <main className="flex-1 px-8 py-8 max-[760px]:px-4">
                     {currentPage === 'coupon' && <CouponPage/>}
+                    {currentPage === 'issue' && <IssuePage/>}
                 </main>
             </div>
         </div>

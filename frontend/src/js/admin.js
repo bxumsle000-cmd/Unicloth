@@ -20,6 +20,21 @@ export const COUPON_TRIGGERS = [
     { key: 'BIRTHDAY',    name: '生日禮' },
 ];
 
+// 預約發送的狀態：key 要跟後端 enum CouponScheduleStatus 一樣，name 是畫面上顯示的名字，color 是狀態文字的顏色
+export const COUPON_SCHEDULE_STATUSES = [
+    { key: 'PENDING',   name: '等待中', color: 'text-[#9a6b1f]' },
+    { key: 'SENT',      name: '已發送', color: 'text-[#2f6b3a]' },
+    { key: 'FAILED',    name: '未發送', color: 'text-[#b0413e]' },
+    { key: 'CANCELLED', name: '已取消', color: 'text-muted' },
+];
+
+/** 折價券折扣的文字：AMOUNT → 折 100 元；PERCENT → 10% off（打 9 折） */
+export function discountText(coupon) {
+    return coupon.type === 'AMOUNT'
+        ? `折 ${coupon.value} 元`
+        : `${coupon.value}% off（打 ${(100 - coupon.value) / 10} 折）`;
+}
+
 // 員工登入資料存在 localStorage 的 key；AdminLogin.jsx 登入成功時存，用到的地方直接 localStorage.getItem 讀，登出時 clearAdminSession() 刪
 // 不用 try/catch：後台每一頁都要登入，瀏覽器不讓用 localStorage 時本來就不能用，直接出錯比較好查
 export const ADMIN_TOKEN_KEY = 'adminToken';

@@ -1,7 +1,7 @@
 package com.EEIT25.unicloth.controller;
 
 import com.EEIT25.unicloth.dto.order.OrderResponse;
-import com.EEIT25.unicloth.service.OrderService;
+import com.EEIT25.unicloth.service.shop.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

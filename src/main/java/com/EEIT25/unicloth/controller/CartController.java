@@ -3,7 +3,7 @@ package com.EEIT25.unicloth.controller;
 import com.EEIT25.unicloth.dto.cartItem.AddCartItemRequest;
 import com.EEIT25.unicloth.dto.cartItem.CartItemResponse;
 import com.EEIT25.unicloth.dto.cartItem.ChangeCartItemQtyRequest;
-import com.EEIT25.unicloth.service.CartItemService;
+import com.EEIT25.unicloth.service.shop.CartItemService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

@@ -4,7 +4,7 @@ import com.EEIT25.unicloth.dto.admin.cs.AdminSupportTicketDetailResponse;
 import com.EEIT25.unicloth.dto.admin.cs.AdminSupportTicketListResponse;
 import com.EEIT25.unicloth.dto.admin.cs.ReplySupportTicketRequest;
 import com.EEIT25.unicloth.enums.TicketStatus;
-import com.EEIT25.unicloth.service.AdminSupportTicketService;
+import com.EEIT25.unicloth.service.admin.AdminSupportTicketService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;

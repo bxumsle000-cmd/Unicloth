@@ -1,8 +1,8 @@
 
 package com.EEIT25.unicloth.controller;
 
-import com.EEIT25.unicloth.service.ecpay.EcpayService;
-import com.EEIT25.unicloth.service.ecpay.EcpayCallbackService;
+import com.EEIT25.unicloth.service.shop.ecpay.EcpayService;
+import com.EEIT25.unicloth.service.shop.ecpay.EcpayCallbackService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

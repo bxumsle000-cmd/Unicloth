@@ -2,7 +2,7 @@ package com.EEIT25.unicloth.controller;
 
 import com.EEIT25.unicloth.dto.category.ProductCardResponse;
 import com.EEIT25.unicloth.dto.product.ProductDetailResponse;
-import com.EEIT25.unicloth.service.ProductService;
+import com.EEIT25.unicloth.service.shop.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;

@@ -11,4 +11,7 @@ public interface CouponScheduleRepository extends JpaRepository<CouponSchedule, 
 
     // 排程用：某個狀態、預約時間已經到了的預約（DB 有 idx_coupon_schedules_status_time）
     List<CouponSchedule> findByStatusAndScheduledAtLessThanEqual(CouponScheduleStatus status, LocalDateTime now);
+
+    // 預約發送紀錄：預約時間晚的排前面
+    List<CouponSchedule> findAllByOrderByScheduledAtDesc();
 }

@@ -6,7 +6,7 @@ import com.EEIT25.unicloth.dto.category.CategoryResponse;
 import com.EEIT25.unicloth.dto.category.FilterOptionsResponse;
 import com.EEIT25.unicloth.dto.category.ProductCardResponse;
 import com.EEIT25.unicloth.dto.category.ProductFilterRequest;
-import com.EEIT25.unicloth.service.CategoryService;
+import com.EEIT25.unicloth.service.shop.CategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;

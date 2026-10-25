@@ -4,7 +4,7 @@ import com.EEIT25.unicloth.dto.auth.FirebaseLoginRequest;
 import com.EEIT25.unicloth.dto.auth.LoginRequest;
 import com.EEIT25.unicloth.dto.auth.LoginResponse;
 import com.EEIT25.unicloth.dto.auth.RegisterRequest;
-import com.EEIT25.unicloth.service.AuthService;
+import com.EEIT25.unicloth.service.shop.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

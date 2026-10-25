@@ -5,7 +5,7 @@ import com.EEIT25.unicloth.dto.staff.CreateNewStaffRequest;
 import com.EEIT25.unicloth.dto.staff.StaffFilterRequest;
 import com.EEIT25.unicloth.dto.staff.StaffResponse;
 import com.EEIT25.unicloth.dto.staff.TempPasswordResponse;
-import com.EEIT25.unicloth.service.StaffService;
+import com.EEIT25.unicloth.service.admin.StaffService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;

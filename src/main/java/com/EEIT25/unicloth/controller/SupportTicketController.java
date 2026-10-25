@@ -2,7 +2,7 @@ package com.EEIT25.unicloth.controller;
 
 import com.EEIT25.unicloth.dto.supportTicket.CreateSupportTicketRequest;
 import com.EEIT25.unicloth.dto.supportTicket.SupportTicketResponse;
-import com.EEIT25.unicloth.service.SupportTicketService;
+import com.EEIT25.unicloth.service.shop.SupportTicketService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

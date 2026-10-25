@@ -1,10 +1,11 @@
 package com.EEIT25.unicloth.controller;
 
 import com.EEIT25.unicloth.dto.coupon.AdminCouponResponse;
+import com.EEIT25.unicloth.dto.coupon.CouponScheduleResponse;
 import com.EEIT25.unicloth.dto.coupon.CreateCouponRequest;
 import com.EEIT25.unicloth.dto.coupon.GrantCouponRequest;
 import com.EEIT25.unicloth.dto.coupon.UpdateCouponRequest;
-import com.EEIT25.unicloth.service.AdminCouponService;
+import com.EEIT25.unicloth.service.admin.AdminCouponService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -63,6 +64,11 @@ public class AdminCouponController {
         adminCouponService.grantTo(id, request);
     }
 
+    /** 預約發送紀錄（含已發送、已取消的），篩選在前端做 */
+    @GetMapping("/schedules")
+    public List<CouponScheduleResponse> getAllSchedules() {
+        return adminCouponService.getAllSchedules();
+    }
     /** 取消預約發送（只有還沒發送的能取消） */
     @PatchMapping("/schedules/{scheduleId}/cancel")
     @ResponseStatus(HttpStatus.NO_CONTENT)

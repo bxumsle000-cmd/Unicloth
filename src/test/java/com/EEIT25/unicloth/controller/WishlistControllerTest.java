@@ -1,7 +1,7 @@
 package com.EEIT25.unicloth.controller;
 
 import com.EEIT25.unicloth.dto.wishlist.WishlistItemResponse;
-import com.EEIT25.unicloth.service.WishlistService;
+import com.EEIT25.unicloth.service.shop.WishlistService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;

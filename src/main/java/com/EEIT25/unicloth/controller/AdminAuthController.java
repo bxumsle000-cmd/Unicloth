@@ -3,7 +3,7 @@ package com.EEIT25.unicloth.controller;
 import com.EEIT25.unicloth.dto.admin.StaffLoginRequest;
 import com.EEIT25.unicloth.dto.admin.StaffLoginResponse;
 import com.EEIT25.unicloth.dto.member.ChangePasswordRequest;
-import com.EEIT25.unicloth.service.AdminAuthService;
+import com.EEIT25.unicloth.service.admin.AdminAuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

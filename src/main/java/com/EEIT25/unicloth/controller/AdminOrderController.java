@@ -6,7 +6,7 @@ import com.EEIT25.unicloth.dto.admin.order.AdminOrderListResponse;
 import com.EEIT25.unicloth.dto.admin.order.ShipOrderRequest;
 import com.EEIT25.unicloth.enums.OrderStatus;
 import com.EEIT25.unicloth.enums.ShippingMethod;
-import com.EEIT25.unicloth.service.AdminOrderService;
+import com.EEIT25.unicloth.service.admin.AdminOrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
