@@ -10,7 +10,7 @@
 
 訂單是在結帳時建立的，請看 [checkout.md](checkout.md)。
 
-> 🔒 **需要登入**：請求要帶 `Authorization: Bearer <token>`（token 從 `/api/auth/login` 或 `/api/auth/firebase` 取得），操作的是 token 裡的那個會員。沒帶 token 或 token 無效、過期回 401。登入了但還沒補填會員資料回 403「請先填寫會員資料」。
+> 🔒 **需要登入**：請求要帶 `Authorization: Bearer <token>`（token 從 `/api/auth/firebase` 取得），操作的是 token 裡的那個會員。沒帶 token 或 token 無效、過期回 401。登入了但還沒補填會員資料回 403「請先填寫會員資料」。
 
 ---
 

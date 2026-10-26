@@ -57,7 +57,7 @@ public class SecurityConfig {
                 // STATELESS：不建立 HttpSession，每個請求只靠自己帶的 JWT 證明身分
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                // 登入走自己的 /api/auth/login，不需要 Security 內建的登入頁與 Basic 認證視窗
+                // 登入走自己的 /api/auth/firebase，不需要 Security 內建的登入頁與 Basic 認證視窗
                 .formLogin(form -> form.disable())
                 .httpBasic(basic -> basic.disable())
 
@@ -69,7 +69,7 @@ public class SecurityConfig {
                 // 授權規則：由上往下比對，第一條符合的生效，所以「放行」要寫在「要登入」前面
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST,
-                                "/api/auth/login", "/api/auth/firebase", "/api/auth/register", "/api/auth/logout").permitAll()
+                                "/api/auth/firebase", "/api/auth/logout").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/admin/auth/login").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/products/**", "/api/categories/**").permitAll()
 

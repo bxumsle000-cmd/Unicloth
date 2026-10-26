@@ -67,7 +67,6 @@ class CheckoutServiceTest {
     void setUp() {
         member = memberRepository.save(Member.builder()
                 .email("order-test@example.com")
-                .passwordHash("x")
                 .build());
         when(currentMember.getCurrentId()).thenReturn(member.getId());
         when(currentMember.require()).thenReturn(member);
@@ -229,7 +228,6 @@ class CheckoutServiceTest {
     void 勾選別人的購物車項目_不能結帳() {
         Member someoneElse = memberRepository.save(Member.builder()
                 .email("order-test-other@example.com")
-                .passwordHash("x")
                 .build());
         Long othersCartItemId = cartItemRepository.save(CartItem.builder()
                 .member(someoneElse).variant(variant).qty(1).build()).getId();

@@ -1,4 +1,4 @@
-# Member API（會員資料 / 修改資料 / 修改密碼）
+# Member API（會員資料 / 補填資料 / 修改資料）
 
 - Controller：`controller/MemberController.java`
 - Service：`service/MemberService.java`
@@ -8,9 +8,8 @@
 |---|---|---|---|---|
 | 取得我的會員資料 | GET | `/api/member/me` | 200 | 會員資料 |
 | 修改我的會員資料 | PUT | `/api/member/me/profile` | 200 | 修改後的會員資料 |
-| 修改密碼 | PATCH | `/api/member/me/password` | 204 | 沒有 body |
 
-> 🔒 **需要登入**：請求要帶 `Authorization: Bearer <token>`（token 從 `/api/auth/login` 或 `/api/auth/firebase` 取得），操作的是 token 裡的那個會員。沒帶 token 或 token 無效、過期回 401。登入了但還沒補填會員資料回 403「請先填寫會員資料」。
+> 🔒 **需要登入**：請求要帶 `Authorization: Bearer <token>`（token 從 `/api/auth/firebase` 取得），操作的是 token 裡的那個會員。沒帶 token 或 token 無效、過期回 401。登入了但還沒補填會員資料回 403「請先填寫會員資料」。
 
 ---
 
@@ -52,8 +51,6 @@
 | `createdAt` | string | 註冊時間，格式 `yyyy-MM-ddTHH:mm:ss`（可能帶小數秒，例如 `2026-10-03T14:30:00.123`） |
 | `profileCompleted` | boolean | 會員資料填了沒；前端的路由守衛靠它決定要不要導去補填頁 |
 
-> 回應**不會**帶出密碼（`MemberResponse.from()` 沒有放 `passwordHash`）。
-
 ### Response — 失敗
 
 | 狀態碼 | 情況 | `message` |
@@ -73,7 +70,7 @@
    ├─ CurrentMember.require()：用目前登入的會員 id 去 members 表查
    │    └─ 查不到 → 401「登入過期或失效」
    ├─ 用會員 id 去 member_profiles 表查個人資料（查不到 = 還沒補填）
-   └─ 把 Member、MemberProfile 轉成 MemberResponse（拿掉密碼）
+   └─ 把 Member、MemberProfile 轉成 MemberResponse
    │
    ▼
 ② 回 200 + JSON
@@ -213,77 +210,4 @@
 
 ---
 
-## 3. 修改密碼 `PATCH /api/member/me/password`
-
-### Request
-
-```json
-{
-  "oldPassword": "12345678",
-  "newPassword": "abcd1234"
-}
-```
-
-| 欄位 | 型別 | 必填 | 規則 |
-|---|---|---|---|
-| `oldPassword` | string | ✅ | 不可空白 |
-| `newPassword` | string | ✅ | 不可空白、**長度 8～72 字**（訊息：`密碼長度需為 8～72 字`） |
-
-> 為什麼上限是 72？BCrypt 只會處理密碼的前 72 個 byte，超過的部分會被忽略，所以直接擋掉。
-> （註冊的 `password` 目前只限制「最少 8 字」，沒有 72 的上限，兩邊規則不一致，供參考。）
-
-### Response — 成功 `204 No Content`
-
-沒有 body。前端只要看狀態碼是 204 就代表修改成功。
-
-> 改完密碼**不會**登出，下次登入要用新密碼。
-
-### Response — 失敗
-
-| 狀態碼 | 情況 | `message` |
-|---|---|---|
-| 400 | 欄位驗證沒過 | 例：`newPassword: 密碼長度需為 8～72 字` |
-| 400 | 其他欄位格式錯誤 | `請求內容格式錯誤，請確認欄位值是否正確` |
-| 400 | 舊密碼輸入錯誤 | `密碼錯誤` |
-| 400 | 新密碼跟舊密碼一樣 | `新密碼不能與舊密碼相同` |
-| 401 | 資料庫找不到目前登入的會員 | `登入過期或失效` |
-| 403 | 帳號被停用 | `此帳號已被停用` |
-
-### 過程中做了什麼
-
-```
-前端 PATCH /api/member/me/password
-   │
-   ▼
-① Spring 把 JSON 轉成 ChangePasswordRequest
-   └─ 轉不過去（JSON 語法錯）→ 400
-   │
-   ▼
-② @Valid 檢查欄位規則
-   └─ 沒過 → 400（一次列出所有錯的欄位）
-   │
-   ▼
-③ MemberService.changePassword()   ← 整段包在 @Transactional 裡
-   ├─ CurrentMember.require()：查出目前登入的會員
-   │    └─ 查不到 → 401「登入過期或失效」
-   ├─ 用 BCrypt 比對 oldPassword 和資料庫的 password_hash
-   │    └─ 不符 → 400「密碼錯誤」
-   ├─ 用 BCrypt 比對 newPassword 和資料庫的 password_hash
-   │    └─ 相符（新舊一樣）→ 400「新密碼不能與舊密碼相同」
-   └─ 用 BCrypt 把 newPassword 加密，設成新的 password_hash
-   │
-   ▼
-④ 交易結束，Hibernate 自動 UPDATE 回資料庫（dirty checking）
-   │
-   ▼
-⑤ 回 204（沒有 body）
-```
-
-**資料庫影響：** `members` 表更新一筆（目前登入的會員）。
-
-| 欄位 | 值從哪來 |
-|---|---|
-| `password_hash` | Request 的 `newPassword` 經 BCrypt 加密 |
-| 其他欄位 | 不變 |
-
-> ⚠️ 觀察到的小地方（不影響目前功能，供參考）：這三支 API 都**沒有**檢查會員 `status`，所以被停用（`DISABLED`）的會員，目前仍然可以查詢、修改資料和改密碼。實際上停用的會員登不進來，所以現階段影響不大。
+> ⚠️ 觀察到的小地方（不影響目前功能，供參考）：這幾支 API 都**沒有**檢查會員 `status`，所以被停用（`DISABLED`）的會員，目前仍然可以查詢、修改資料。實際上停用的會員登不進來，所以現階段影響不大。

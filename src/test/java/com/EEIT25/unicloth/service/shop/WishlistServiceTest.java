@@ -47,7 +47,6 @@ class WishlistServiceTest {
     void setUp() {
         member = memberRepository.save(Member.builder()
                 .email("wishlist-test@example.com")
-                .passwordHash("x")
                 .build());
         when(currentMember.getCurrentId()).thenReturn(member.getId());
         when(currentMember.require()).thenReturn(member);

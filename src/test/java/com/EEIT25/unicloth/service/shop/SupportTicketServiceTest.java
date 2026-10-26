@@ -51,7 +51,6 @@ class SupportTicketServiceTest {
     private Member saveMember(String email) {
         return memberRepository.save(Member.builder()
                 .email(email)
-                .passwordHash("x")
                 .build());
     }
 

@@ -77,7 +77,6 @@ class EcpayCallbackCancelTest {
     void setUp() {
         member = memberRepository.save(Member.builder()
                 .email("ecpay-cancel-test@example.com")
-                .passwordHash("x")
                 .build());
         when(currentMember.getCurrentId()).thenReturn(member.getId());
         when(currentMember.require()).thenReturn(member);

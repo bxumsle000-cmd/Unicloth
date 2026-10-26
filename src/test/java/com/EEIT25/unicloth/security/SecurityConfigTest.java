@@ -58,7 +58,7 @@ class SecurityConfigTest {
         @GetMapping("/api/cart") String cart() { return "cart"; }
         @GetMapping("/api/products") String products() { return "products"; }
         @PostMapping("/api/products") String createProduct() { return "created"; }
-        @PostMapping("/api/auth/login") String login() { return "ok"; }
+        @PostMapping("/api/auth/firebase") String login() { return "ok"; }
         @GetMapping("/api/member/me") String me() { return "me"; }
         @PutMapping("/api/member/me/complete-profile") String completeProfile() { return "completed"; }
         /** 回傳 CurrentMember 認為的「現在是誰」，驗證整條鏈：Filter → SecurityContext → CurrentMember */
@@ -208,7 +208,7 @@ class SecurityConfigTest {
 
     @Test
     void 登入端點_沒帶token_放行() throws Exception {
-        mockMvc.perform(post("/api/auth/login"))
+        mockMvc.perform(post("/api/auth/firebase"))
                 .andExpect(status().isOk());
     }
 

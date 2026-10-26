@@ -75,7 +75,6 @@ class CheckoutCouponConcurrencyTest {
     void setUp() {
         member = memberRepository.save(Member.builder()
                 .email("coupon-race-" + System.nanoTime() + "@example.com")
-                .passwordHash("x")
                 .build());
         when(currentMember.require()).thenReturn(member);
         when(currentMember.getCurrentId()).thenReturn(member.getId());

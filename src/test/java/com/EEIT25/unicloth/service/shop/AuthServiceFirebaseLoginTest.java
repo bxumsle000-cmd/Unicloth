@@ -1,7 +1,6 @@
 package com.EEIT25.unicloth.service.shop;
 
 import com.EEIT25.unicloth.dto.auth.FirebaseLoginRequest;
-import com.EEIT25.unicloth.dto.auth.LoginRequest;
 import com.EEIT25.unicloth.dto.auth.LoginResponse;
 import com.EEIT25.unicloth.entity.Member;
 import com.EEIT25.unicloth.enums.MemberStatus;
@@ -44,13 +43,12 @@ class AuthServiceFirebaseLoginTest {
     }
 
     @Test
-    void 第一次登入_建新會員且沒有密碼() {
+    void 第一次登入_建新會員() {
         LoginResponse response = loginAs("uid-new", "google-new@example.com", true);
 
         Member member = memberRepository.findById(response.memberId()).orElseThrow();
         assertThat(member.getEmail()).isEqualTo("google-new@example.com");
         assertThat(member.getFirebaseUid()).isEqualTo("uid-new");
-        assertThat(member.getPasswordHash()).isNull();
         // 新會員還沒有個人資料，前端要導去補填頁
         assertThat(response.profileCompleted()).isFalse();
         // 回傳的是我們自己的 JWT，解回來是同一個會員
@@ -72,7 +70,6 @@ class AuthServiceFirebaseLoginTest {
     void email已經用密碼註冊過_綁定到原本的帳號() {
         Member existing = memberRepository.save(Member.builder()
                 .email("password-user@example.com")
-                .passwordHash("x")
                 .build());
 
         Long memberId = loginAs("uid-link", "password-user@example.com", true).memberId();
@@ -85,7 +82,6 @@ class AuthServiceFirebaseLoginTest {
     void email已經註冊過但Google沒驗證email_409() {
         memberRepository.save(Member.builder()
                 .email("unverified@example.com")
-                .passwordHash("x")
                 .build());
 
         assertThatThrownBy(() -> loginAs("uid-unverified", "unverified@example.com", false))
@@ -116,15 +112,5 @@ class AuthServiceFirebaseLoginTest {
         assertThatThrownBy(() -> loginAs("uid-disabled", "disabled@example.com", true))
                 .isInstanceOf(ApiException.class)
                 .extracting("status").isEqualTo(HttpStatus.FORBIDDEN);
-    }
-
-    @Test
-    void Google登入建的會員_不能用密碼登入() {
-        loginAs("uid-no-password", "no-password@example.com", true);
-
-        assertThatThrownBy(() -> authService.login(
-                new LoginRequest("no-password@example.com", "anything")))
-                .isInstanceOf(ApiException.class)
-                .extracting("status").isEqualTo(HttpStatus.UNAUTHORIZED);
     }
 }

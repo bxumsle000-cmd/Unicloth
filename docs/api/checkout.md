@@ -10,7 +10,7 @@
 
 **結帳只買「勾選」的購物車項目**：前端把要買的購物車項目 id 放在 `cartItemIdList` 傳上來，沒勾的會留在購物車。
 
-> 🔒 **需要登入**：請求要帶 `Authorization: Bearer <token>`（token 從 `/api/auth/login` 或 `/api/auth/firebase` 取得），操作的是 token 裡的那個會員。沒帶 token 或 token 無效、過期回 401。登入了但還沒補填會員資料回 403「請先填寫會員資料」。
+> 🔒 **需要登入**：請求要帶 `Authorization: Bearer <token>`（token 從 `/api/auth/firebase` 取得），操作的是 token 裡的那個會員。沒帶 token 或 token 無效、過期回 401。登入了但還沒補填會員資料回 403「請先填寫會員資料」。
 
 ---
 

@@ -13,11 +13,8 @@ import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
-    // 登入用：用 email 查會員
+    // Google 登入用：同一個 email 已有帳號時，把 Firebase uid 綁上去
     Optional<Member> findByEmail(String email);
-
-    // 註冊用：檢查 email 是否已被使用
-    boolean existsByEmail(String email);
 
     // Google 登入用：用 Firebase uid 查會員
     Optional<Member> findByFirebaseUid(String firebaseUid);
