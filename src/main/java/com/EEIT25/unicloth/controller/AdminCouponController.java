@@ -1,11 +1,14 @@
 package com.EEIT25.unicloth.controller;
 
 import com.EEIT25.unicloth.dto.coupon.AdminCouponResponse;
+import com.EEIT25.unicloth.dto.coupon.CouponRecordResponse;
 import com.EEIT25.unicloth.dto.coupon.CouponScheduleResponse;
 import com.EEIT25.unicloth.dto.coupon.CreateCouponRequest;
 import com.EEIT25.unicloth.dto.coupon.GrantCouponRequest;
 import com.EEIT25.unicloth.dto.coupon.UpdateCouponRequest;
 import com.EEIT25.unicloth.enums.CouponScheduleStatus;
+import com.EEIT25.unicloth.enums.CouponSource;
+import com.EEIT25.unicloth.enums.MemberCouponStatus;
 import com.EEIT25.unicloth.service.admin.AdminCouponService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,9 +17,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -86,5 +91,23 @@ public class AdminCouponController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void cancelSchedule(@PathVariable Long scheduleId) {
         adminCouponService.cancelSchedule(scheduleId);
+    }
+
+    /**
+     * 發券紀錄：每張發出去的券一筆（手動發和自動發都有），發券時間新的排前面<br>
+     * 篩選都是選填：keyword 比對會員姓名或 email；status 是 USABLE / USED / EXPIRED；
+     * receivedFrom、receivedTo 格式 2026-10-01，兩端都含，只傳一邊也可以<br>
+     * page 從 0 開始，預設每頁 10 筆；排序寫死在查詢裡，不吃 sort 參數
+     */
+    @GetMapping("/records")
+    public Page<CouponRecordResponse> getRecords(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Long couponId,
+            @RequestParam(required = false) CouponSource source,
+            @RequestParam(required = false) MemberCouponStatus status,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate receivedFrom,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate receivedTo,
+            @ParameterObject @PageableDefault(size = 10) Pageable pageable) {
+        return adminCouponService.getRecords(keyword, couponId, source, status, receivedFrom, receivedTo, pageable);
     }
 }

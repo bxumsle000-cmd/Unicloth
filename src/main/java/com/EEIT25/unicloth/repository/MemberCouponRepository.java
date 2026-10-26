@@ -1,8 +1,12 @@
 package com.EEIT25.unicloth.repository;
 
+import com.EEIT25.unicloth.dto.coupon.CouponRecordResponse;
 import com.EEIT25.unicloth.entity.Member;
 import com.EEIT25.unicloth.entity.MemberCoupon;
 import com.EEIT25.unicloth.entity.Order;
+import com.EEIT25.unicloth.enums.CouponSource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -49,4 +53,41 @@ public interface MemberCouponRepository extends JpaRepository<MemberCoupon, Long
     List<MemberCoupon> findByMember(Member member);
 
     List<MemberCoupon> findByMemberOrderByExpireAtAsc(Member member);
+
+    /**
+     * 後台發券紀錄：每張發出去的券一筆，發券時間新的排前面。<br>
+     * 每個篩選是 null 就不篩；keyword 要先轉小寫、前後加 %（比對姓名或 email）；
+     * status 傳 MemberCouponStatus 的 name()（例如 "USED"），判斷方式跟 MemberCouponStatus.of 一樣；receivedFrom 含、receivedTo 不含。<br>
+     * （status 不能直接傳 enum：MemberCouponStatus 不是任何 entity 的欄位，Hibernate 判斷不出參數的型別，查詢會失敗）<br>
+     * members 和 member_profiles 沒有 JPA 關聯，所以用 left join ... on 接；沒補填資料的姓名是 null。<br>
+     * 每筆的 status 不在這裡算，由 CouponRecordResponse 的建構子用 usedAt、expireAt 算。
+     */
+    @Query("""
+            select new com.EEIT25.unicloth.dto.coupon.CouponRecordResponse(
+                mc.id, mc.receivedAt, p.name, m.email, c.code, c.title, mc.source, mc.expireAt,
+                mc.usedAt, o.orderNo, o.discount)
+            from MemberCoupon mc
+            join mc.member m
+            join mc.coupon c
+            left join MemberProfile p on p.memberId = m.id
+            left join mc.order o
+            where (:keyword is null or lower(m.email) like :keyword or lower(p.name) like :keyword)
+              and (:couponId is null or c.id = :couponId)
+              and (:source is null or mc.source = :source)
+              and (:status is null
+                   or (:status = 'USED' and mc.usedAt is not null)
+                   or (:status = 'EXPIRED' and mc.usedAt is null and mc.expireAt < :now)
+                   or (:status = 'USABLE' and mc.usedAt is null and mc.expireAt >= :now))
+              and (:receivedFrom is null or mc.receivedAt >= :receivedFrom)
+              and (:receivedTo is null or mc.receivedAt < :receivedTo)
+            order by mc.receivedAt desc, mc.id desc
+            """)
+    Page<CouponRecordResponse> findRecords(@Param("keyword") String keyword,
+                                           @Param("couponId") Long couponId,
+                                           @Param("source") CouponSource source,
+                                           @Param("status") String status,
+                                           @Param("receivedFrom") LocalDateTime receivedFrom,
+                                           @Param("receivedTo") LocalDateTime receivedTo,
+                                           @Param("now") LocalDateTime now,
+                                           Pageable pageable);
 }

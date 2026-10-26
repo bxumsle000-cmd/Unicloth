@@ -1,6 +1,7 @@
 package com.EEIT25.unicloth.service.admin;
 
 import com.EEIT25.unicloth.dto.coupon.AdminCouponResponse;
+import com.EEIT25.unicloth.dto.coupon.CouponRecordResponse;
 import com.EEIT25.unicloth.dto.coupon.CouponScheduleResponse;
 import com.EEIT25.unicloth.dto.coupon.CreateCouponRequest;
 import com.EEIT25.unicloth.dto.coupon.GrantCouponRequest;
@@ -11,7 +12,9 @@ import com.EEIT25.unicloth.entity.CouponSchedule;
 import com.EEIT25.unicloth.entity.Member;
 import com.EEIT25.unicloth.entity.MemberCoupon;
 import com.EEIT25.unicloth.enums.CouponScheduleStatus;
+import com.EEIT25.unicloth.enums.CouponSource;
 import com.EEIT25.unicloth.enums.CouponType;
+import com.EEIT25.unicloth.enums.MemberCouponStatus;
 import com.EEIT25.unicloth.enums.MemberStatus;
 import com.EEIT25.unicloth.exception.ApiException;
 import com.EEIT25.unicloth.repository.CouponRepository;
@@ -21,10 +24,12 @@ import com.EEIT25.unicloth.repository.MemberRepository;
 import com.EEIT25.unicloth.security.CurrentStaff;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
@@ -39,7 +44,8 @@ import java.util.List;
  * - {@link #getIssueMembers()}：發券時可以選的會員<br><br>
  * - {@link #grantTo(Long, GrantCouponRequest)}：發券給會員（立即或預約）<br><br>
  * - {@link #getSchedules(CouponScheduleStatus, Pageable)}：預約發送紀錄（分頁）<br><br>
- * - {@link #cancelSchedule(Long)}：取消預約發送
+ * - {@link #cancelSchedule(Long)}：取消預約發送<br><br>
+ * - {@link #getRecords(String, Long, CouponSource, MemberCouponStatus, LocalDate, LocalDate, Pageable)}：發券紀錄（分頁）
  */
 @Service
 @RequiredArgsConstructor
@@ -207,6 +213,35 @@ public class AdminCouponService {
     public Page<CouponScheduleResponse> getSchedules(CouponScheduleStatus status, Pageable pageable){
         return couponScheduleRepository.findByStatusFilter(status, pageable)
                 .map(schedule -> CouponScheduleResponse.from(schedule));
+    }
+
+    /**
+     * 發券紀錄：每張發出去的券一筆（手動發的和自動發的都有），發券時間新的排前面，分頁查詢。<br>
+     * 每個篩選是 null 就不篩（keyword 空白也不篩）：<br>
+     * - keyword：比對會員姓名或 email（不分大小寫、部分符合就算）<br>
+     * - status：可使用 / 已使用 / 已過期，判斷方式見 {@link MemberCouponStatus#of}<br>
+     * - receivedFrom、receivedTo：發券日期的區間，兩端都含，只填一邊也可以
+     */
+    @Transactional(readOnly = true)
+    public Page<CouponRecordResponse> getRecords(String keyword, Long couponId, CouponSource source, MemberCouponStatus status,
+                                                 LocalDate receivedFrom, LocalDate receivedTo, Pageable pageable){
+        if (receivedFrom != null && receivedTo != null && receivedFrom.isAfter(receivedTo)) {
+            throw ApiException.badRequest("開始日期不能晚於結束日期");
+        }
+
+        // 姓名或 email 部分符合就算：轉小寫、前後加 %
+        String keywordPattern = keyword == null || keyword.isBlank()
+                ? null
+                : "%" + keyword.trim().toLowerCase() + "%";
+        // 日期換成時間：結束日要含當天，所以查到隔天 00:00 之前
+        LocalDateTime receivedFromTime = receivedFrom == null ? null : receivedFrom.atStartOfDay();
+        LocalDateTime receivedToTime = receivedTo == null ? null : receivedTo.plusDays(1).atStartOfDay();
+
+        String statusName = status == null ? null : status.name();
+        // 排序寫死在查詢裡；pageable 帶了 sort 的話會再接一次 order by，SQL Server 會報錯，所以只取頁碼和筆數
+        Pageable pageOnly = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize());
+        return memberCouponRepository.findRecords(keywordPattern, couponId, source, statusName,
+                receivedFromTime, receivedToTime, LocalDateTime.now(), pageOnly);
     }
 
     /** 取消預約：只有還沒發送（PENDING）的能取消 */

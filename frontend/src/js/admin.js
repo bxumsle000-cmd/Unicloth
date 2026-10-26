@@ -28,6 +28,20 @@ export const COUPON_SCHEDULE_STATUSES = [
     { key: 'CANCELLED', name: '已取消', color: 'text-muted' },
 ];
 
+// 會員拿到的券是怎麼來的：key 要跟後端 enum CouponSource 一樣，name 是畫面上顯示的名字
+export const COUPON_SOURCES = [
+    { key: 'MANUAL',   name: '手動發券' },
+    { key: 'SIGNUP',   name: '自動：註冊禮' },
+    { key: 'BIRTHDAY', name: '自動：生日禮' },
+];
+
+// 會員拿到的券現在的狀態：key 要跟後端 enum MemberCouponStatus 一樣，name 是畫面上顯示的名字，color 是狀態文字的顏色
+export const MEMBER_COUPON_STATUSES = [
+    { key: 'USABLE',  name: '可使用', color: 'text-[#2f6b3a]' },
+    { key: 'USED',    name: '已使用', color: 'text-muted' },
+    { key: 'EXPIRED', name: '已過期', color: 'text-[#b0413e]' },
+];
+
 /** 折價券折扣的文字：AMOUNT → 折 100 元；PERCENT → 10% off（打 9 折） */
 export function discountText(coupon) {
     return coupon.type === 'AMOUNT'
