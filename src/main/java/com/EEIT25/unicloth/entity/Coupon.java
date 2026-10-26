@@ -52,7 +52,7 @@ public class Coupon {
     @Column(name = "valid_days", nullable = false)
     private Integer validDays;
 
-    // 自動發送時機，存成大寫字串，例如 SIGNUP；null = 只能手動發
+    // 自動發送時機，存成大寫字串，例如 BIRTHDAY；null = 只能手動發
     @Enumerated(EnumType.STRING)
     @Column(name = "auto_trigger", length = 20)
     private CouponAutoTrigger autoTrigger;

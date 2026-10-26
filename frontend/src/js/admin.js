@@ -16,7 +16,6 @@ export const DEPARTMENTS = [
 
 // 折價券的自動發送時機：key 要跟後端 enum CouponAutoTrigger 一樣，name 是畫面上顯示的名字
 export const COUPON_TRIGGERS = [
-    { key: 'SIGNUP',      name: '註冊禮' },
     { key: 'BIRTHDAY',    name: '生日禮' },
 ];
 
@@ -31,7 +30,6 @@ export const COUPON_SCHEDULE_STATUSES = [
 // 會員拿到的券是怎麼來的：key 要跟後端 enum CouponSource 一樣，name 是畫面上顯示的名字
 export const COUPON_SOURCES = [
     { key: 'MANUAL',   name: '手動發券' },
-    { key: 'SIGNUP',   name: '自動：註冊禮' },
     { key: 'BIRTHDAY', name: '自動：生日禮' },
 ];
 

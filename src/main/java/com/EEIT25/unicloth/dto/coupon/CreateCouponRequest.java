@@ -18,7 +18,7 @@ import jakarta.validation.constraints.Size;
  * @param value       AMOUNT → 折多少元；PERCENT → 折幾 %（10 = 9 折）
  * @param minSubtotal 最低消費
  * @param validDays   領取後幾天內有效
- * @param autoTrigger 自動發送時機，例如 SIGNUP；null = 只能手動發
+ * @param autoTrigger 自動發送時機，例如 BIRTHDAY；null = 只能手動發
  */
 public record CreateCouponRequest(
         @NotBlank(message = "請輸入折扣碼") String code,

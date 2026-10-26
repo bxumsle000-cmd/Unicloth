@@ -15,7 +15,7 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
     // 領券頁面：只列出可領取的
     List<Coupon> findByActiveTrue();
 
-    // 某個時機要自動發放的券（例如註冊時：SIGNUP），同一種時機可以有好幾張
+    // 某個時機要自動發放的券（例如生日：BIRTHDAY），同一種時機可以有好幾張
     List<Coupon> findByAutoTriggerAndActiveTrue(CouponAutoTrigger autoTrigger);
 
     // ==================== 以下提供給行銷後台使用 ====================

@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum CouponSource {
     MANUAL("手動發券"),
-    SIGNUP("自動：註冊禮"),
     BIRTHDAY("自動：生日禮");
 
     // 畫面上顯示的中文

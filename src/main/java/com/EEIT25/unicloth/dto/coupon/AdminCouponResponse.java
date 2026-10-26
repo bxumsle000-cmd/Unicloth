@@ -14,7 +14,7 @@ import com.EEIT25.unicloth.enums.CouponType;
  * @param value       AMOUNT → 折多少元；PERCENT → 折幾 %（10 = 9 折）
  * @param minSubtotal 最低消費
  * @param validDays   領取後幾天內有效
- * @param autoTrigger 自動發送時機，例如 SIGNUP；null = 只能手動發
+ * @param autoTrigger 自動發送時機，例如 BIRTHDAY；null = 只能手動發
  * @param active      是否啟用；停用後不能再發，已發出的券會員還是能用
  * @param issuedCount 已經發出去幾張；大於 0 時編輯視窗要顯示「已發出的券也會跟著變」
  */
