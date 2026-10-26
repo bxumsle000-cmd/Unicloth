@@ -1,10 +1,10 @@
 package com.EEIT25.unicloth.repository;
 
-import com.EEIT25.unicloth.dto.coupon.CouponRecordResponse;
+import com.EEIT25.unicloth.dto.admin.coupon.CouponRecordResponse;
 import com.EEIT25.unicloth.entity.Member;
 import com.EEIT25.unicloth.entity.MemberCoupon;
 import com.EEIT25.unicloth.entity.Order;
-import com.EEIT25.unicloth.enums.CouponSource;
+import com.EEIT25.unicloth.enums.coupon.CouponSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -74,7 +74,7 @@ public interface MemberCouponRepository extends JpaRepository<MemberCoupon, Long
      * 每筆的 status 不在這裡算，由 CouponRecordResponse 的建構子用 usedAt、expireAt 算。
      */
     @Query("""
-            select new com.EEIT25.unicloth.dto.coupon.CouponRecordResponse(
+            select new com.EEIT25.unicloth.dto.admin.coupon.CouponRecordResponse(
                 mc.id, mc.receivedAt, p.name, m.email, c.code, c.title, mc.source, mc.expireAt,
                 mc.usedAt, o.orderNo, o.discount)
             from MemberCoupon mc

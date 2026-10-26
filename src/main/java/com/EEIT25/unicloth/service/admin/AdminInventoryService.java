@@ -6,7 +6,7 @@ import com.EEIT25.unicloth.entity.InventoryTransaction;
 import com.EEIT25.unicloth.entity.InventoryTransactionItem;
 import com.EEIT25.unicloth.entity.ProductVariant;
 import com.EEIT25.unicloth.entity.Staff;
-import com.EEIT25.unicloth.enums.InventoryTransactionType;
+import com.EEIT25.unicloth.enums.product.InventoryTransactionType;
 import com.EEIT25.unicloth.exception.ApiException;
 import com.EEIT25.unicloth.repository.InventoryTransactionItemRepository;
 import com.EEIT25.unicloth.repository.InventoryTransactionRepository;

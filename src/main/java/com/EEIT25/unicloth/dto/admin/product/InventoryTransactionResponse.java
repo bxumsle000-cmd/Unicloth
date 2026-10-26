@@ -1,6 +1,6 @@
 package com.EEIT25.unicloth.dto.admin.product;
 
-import com.EEIT25.unicloth.enums.InventoryTransactionType;
+import com.EEIT25.unicloth.enums.product.InventoryTransactionType;
 
 import java.time.LocalDateTime;
 import java.util.List;

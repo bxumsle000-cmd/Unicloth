@@ -2,7 +2,7 @@
 package com.EEIT25.unicloth.repository;
 
 import com.EEIT25.unicloth.entity.Payment;
-import com.EEIT25.unicloth.enums.PaymentStatus;
+import com.EEIT25.unicloth.enums.order.PaymentStatus;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

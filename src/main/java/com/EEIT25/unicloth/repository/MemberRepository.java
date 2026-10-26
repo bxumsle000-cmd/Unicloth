@@ -1,8 +1,8 @@
 package com.EEIT25.unicloth.repository;
 
-import com.EEIT25.unicloth.dto.coupon.IssueMemberResponse;
+import com.EEIT25.unicloth.dto.admin.coupon.IssueMemberResponse;
 import com.EEIT25.unicloth.entity.Member;
-import com.EEIT25.unicloth.enums.MemberStatus;
+import com.EEIT25.unicloth.enums.member.MemberStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -27,7 +27,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     // 後台發券選會員用：某個狀態的會員連同姓名（members 和 member_profiles 沒有 JPA 關聯，所以用 left join ... on 接；沒補填資料的姓名是 null）
     @Query("""
-            select new com.EEIT25.unicloth.dto.coupon.IssueMemberResponse(m.id, p.name, m.email)
+            select new com.EEIT25.unicloth.dto.admin.coupon.IssueMemberResponse(m.id, p.name, m.email)
             from Member m
             left join MemberProfile p on p.memberId = m.id
             where m.status = :status

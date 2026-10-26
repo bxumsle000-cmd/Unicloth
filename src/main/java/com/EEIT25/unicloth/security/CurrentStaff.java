@@ -1,7 +1,7 @@
 package com.EEIT25.unicloth.security;
 
 import com.EEIT25.unicloth.entity.Staff;
-import com.EEIT25.unicloth.enums.StaffStatus;
+import com.EEIT25.unicloth.enums.staff.StaffStatus;
 import com.EEIT25.unicloth.exception.ApiException;
 import com.EEIT25.unicloth.repository.StaffRepository;
 import lombok.RequiredArgsConstructor;

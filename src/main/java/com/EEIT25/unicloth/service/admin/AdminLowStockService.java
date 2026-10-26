@@ -3,7 +3,7 @@ package com.EEIT25.unicloth.service.admin;
 import com.EEIT25.unicloth.dto.admin.product.AdminLowStockResponse;
 import com.EEIT25.unicloth.entity.Product;
 import com.EEIT25.unicloth.entity.ProductVariant;
-import com.EEIT25.unicloth.enums.ProductStatus;
+import com.EEIT25.unicloth.enums.product.ProductStatus;
 import com.EEIT25.unicloth.exception.ApiException;
 import com.EEIT25.unicloth.repository.ProductVariantRepository;
 import lombok.RequiredArgsConstructor;

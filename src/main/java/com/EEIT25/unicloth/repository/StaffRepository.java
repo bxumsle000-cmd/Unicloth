@@ -1,9 +1,9 @@
 package com.EEIT25.unicloth.repository;
 
-import com.EEIT25.unicloth.dto.staff.StaffResponse;
+import com.EEIT25.unicloth.dto.admin.staff.StaffResponse;
 import com.EEIT25.unicloth.entity.Staff;
-import com.EEIT25.unicloth.enums.Department;
-import com.EEIT25.unicloth.enums.StaffStatus;
+import com.EEIT25.unicloth.enums.staff.Department;
+import com.EEIT25.unicloth.enums.staff.StaffStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

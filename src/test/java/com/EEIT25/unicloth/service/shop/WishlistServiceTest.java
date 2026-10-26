@@ -1,9 +1,9 @@
 package com.EEIT25.unicloth.service.shop;
 
-import com.EEIT25.unicloth.dto.wishlist.WishlistItemResponse;
+import com.EEIT25.unicloth.dto.store.wishlist.WishlistItemResponse;
 import com.EEIT25.unicloth.entity.Member;
 import com.EEIT25.unicloth.entity.Product;
-import com.EEIT25.unicloth.enums.ProductStatus;
+import com.EEIT25.unicloth.enums.product.ProductStatus;
 import com.EEIT25.unicloth.repository.MemberRepository;
 import com.EEIT25.unicloth.repository.ProductRepository;
 import com.EEIT25.unicloth.repository.WishlistItemRepository;

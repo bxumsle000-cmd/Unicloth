@@ -1,7 +1,7 @@
 package com.EEIT25.unicloth.service.shop;
 
-import com.EEIT25.unicloth.dto.checkout.CheckoutRequest;
-import com.EEIT25.unicloth.dto.checkout.CheckoutResponse;
+import com.EEIT25.unicloth.dto.store.checkout.CheckoutRequest;
+import com.EEIT25.unicloth.dto.store.checkout.CheckoutResponse;
 import com.EEIT25.unicloth.entity.CartItem;
 import com.EEIT25.unicloth.entity.Coupon;
 import com.EEIT25.unicloth.entity.Member;
@@ -10,9 +10,9 @@ import com.EEIT25.unicloth.entity.Order;
 import com.EEIT25.unicloth.entity.OrderItem;
 import com.EEIT25.unicloth.entity.Product;
 import com.EEIT25.unicloth.entity.ProductVariant;
-import com.EEIT25.unicloth.enums.OrderStatus;
-import com.EEIT25.unicloth.enums.PaymentMethod;
-import com.EEIT25.unicloth.enums.ProductStatus;
+import com.EEIT25.unicloth.enums.order.OrderStatus;
+import com.EEIT25.unicloth.enums.order.PaymentMethod;
+import com.EEIT25.unicloth.enums.product.ProductStatus;
 import com.EEIT25.unicloth.exception.ApiException;
 import com.EEIT25.unicloth.repository.CartItemRepository;
 import com.EEIT25.unicloth.repository.MemberCouponRepository;

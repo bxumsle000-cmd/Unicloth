@@ -1,14 +1,14 @@
 package com.EEIT25.unicloth.service.shop;
 
-import com.EEIT25.unicloth.dto.category.BreadcrumbResponse;
-import com.EEIT25.unicloth.dto.category.CategoryDetailResponse;
-import com.EEIT25.unicloth.dto.category.CategoryResponse;
-import com.EEIT25.unicloth.dto.category.FilterOptionsResponse;
-import com.EEIT25.unicloth.dto.category.ProductCardResponse;
-import com.EEIT25.unicloth.dto.category.ProductFilterRequest;
+import com.EEIT25.unicloth.dto.store.category.BreadcrumbResponse;
+import com.EEIT25.unicloth.dto.store.category.CategoryDetailResponse;
+import com.EEIT25.unicloth.dto.store.category.CategoryResponse;
+import com.EEIT25.unicloth.dto.store.category.FilterOptionsResponse;
+import com.EEIT25.unicloth.dto.store.category.ProductCardResponse;
+import com.EEIT25.unicloth.dto.store.category.ProductFilterRequest;
 import com.EEIT25.unicloth.entity.Category;
 import com.EEIT25.unicloth.entity.Product;
-import com.EEIT25.unicloth.enums.ProductStatus;
+import com.EEIT25.unicloth.enums.product.ProductStatus;
 import com.EEIT25.unicloth.exception.ApiException;
 import com.EEIT25.unicloth.repository.CategoryRepository;
 import com.EEIT25.unicloth.repository.ProductRepository;

@@ -1,8 +1,8 @@
 package com.EEIT25.unicloth.service.shop;
 
-import com.EEIT25.unicloth.dto.member.CompleteProfileRequest;
-import com.EEIT25.unicloth.dto.member.MemberResponse;
-import com.EEIT25.unicloth.dto.member.UpdateMemberRequest;
+import com.EEIT25.unicloth.dto.store.member.CompleteProfileRequest;
+import com.EEIT25.unicloth.dto.store.member.MemberResponse;
+import com.EEIT25.unicloth.dto.store.member.UpdateMemberRequest;
 import com.EEIT25.unicloth.entity.Member;
 import com.EEIT25.unicloth.entity.MemberProfile;
 import com.EEIT25.unicloth.exception.ApiException;

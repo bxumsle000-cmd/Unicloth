@@ -1,7 +1,7 @@
 package com.EEIT25.unicloth.repository;
 
 import com.EEIT25.unicloth.entity.Product;
-import com.EEIT25.unicloth.enums.ProductStatus;
+import com.EEIT25.unicloth.enums.product.ProductStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -55,7 +55,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             SELECT p
             FROM Product p
             WHERE p.slug = :slug
-              AND p.status = com.EEIT25.unicloth.enums.ProductStatus.ON_SALE
+              AND p.status = com.EEIT25.unicloth.enums.product.ProductStatus.ON_SALE
             """)
     Optional<Product> findOnSaleBySlug(@Param("slug") String slug);
 

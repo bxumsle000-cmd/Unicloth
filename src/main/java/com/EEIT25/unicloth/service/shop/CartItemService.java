@@ -1,12 +1,12 @@
 package com.EEIT25.unicloth.service.shop;
 
-import com.EEIT25.unicloth.dto.cartItem.AddCartItemRequest;
-import com.EEIT25.unicloth.dto.cartItem.CartItemResponse;
-import com.EEIT25.unicloth.dto.cartItem.ChangeCartItemQtyRequest;
+import com.EEIT25.unicloth.dto.store.cartItem.AddCartItemRequest;
+import com.EEIT25.unicloth.dto.store.cartItem.CartItemResponse;
+import com.EEIT25.unicloth.dto.store.cartItem.ChangeCartItemQtyRequest;
 import com.EEIT25.unicloth.entity.CartItem;
 import com.EEIT25.unicloth.entity.Member;
 import com.EEIT25.unicloth.entity.ProductVariant;
-import com.EEIT25.unicloth.enums.ProductStatus;
+import com.EEIT25.unicloth.enums.product.ProductStatus;
 import com.EEIT25.unicloth.exception.ApiException;
 import com.EEIT25.unicloth.repository.CartItemRepository;
 import com.EEIT25.unicloth.repository.ProductVariantRepository;

@@ -5,7 +5,7 @@ import com.EEIT25.unicloth.dto.admin.product.BatchUpdateProductStatusRequest;
 import com.EEIT25.unicloth.entity.Category;
 import com.EEIT25.unicloth.entity.Product;
 import com.EEIT25.unicloth.entity.ProductVariant;
-import com.EEIT25.unicloth.enums.ProductStatus;
+import com.EEIT25.unicloth.enums.product.ProductStatus;
 import com.EEIT25.unicloth.exception.ApiException;
 import com.EEIT25.unicloth.repository.CategoryRepository;
 import com.EEIT25.unicloth.repository.ProductRepository;

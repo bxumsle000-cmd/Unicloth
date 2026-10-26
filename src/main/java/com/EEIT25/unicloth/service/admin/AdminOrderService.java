@@ -6,7 +6,7 @@ import com.EEIT25.unicloth.dto.admin.order.AdminOrderListResponse;
 import com.EEIT25.unicloth.dto.admin.order.ShipOrderRequest;
 import com.EEIT25.unicloth.entity.Order;
 import com.EEIT25.unicloth.entity.OrderItem;
-import com.EEIT25.unicloth.enums.OrderStatus;
+import com.EEIT25.unicloth.enums.order.OrderStatus;
 import com.EEIT25.unicloth.exception.ApiException;
 import com.EEIT25.unicloth.repository.OrderItemRepository;
 import com.EEIT25.unicloth.repository.OrderRepository;

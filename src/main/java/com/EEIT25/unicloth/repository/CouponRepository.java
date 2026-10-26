@@ -1,7 +1,7 @@
 package com.EEIT25.unicloth.repository;
 
 import com.EEIT25.unicloth.entity.Coupon;
-import com.EEIT25.unicloth.enums.CouponAutoTrigger;
+import com.EEIT25.unicloth.enums.coupon.CouponAutoTrigger;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

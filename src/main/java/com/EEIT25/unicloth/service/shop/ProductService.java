@@ -1,10 +1,10 @@
 package com.EEIT25.unicloth.service.shop;
 
-import com.EEIT25.unicloth.dto.category.ProductCardResponse;
-import com.EEIT25.unicloth.dto.product.ProductDetailResponse;
+import com.EEIT25.unicloth.dto.store.category.ProductCardResponse;
+import com.EEIT25.unicloth.dto.store.product.ProductDetailResponse;
 import com.EEIT25.unicloth.entity.Product;
 import com.EEIT25.unicloth.entity.ProductVariant;
-import com.EEIT25.unicloth.enums.ProductStatus;
+import com.EEIT25.unicloth.enums.product.ProductStatus;
 import com.EEIT25.unicloth.exception.ApiException;
 import com.EEIT25.unicloth.repository.ProductRepository;
 import com.EEIT25.unicloth.repository.ProductVariantRepository;

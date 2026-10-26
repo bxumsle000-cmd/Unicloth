@@ -1,6 +1,6 @@
 package com.EEIT25.unicloth.service.shop.ecpay;
 
-import com.EEIT25.unicloth.dto.checkout.CheckoutRequest;
+import com.EEIT25.unicloth.dto.store.checkout.CheckoutRequest;
 import com.EEIT25.unicloth.entity.CartItem;
 import com.EEIT25.unicloth.entity.Coupon;
 import com.EEIT25.unicloth.entity.Member;
@@ -8,12 +8,12 @@ import com.EEIT25.unicloth.entity.MemberCoupon;
 import com.EEIT25.unicloth.entity.Order;
 import com.EEIT25.unicloth.entity.Payment;
 import com.EEIT25.unicloth.entity.ProductVariant;
-import com.EEIT25.unicloth.enums.CouponType;
-import com.EEIT25.unicloth.enums.OrderStatus;
-import com.EEIT25.unicloth.enums.PaymentMethod;
-import com.EEIT25.unicloth.enums.PaymentStatus;
-import com.EEIT25.unicloth.enums.ProductStatus;
-import com.EEIT25.unicloth.enums.ShippingMethod;
+import com.EEIT25.unicloth.enums.coupon.CouponType;
+import com.EEIT25.unicloth.enums.order.OrderStatus;
+import com.EEIT25.unicloth.enums.order.PaymentMethod;
+import com.EEIT25.unicloth.enums.order.PaymentStatus;
+import com.EEIT25.unicloth.enums.product.ProductStatus;
+import com.EEIT25.unicloth.enums.order.ShippingMethod;
 import com.EEIT25.unicloth.repository.CartItemRepository;
 import com.EEIT25.unicloth.repository.CouponRepository;
 import com.EEIT25.unicloth.repository.MemberCouponRepository;

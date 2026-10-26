@@ -1,8 +1,8 @@
 
 package com.EEIT25.unicloth.entity;
 
-import com.EEIT25.unicloth.enums.PaymentMethod;
-import com.EEIT25.unicloth.enums.PaymentStatus;
+import com.EEIT25.unicloth.enums.order.PaymentMethod;
+import com.EEIT25.unicloth.enums.order.PaymentStatus;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

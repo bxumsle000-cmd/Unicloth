@@ -1,6 +1,6 @@
 package com.EEIT25.unicloth.security;
 
-import com.EEIT25.unicloth.enums.Department;
+import com.EEIT25.unicloth.enums.staff.Department;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;

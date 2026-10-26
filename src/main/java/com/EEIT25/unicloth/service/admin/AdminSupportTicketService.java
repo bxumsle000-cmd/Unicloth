@@ -4,7 +4,7 @@ import com.EEIT25.unicloth.dto.admin.cs.AdminSupportTicketDetailResponse;
 import com.EEIT25.unicloth.dto.admin.cs.AdminSupportTicketListResponse;
 import com.EEIT25.unicloth.dto.admin.cs.ReplySupportTicketRequest;
 import com.EEIT25.unicloth.entity.SupportTicket;
-import com.EEIT25.unicloth.enums.TicketStatus;
+import com.EEIT25.unicloth.enums.supportTicket.TicketStatus;
 import com.EEIT25.unicloth.exception.ApiException;
 import com.EEIT25.unicloth.repository.SupportTicketRepository;
 import lombok.RequiredArgsConstructor;

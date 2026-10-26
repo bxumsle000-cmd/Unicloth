@@ -1,6 +1,6 @@
 package com.EEIT25.unicloth.security;
 
-import com.EEIT25.unicloth.enums.Department;
+import com.EEIT25.unicloth.enums.staff.Department;
 import com.EEIT25.unicloth.repository.MemberProfileRepository;
 import com.EEIT25.unicloth.repository.MemberRepository;
 import com.EEIT25.unicloth.repository.StaffRepository;

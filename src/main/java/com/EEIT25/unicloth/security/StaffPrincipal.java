@@ -1,6 +1,6 @@
 package com.EEIT25.unicloth.security;
 
-import com.EEIT25.unicloth.enums.Department;
+import com.EEIT25.unicloth.enums.staff.Department;
 
 /**
  * 員工登入後放在 SecurityContext 裡的身分（principal）。

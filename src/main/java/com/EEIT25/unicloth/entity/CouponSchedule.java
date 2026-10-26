@@ -1,6 +1,6 @@
 package com.EEIT25.unicloth.entity;
 
-import com.EEIT25.unicloth.enums.CouponScheduleStatus;
+import com.EEIT25.unicloth.enums.coupon.CouponScheduleStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

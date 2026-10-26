@@ -1,7 +1,7 @@
 package com.EEIT25.unicloth.repository;
 
 import com.EEIT25.unicloth.entity.CouponSchedule;
-import com.EEIT25.unicloth.enums.CouponScheduleStatus;
+import com.EEIT25.unicloth.enums.coupon.CouponScheduleStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,7 +1,7 @@
 package com.EEIT25.unicloth.service.shop;
 
 
-import com.EEIT25.unicloth.dto.wishlist.WishlistItemResponse;
+import com.EEIT25.unicloth.dto.store.wishlist.WishlistItemResponse;
 import com.EEIT25.unicloth.entity.Member;
 import com.EEIT25.unicloth.entity.Product;
 import com.EEIT25.unicloth.entity.WishlistItem;

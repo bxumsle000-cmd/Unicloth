@@ -1,6 +1,6 @@
 package com.EEIT25.unicloth.dto.admin.product;
 
-import com.EEIT25.unicloth.enums.ProductStatus;
+import com.EEIT25.unicloth.enums.product.ProductStatus;
 import java.time.LocalDateTime;
 import java.util.List;
 

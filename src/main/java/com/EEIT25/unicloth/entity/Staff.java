@@ -1,7 +1,7 @@
 package com.EEIT25.unicloth.entity;
 
-import com.EEIT25.unicloth.enums.Department;
-import com.EEIT25.unicloth.enums.StaffStatus;
+import com.EEIT25.unicloth.enums.staff.Department;
+import com.EEIT25.unicloth.enums.staff.StaffStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

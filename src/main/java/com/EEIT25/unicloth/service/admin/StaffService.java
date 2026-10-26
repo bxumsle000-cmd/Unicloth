@@ -1,10 +1,10 @@
 package com.EEIT25.unicloth.service.admin;
 
-import com.EEIT25.unicloth.dto.staff.CreateNewStaffRequest;
-import com.EEIT25.unicloth.dto.staff.StaffFilterRequest;
-import com.EEIT25.unicloth.dto.staff.StaffResponse;
+import com.EEIT25.unicloth.dto.admin.staff.CreateNewStaffRequest;
+import com.EEIT25.unicloth.dto.admin.staff.StaffFilterRequest;
+import com.EEIT25.unicloth.dto.admin.staff.StaffResponse;
 import com.EEIT25.unicloth.entity.Staff;
-import com.EEIT25.unicloth.enums.StaffStatus;
+import com.EEIT25.unicloth.enums.staff.StaffStatus;
 import com.EEIT25.unicloth.exception.ApiException;
 import com.EEIT25.unicloth.repository.StaffRepository;
 import com.EEIT25.unicloth.security.CurrentStaff;

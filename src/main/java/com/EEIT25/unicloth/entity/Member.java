@@ -1,6 +1,6 @@
 package com.EEIT25.unicloth.entity;
 
-import com.EEIT25.unicloth.enums.MemberStatus;
+import com.EEIT25.unicloth.enums.member.MemberStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,9 +1,9 @@
 package com.EEIT25.unicloth.dto.admin.order;
 
 import com.EEIT25.unicloth.entity.Order;
-import com.EEIT25.unicloth.enums.OrderStatus;
-import com.EEIT25.unicloth.enums.PaymentMethod;
-import com.EEIT25.unicloth.enums.ShippingMethod;
+import com.EEIT25.unicloth.enums.order.OrderStatus;
+import com.EEIT25.unicloth.enums.order.PaymentMethod;
+import com.EEIT25.unicloth.enums.order.ShippingMethod;
 import java.time.LocalDateTime;
 
 public record AdminOrderListResponse(

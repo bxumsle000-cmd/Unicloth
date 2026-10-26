@@ -1,6 +1,6 @@
 package com.EEIT25.unicloth.entity;
 
-import com.EEIT25.unicloth.enums.InventoryTransactionType;
+import com.EEIT25.unicloth.enums.product.InventoryTransactionType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

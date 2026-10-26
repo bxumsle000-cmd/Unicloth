@@ -1,0 +1,25 @@
+package com.EEIT25.unicloth.controller.store;
+
+import com.EEIT25.unicloth.dto.store.coupon.*;
+import com.EEIT25.unicloth.service.shop.CouponService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/coupon")
+public class CouponController {
+    private final CouponService couponService ;
+
+    @GetMapping
+    public List<CouponResponse> getMyCoupons(){
+        return couponService.getMyCoupons();
+    }
+
+    @GetMapping("/usable")
+    public List<UsableCouponResponse>  getUsableCoupons(int subtotal){
+        return couponService.getUsableCoupons(subtotal);
+    }
+}

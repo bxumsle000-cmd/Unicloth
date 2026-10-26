@@ -1,13 +1,13 @@
 package com.EEIT25.unicloth.service.shop;
 
-import com.EEIT25.unicloth.dto.order.OrderResponse;
+import com.EEIT25.unicloth.dto.store.order.OrderResponse;
 import com.EEIT25.unicloth.entity.Member;
 import com.EEIT25.unicloth.entity.MemberCoupon;
 import com.EEIT25.unicloth.entity.Order;
 import com.EEIT25.unicloth.entity.OrderItem;
 import com.EEIT25.unicloth.entity.Payment;
-import com.EEIT25.unicloth.enums.OrderStatus;
-import com.EEIT25.unicloth.enums.PaymentStatus;
+import com.EEIT25.unicloth.enums.order.OrderStatus;
+import com.EEIT25.unicloth.enums.order.PaymentStatus;
 import com.EEIT25.unicloth.exception.ApiException;
 import com.EEIT25.unicloth.repository.OrderItemRepository;
 import com.EEIT25.unicloth.repository.OrderRepository;

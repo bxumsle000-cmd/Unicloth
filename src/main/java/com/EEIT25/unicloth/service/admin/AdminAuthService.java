@@ -1,11 +1,11 @@
 package com.EEIT25.unicloth.service.admin;
 
-import com.EEIT25.unicloth.dto.admin.StaffLoginRequest;
-import com.EEIT25.unicloth.dto.admin.StaffLoginResponse;
-import com.EEIT25.unicloth.dto.member.ChangePasswordRequest;
+import com.EEIT25.unicloth.dto.admin.auth.StaffLoginRequest;
+import com.EEIT25.unicloth.dto.admin.auth.StaffLoginResponse;
+import com.EEIT25.unicloth.dto.admin.auth.ChangePasswordRequest;
 import com.EEIT25.unicloth.entity.Staff;
-import com.EEIT25.unicloth.enums.Department;
-import com.EEIT25.unicloth.enums.StaffStatus;
+import com.EEIT25.unicloth.enums.staff.Department;
+import com.EEIT25.unicloth.enums.staff.StaffStatus;
 import com.EEIT25.unicloth.exception.ApiException;
 import com.EEIT25.unicloth.repository.StaffRepository;
 import com.EEIT25.unicloth.security.CurrentStaff;

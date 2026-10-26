@@ -1,6 +1,6 @@
 package com.EEIT25.unicloth.entity;
 
-import com.EEIT25.unicloth.enums.CouponSource;
+import com.EEIT25.unicloth.enums.coupon.CouponSource;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

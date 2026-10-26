@@ -1,10 +1,10 @@
 package com.EEIT25.unicloth.service.shop;
 
-import com.EEIT25.unicloth.dto.supportTicket.CreateSupportTicketRequest;
-import com.EEIT25.unicloth.dto.supportTicket.SupportTicketResponse;
+import com.EEIT25.unicloth.dto.store.supportTicket.CreateSupportTicketRequest;
+import com.EEIT25.unicloth.dto.store.supportTicket.SupportTicketResponse;
 import com.EEIT25.unicloth.entity.Member;
 import com.EEIT25.unicloth.entity.SupportTicket;
-import com.EEIT25.unicloth.enums.TicketStatus;
+import com.EEIT25.unicloth.enums.supportTicket.TicketStatus;
 import com.EEIT25.unicloth.repository.MemberRepository;
 import com.EEIT25.unicloth.repository.SupportTicketRepository;
 import com.EEIT25.unicloth.security.CurrentMember;

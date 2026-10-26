@@ -1,9 +1,9 @@
 package com.EEIT25.unicloth.repository;
 
 import com.EEIT25.unicloth.entity.Order;
-import com.EEIT25.unicloth.enums.OrderStatus;
-import com.EEIT25.unicloth.enums.PaymentMethod;
-import com.EEIT25.unicloth.enums.ShippingMethod;
+import com.EEIT25.unicloth.enums.order.OrderStatus;
+import com.EEIT25.unicloth.enums.order.PaymentMethod;
+import com.EEIT25.unicloth.enums.order.ShippingMethod;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

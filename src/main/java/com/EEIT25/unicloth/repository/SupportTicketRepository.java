@@ -1,7 +1,7 @@
 package com.EEIT25.unicloth.repository;
 
 import com.EEIT25.unicloth.entity.SupportTicket;
-import com.EEIT25.unicloth.enums.TicketStatus;
+import com.EEIT25.unicloth.enums.supportTicket.TicketStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
