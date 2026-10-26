@@ -37,4 +37,14 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             order by m.id
             """)
     List<IssueMemberResponse> findIssueMembers(@Param("status") MemberStatus status);
+
+    // 生日禮自動發送用：某個月份生日、某個狀態的會員（生日在 member_profiles，沒補填資料的會員不會被查到）
+    @Query("""
+            select m from Member m
+            join MemberProfile p on p.memberId = m.id
+            where month(p.birthday) = :month
+              and m.status = :status
+            order by m.id
+            """)
+    List<Member> findByBirthdayMonthAndStatus(@Param("month") int month, @Param("status") MemberStatus status);
 }

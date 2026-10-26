@@ -11,6 +11,7 @@ import com.EEIT25.unicloth.entity.Coupon;
 import com.EEIT25.unicloth.entity.CouponSchedule;
 import com.EEIT25.unicloth.entity.Member;
 import com.EEIT25.unicloth.entity.MemberCoupon;
+import com.EEIT25.unicloth.enums.CouponAutoTrigger;
 import com.EEIT25.unicloth.enums.CouponScheduleStatus;
 import com.EEIT25.unicloth.enums.CouponSource;
 import com.EEIT25.unicloth.enums.CouponType;
@@ -45,6 +46,7 @@ import java.util.List;
  * - {@link #grantTo(Long, GrantCouponRequest)}：發券給會員（立即或預約）<br><br>
  * - {@link #getSchedules(CouponScheduleStatus, Pageable)}：預約發送紀錄（分頁）<br><br>
  * - {@link #cancelSchedule(Long)}：取消預約發送<br><br>
+ * - {@link #sendBirthdayCoupons()}：生日禮自動發送（每天檢查兩次，發給這個月還沒領過的當月壽星）<br><br>
  * - {@link #getRecords(String, Long, CouponSource, MemberCouponStatus, LocalDate, LocalDate, Pageable)}：發券紀錄（分頁）
  */
 @Service
@@ -157,7 +159,7 @@ public class AdminCouponService {
             if (request.targetAll()) {
                 targetMembers = memberRepository.findByStatus(MemberStatus.ACTIVE);
             }
-            issue(coupon, targetMembers);
+            issue(coupon, targetMembers, CouponSource.MANUAL);
             return;
         }
 
@@ -199,10 +201,38 @@ public class AdminCouponService {
                         .filter(member -> member.getStatus() == MemberStatus.ACTIVE)
                         .toList();
 
-        int count = issue(schedule.getCoupon(), targetMembers);
+        int count = issue(schedule.getCoupon(), targetMembers, CouponSource.MANUAL);
         schedule.setSentCount(count);
         schedule.setSentAt(LocalDateTime.now());
         schedule.setStatus(CouponScheduleStatus.SENT);
+    }
+
+    /**
+     * 生日禮自動發送，給 {@link BirthdayCouponScheduler} 每天呼叫兩次，回傳總共發了幾張。<br>
+     * 自動發送時機設成 BIRTHDAY、而且啟用中的券，每張都發給當月壽星（狀態 ACTIVE 的會員）。<br>
+     * 這個月已經領過同一張生日券的會員不再發，所以一個月跑很多次也只會發一張。
+     */
+    @Transactional
+    public int sendBirthdayCoupons(){
+        List<Coupon> birthdayCoupons = couponRepository.findByAutoTriggerAndActiveTrue(CouponAutoTrigger.BIRTHDAY);
+        if (birthdayCoupons.isEmpty()) {
+            return 0;
+        }
+
+        LocalDate today = LocalDate.now();
+        List<Member> birthdayMembers = memberRepository.findByBirthdayMonthAndStatus(today.getMonthValue(), MemberStatus.ACTIVE);
+        LocalDateTime monthStart = today.withDayOfMonth(1).atStartOfDay();
+
+        int totalCount = 0;
+        for (Coupon coupon : birthdayCoupons) {
+            List<Long> receivedMemberIds = memberCouponRepository
+                    .findReceivedMemberIds(coupon.getId(), CouponSource.BIRTHDAY, monthStart);
+            List<Member> notReceivedMembers = birthdayMembers.stream()
+                    .filter(member -> !receivedMemberIds.contains(member.getId()))
+                    .toList();
+            totalCount += issue(coupon, notReceivedMembers, CouponSource.BIRTHDAY);
+        }
+        return totalCount;
     }
 
     /**
@@ -257,15 +287,16 @@ public class AdminCouponService {
 
     /**
      * 每位會員各發一張，回傳發了幾張。<br>
-     * 到期時間 = 現在 + 這種券的有效天數；source 用 MemberCoupon 的預設值 MANUAL。
+     * 到期時間 = 現在 + 這種券的有效天數；source 是這張券怎麼來的（手動發 MANUAL、生日禮 BIRTHDAY…）。
      */
-    private int issue(Coupon coupon, List<Member> members) {
+    private int issue(Coupon coupon, List<Member> members, CouponSource source) {
         LocalDateTime expireAt = LocalDateTime.now().plusDays(coupon.getValidDays());
         List<MemberCoupon> memberCoupons = members.stream()
                 .map(member -> MemberCoupon.builder()
                         .member(member)
                         .coupon(coupon)
                         .expireAt(expireAt)
+                        .source(source)
                         .build())
                 .toList();
         memberCouponRepository.saveAll(memberCoupons);

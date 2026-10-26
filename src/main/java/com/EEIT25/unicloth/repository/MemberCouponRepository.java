@@ -50,6 +50,17 @@ public interface MemberCouponRepository extends JpaRepository<MemberCoupon, Long
             """)
     int markUsed(@Param("id") Long id, @Param("order") Order order, @Param("usedAt") LocalDateTime usedAt);
 
+    // 自動發券防重複：某段時間之後，已經用某種方式（例如 BIRTHDAY）領過某張券的會員 id
+    @Query("""
+            select mc.member.id from MemberCoupon mc
+            where mc.coupon.id = :couponId
+              and mc.source = :source
+              and mc.receivedAt >= :receivedFrom
+            """)
+    List<Long> findReceivedMemberIds(@Param("couponId") Long couponId,
+                                     @Param("source") CouponSource source,
+                                     @Param("receivedFrom") LocalDateTime receivedFrom);
+
     List<MemberCoupon> findByMember(Member member);
 
     List<MemberCoupon> findByMemberOrderByExpireAtAsc(Member member);
