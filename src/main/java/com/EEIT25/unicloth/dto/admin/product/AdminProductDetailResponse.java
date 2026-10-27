@@ -2,7 +2,6 @@ package com.EEIT25.unicloth.dto.admin.product;
 
 import com.EEIT25.unicloth.dto.style.StyleResponse;
 import com.EEIT25.unicloth.enums.ProductStatus;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -24,8 +23,10 @@ public record AdminProductDetailResponse(
         List<StyleResponse> styles,
         List<VariantResponse> variants
 ) {
-    /**
-     * 保留原本的參數格式，避免其他程式立即發生錯誤。
+    /*
+     * 讓原本尚未修改的 AdminProductService
+     * 仍可使用舊的參數格式建立回應。
+     * 新增的下架時間與風格欄位使用預設值。
      */
     public AdminProductDetailResponse(
             Long id,

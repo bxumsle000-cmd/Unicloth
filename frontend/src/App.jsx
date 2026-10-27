@@ -14,6 +14,7 @@ import Orders from "./pages/store/Orders.jsx";
 import Support from "./pages/store/Support.jsx";
 import Login from "./pages/store/Login.jsx";
 import CompleteProfile from "./pages/store/CompleteProfile.jsx";
+import RecommendationSettings from "./pages/store/RecommendationSettings.jsx";
 import ProfileGuard from "./component/ProfileGuard.jsx";
 import RequireLogin from "./component/RequireLogin.jsx";
 import { LanguageProvider } from "./js/LanguageProvider.jsx";
@@ -44,6 +45,8 @@ function StoreLayout(){
                         <Route path="/orders" element={<RequireLogin><Orders/></RequireLogin>}/>
                         {/* 客服單目前必須登入才能建立，規則與後端 SecurityConfig 一致。 */}
                         <Route path="/support" element={<RequireLogin><Support/></RequireLogin>}/>
+                        {/* 推薦設定包含會員瀏覽紀錄管理，必須登入才能使用。 */}
+                        <Route path="/recommendation-settings" element={<RequireLogin><RecommendationSettings/></RequireLogin>}/>
                         <Route path="/login" element={<Login/>}/>
                         <Route path="/complete-profile" element={<CompleteProfile/>}/>
                     </Routes>

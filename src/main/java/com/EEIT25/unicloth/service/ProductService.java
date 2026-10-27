@@ -10,32 +10,37 @@ import com.EEIT25.unicloth.exception.ApiException;
 import com.EEIT25.unicloth.repository.ProductRepository;
 import com.EEIT25.unicloth.repository.ProductVariantRepository;
 import com.EEIT25.unicloth.repository.StyleRepository;
+import com.EEIT25.unicloth.security.CurrentMember;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * 處理前台商品查詢。
+ * 商品相關服務<br>
+ * - {@link #getProductDetail(String)}：商品詳細頁，登入會員同時記錄瀏覽<br>
+ * - {@link #getProductsBySearch(String, Pageable)}：用商品名稱、直接風格與相關風格搜尋
  */
 @Service
 @RequiredArgsConstructor
 public class ProductService {
     private final ProductRepository productRepository;
-    private final ProductVariantRepository
-            productVariantRepository;
+    private final ProductVariantRepository productVariantRepository;
     private final StyleRepository styleRepository;
+    private final CurrentMember currentMember;
+    private final MemberProductViewService memberProductViewService;
 
     /**
-     * 取得上架中的商品詳細資料。
+     * 商品詳細頁（只查上架中的）：
+     * 把所有 SKU 依顏色分組，每個顏色底下帶各尺寸；
+     * 登入會員瀏覽時同時記錄商品偏好。
      */
-    @Transactional(readOnly = true)
+    @Transactional
     public ProductDetailResponse getProductDetail(
             String slug
     ) {
@@ -53,6 +58,12 @@ public class ProductService {
                                 product.getId()
                         );
 
+        // 未登入時 memberId 為 null，不會建立瀏覽紀錄。
+        memberProductViewService.recordView(
+                currentMember.getCurrentIdOrNull(),
+                product
+        );
+
         return ProductDetailResponse.from(
                 product,
                 variants
@@ -60,7 +71,8 @@ public class ProductService {
     }
 
     /**
-     * 使用商品名稱、直接風格或相關風格搜尋商品。
+     * 用商品名稱、直接風格與相關風格搜尋（不分大小寫、分頁）。
+     * 關鍵字是空的就回空頁，不會撈出全部商品。
      */
     @Transactional(readOnly = true)
     public Page<ProductCardResponse> getProductsBySearch(
@@ -72,12 +84,12 @@ public class ProductService {
                         ? ""
                         : keyword.trim();
 
-        // 空白關鍵字不查詢全部商品
+        // 空白關鍵字不查詢全部商品。
         if (normalizedKeyword.isEmpty()) {
             return Page.empty(pageable);
         }
 
-        // 找出正式名稱、代碼或別名符合的風格
+        // 找出正式名稱、代碼或別名符合的風格。
         Set<Long> directStyleIds =
                 styleRepository
                         .findMatchingStyles(
@@ -87,7 +99,7 @@ public class ProductService {
                         .map(Style::getId)
                         .collect(Collectors.toSet());
 
-        // 根據直接風格取得相關風格
+        // 根據直接風格取得相關風格。
         Set<Long> relatedStyleIds =
                 new HashSet<>();
 
@@ -103,7 +115,7 @@ public class ProductService {
             );
         }
 
-        // 直接符合的風格不需要重複出現在相關風格
+        // 直接符合的風格不需要重複出現在相關風格。
         relatedStyleIds.removeAll(directStyleIds);
 
         boolean hasDirectStyles =
@@ -112,7 +124,7 @@ public class ProductService {
         boolean hasRelatedStyles =
                 !relatedStyleIds.isEmpty();
 
-        // 避免產生空的 SQL IN 條件
+        // 避免產生空的 SQL IN 條件。
         Set<Long> directQueryIds =
                 hasDirectStyles
                         ? directStyleIds

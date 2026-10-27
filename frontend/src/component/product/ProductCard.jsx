@@ -4,17 +4,20 @@ import { IoHeart } from "react-icons/io5";
 import { Link } from "react-router-dom";
 
 /**
- * 顯示商品圖片、名稱、風格、價格與收藏按鈕。
+ * 商品卡片：product 是商品列表 API 回傳的一筆資料。
+ * liked 表示是否已收藏；toggleLike 是按愛心時執行的功能。
  */
 function ProductCard({ product, liked, toggleLike }) {
-    // 有原價且原價較高時顯示特價
+    // 有原價而且比售價高，就顯示成特價
     const onSaleNow =
         product.origPrice &&
         product.origPrice > product.price;
 
     return (
         <div className="relative">
+            {/* 點圖片或名稱進商品頁 */}
             <Link to={`/product/${product.slug}`}>
+                {/* 商品圖 */}
                 <div className="relative aspect-[3/4] bg-[#F0EBE3]">
                     {product.imageUrl && (
                         <img
@@ -25,6 +28,7 @@ function ProductCard({ product, liked, toggleLike }) {
                         />
                     )}
 
+                    {/* 左上角標籤 */}
                     <div className="absolute top-2.5 left-2.5 flex gap-[5px]">
                         {product.newArrival && (
                             <span className="bg-white px-[7px] py-1 text-[8px] tracking-[.15em]">
@@ -40,6 +44,7 @@ function ProductCard({ product, liked, toggleLike }) {
                     </div>
                 </div>
 
+                {/* 商品名稱 */}
                 <div className="mt-3 mb-[5px] text-[14px] leading-[1.6] tracking-[.04em]">
                     {product.name}
                 </div>
@@ -60,6 +65,7 @@ function ProductCard({ product, liked, toggleLike }) {
                     </div>
                 )}
 
+                {/* 價格：特價時售價變紅，原價加刪除線 */}
                 <div
                     className={
                         "text-xs tracking-[.05em] " +
@@ -78,6 +84,7 @@ function ProductCard({ product, liked, toggleLike }) {
                 </div>
             </Link>
 
+            {/* 收藏愛心：已收藏是紅色實心，沒收藏是空心 */}
             <button
                 aria-label={
                     liked ? "取消收藏" : "收藏"

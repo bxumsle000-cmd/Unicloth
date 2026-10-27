@@ -8,23 +8,22 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Optional;
 
 public interface ProductRepository
         extends JpaRepository<Product, Long> {
-
     boolean existsBySlug(String slug);
 
     /**
      * 檢查商品貨號是否已被使用。
+     * 例如 suffix 傳入 -123456。
      */
     boolean existsBySlugEndingWith(String suffix);
 
     /**
-     * 查詢分類底下指定狀態的商品。
+     * 分類 id 在清單內、且狀態符合的商品（分頁）。
      */
     Page<Product> findByCategoryIdInAndStatus(
             Collection<Long> categoryIds,
@@ -33,7 +32,12 @@ public interface ProductRepository
     );
 
     /**
-     * 查詢分類商品並套用價格、顏色及尺寸篩選。
+     * 分類商品 + 篩選（分頁）。每個條件都是「沒帶就不篩」：<br>
+     * - 價格：minPrice / maxPrice 是 null → (NULL IS NULL OR …) 永遠成立，等於沒這個條件<br>
+     * - 顏色 / 尺寸：清單不能寫 :colors IS NULL（Hibernate 會把清單展開），所以另外傳布林旗標：
+     *   allColors = true 表示不篩顏色；這時 colors 只是佔位值，不會被用到<br>
+     * - filterSku = false（顏色、尺寸都沒選）→ 整段 EXISTS 跳過<br>
+     * 顏色和尺寸放在同一個 EXISTS：選黑色 + M，要同一個 SKU 是黑色 M 號才算。
      */
     @Query("""
             SELECT p FROM Product p
@@ -61,7 +65,7 @@ public interface ProductRepository
     );
 
     /**
-     * 使用 slug 查詢上架中的商品。
+     * 上架中的商品（依 slug）。
      */
     @Query("""
             SELECT p
@@ -75,7 +79,8 @@ public interface ProductRepository
     );
 
     /**
-     * 使用商品名稱搜尋上架中的商品。
+     * 狀態符合、名稱包含關鍵字的商品（分頁），不分大小寫；
+     * LIKE 的 % 和 _ 由 Spring 自動跳脫。
      */
     Page<Product> findByStatusAndNameContainingIgnoreCase(
             ProductStatus status,
@@ -108,7 +113,8 @@ public interface ProductRepository
 
     /**
      * 搜尋商品名稱、直接符合風格及相關風格。
-     * 排序順序：名稱符合、直接風格、相關風格。
+     * 排序順序：商品名稱符合、直接風格符合、相關風格符合。
+     * hasDirectStyles 和 hasRelatedStyles 用來避免查詢空的 IN 清單。
      */
     @Query("""
         SELECT product
@@ -178,6 +184,7 @@ public interface ProductRepository
 
     /**
      * 後台商品列表。
+     * keyword 空白時查全部；status 是 null 時不限商品狀態。
      */
     @Query("""
         SELECT product
@@ -201,7 +208,9 @@ public interface ProductRepository
     );
 
     /**
-     * 將已到預定時間的商品下架。
+     * 將已到預定時間的上架商品改為下架。
+     * 同時清除已執行的下架時間，避免商品重新上架後又被舊時間下架。
+     * 回傳實際下架的商品數量。必須由有 @Transactional 的服務呼叫。
      */
     @Modifying(
             flushAutomatically = true,
