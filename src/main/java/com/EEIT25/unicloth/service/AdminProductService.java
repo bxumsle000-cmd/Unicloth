@@ -8,6 +8,7 @@ import com.EEIT25.unicloth.dto.admin.product.CreateProductVariantsRequest;
 import com.EEIT25.unicloth.dto.admin.product.UpdateProductRequest;
 import com.EEIT25.unicloth.dto.admin.product.UpdateProductStatusRequest;
 import com.EEIT25.unicloth.dto.admin.product.UpdateProductStockRequest;
+import com.EEIT25.unicloth.dto.style.StyleResponse;
 import com.EEIT25.unicloth.entity.Category;
 import com.EEIT25.unicloth.entity.Product;
 import com.EEIT25.unicloth.entity.ProductVariant;
@@ -38,6 +39,7 @@ public class AdminProductService {
     private final ProductRepository productRepository;
     private final ProductVariantRepository productVariantRepository;
     private final CategoryRepository categoryRepository;
+    private final ProductStyleService productStyleService;
 
     /**
      * 後台商品列表。
@@ -186,6 +188,12 @@ public class AdminProductService {
                 .imageUrl(null)
                 .status(ProductStatus.OFF_SHELF)
                 .build();
+
+        // 將選擇的風格標籤設定到新商品
+        productStyleService.applyStyles(
+                product,
+                request.styleIds()
+        );
 
         Product savedProduct =
                 productRepository.save(product);
@@ -364,6 +372,12 @@ public class AdminProductService {
         product.setCategory(category);
         product.setNewArrival(request.newArrival());
         product.setHot(request.hot());
+
+        // 更新商品的風格標籤
+        productStyleService.applyStyles(
+                product,
+                request.styleIds()
+        );
 
         List<ProductVariant> variants =
                 productVariantRepository
@@ -620,6 +634,9 @@ public class AdminProductService {
     /**
      * 將 Product 與 SKU 轉成後台詳細資料。
      */
+    /**
+     * 將商品與 SKU 轉成後台詳細資料。
+     */
     private AdminProductDetailResponse toDetailResponse(
             Product product,
             List<ProductVariant> variants
@@ -640,6 +657,16 @@ public class AdminProductService {
                         )
                         .toList();
 
+        // 將商品風格轉成回傳格式，並依照 ID 排序
+        List<StyleResponse> styles =
+                product.getStyles()
+                        .stream()
+                        .map(StyleResponse::from)
+                        .sorted(Comparator.comparing(
+                                StyleResponse::id
+                        ))
+                        .toList();
+
         return new AdminProductDetailResponse(
                 product.getId(),
                 product.getSlug(),
@@ -653,7 +680,9 @@ public class AdminProductService {
                 product.isNewArrival(),
                 product.isHot(),
                 product.getStatus(),
+                product.getScheduledOffAt(),
                 product.getImageUrl(),
+                styles,
                 variantResponses
         );
     }

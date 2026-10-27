@@ -120,14 +120,40 @@ function ProductDetail() {
                 {/* 右：商品資訊 */}
                 <div className="pt-2">
                     <div className="mb-3 text-[10px] tracking-[.22em] text-[#76716c]">KINU</div>
-                    <h1 className="mb-5 text-[clamp(24px,2.6vw,32px)] font-medium leading-[1.4] tracking-[.06em]">
+                    <h1 className="mb-4 text-[clamp(24px,2.6vw,32px)] font-medium leading-[1.4] tracking-[.06em]">
                         {product.name}
                     </h1>
 
+                    {/* 商品風格標籤 */}
+                    {product.styles?.length > 0 && (
+                        <div className="mb-5 flex flex-wrap gap-2">
+                            {product.styles.map(style => (
+                                <span
+                                    key={style.id}
+                                    className="border border-[#d6d0c7] bg-white px-3 py-1.5 text-[10px] tracking-[.1em] text-[#4a4643]"
+                                >
+                {style.name}
+            </span>
+                            ))}
+                        </div>
+                    )}
+
                     {/* 價格：特價時售價變紅，原價加刪除線 */}
-                    <div className={`mb-9 text-[17px] tracking-[.05em] ${onSaleNow ? "text-[#9a3b2d]" : ""}`}>
+                    <div
+                        className={
+                            "mb-9 text-[17px] tracking-[.05em] " +
+                            (onSaleNow
+                                ? "text-[#9a3b2d]"
+                                : "")
+                        }
+                    >
                         {money(product.price)}
-                        {onSaleNow && <del className="ml-3 text-[13px] text-[#76716c]">{money(product.origPrice)}</del>}
+
+                        {onSaleNow && (
+                            <del className="ml-3 text-[13px] text-[#76716c]">
+                                {money(product.origPrice)}
+                            </del>
+                        )}
                     </div>
 
                     {/* 顏色 */}

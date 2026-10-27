@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getAdminToken } from "../../js/admin.js";
 import { money, toast } from "../../js/kinu.js";
+import ProductStyleSelector from "./ProductStyleSelector.jsx";
 
 const EMPTY_FORM = {
     productNumber: "",
@@ -9,6 +10,7 @@ const EMPTY_FORM = {
     price: "",
     origPrice: "",
     categoryId: "",
+    styleIds: [],
     newArrival: false,
     hot: false,
 };
@@ -49,6 +51,7 @@ function ProductCreateModal({
                                 onCreated,
                             }) {
     const [categories, setCategories] = useState([]);
+    const [styles, setStyles] = useState([]);
     const [form, setForm] = useState(EMPTY_FORM);
 
     const [loading, setLoading] = useState(true);
@@ -58,17 +61,22 @@ function ProductCreateModal({
     useEffect(() => {
         let active = true;
 
-        async function loadCategories() {
+        async function loadData() {
             setLoading(true);
             setError("");
 
             try {
-                const data = await adminRequest(
-                    "/api/admin/product/categories"
-                );
+                const [categoryData, styleData] =
+                    await Promise.all([
+                        adminRequest(
+                            "/api/admin/product/categories"
+                        ),
+                        adminRequest("/api/styles"),
+                    ]);
 
                 if (active) {
-                    setCategories(data || []);
+                    setCategories(categoryData || []);
+                    setStyles(styleData || []);
                 }
             } catch (e) {
                 if (active) {
@@ -81,7 +89,7 @@ function ProductCreateModal({
             }
         }
 
-        loadCategories();
+        loadData();
 
         return () => {
             active = false;
@@ -195,8 +203,8 @@ function ProductCreateModal({
                             price,
                             origPrice,
                             categoryId,
-                            newArrival:
-                            form.newArrival,
+                            styleIds: form.styleIds,
+                            newArrival: form.newArrival,
                             hot: form.hot,
                         }),
                     }
@@ -335,6 +343,18 @@ function ProductCreateModal({
                                         )}
                                     </select>
                                 </label>
+
+                                <ProductStyleSelector
+                                    styles={styles}
+                                    selectedStyleIds={form.styleIds}
+                                    onChange={styleIds =>
+                                        setForm(current => ({
+                                            ...current,
+                                            styleIds,
+                                        }))
+                                    }
+                                    disabled={saving}
+                                />
 
                                 <label className="col-span-2 flex flex-col gap-1.5 max-[600px]:col-span-1">
                                     <span className="text-[11px] tracking-[.1em] text-muted">

@@ -1,6 +1,8 @@
 package com.EEIT25.unicloth.dto.admin.product;
 
+import com.EEIT25.unicloth.dto.style.StyleResponse;
 import com.EEIT25.unicloth.enums.ProductStatus;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,11 +21,11 @@ public record AdminProductDetailResponse(
         ProductStatus status,
         LocalDateTime scheduledOffAt,
         String imageUrl,
+        List<StyleResponse> styles,
         List<VariantResponse> variants
 ) {
-    /*
-     * 讓原本尚未修改的 AdminProductService
-     * 仍可使用舊的參數格式建立回應。
+    /**
+     * 保留原本的參數格式，避免其他程式立即發生錯誤。
      */
     public AdminProductDetailResponse(
             Long id,
@@ -56,10 +58,14 @@ public record AdminProductDetailResponse(
                 status,
                 null,
                 imageUrl,
+                List.of(),
                 variants
         );
     }
 
+    /**
+     * 商品的一個顏色與尺寸組合。
+     */
     public record VariantResponse(
             Long id,
             String color,

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { getAdminToken } from "../../js/admin.js";
 import { money, toast } from "../../js/kinu.js";
+import ProductStyleSelector from "./ProductStyleSelector.jsx";
 
 const EMPTY_FORM = {
     name: "",
@@ -8,6 +9,7 @@ const EMPTY_FORM = {
     price: "",
     origPrice: "",
     categoryId: "",
+    styleIds: [],
     newArrival: false,
     hot: false,
 };
@@ -81,6 +83,7 @@ function ProductEditModal({
 
     const [product, setProduct] = useState(null);
     const [categories, setCategories] = useState([]);
+    const [styles, setStyles] = useState([]);
     const [form, setForm] = useState(EMPTY_FORM);
     const [stockValues, setStockValues] = useState({});
 
@@ -114,7 +117,7 @@ function ProductEditModal({
             setError("");
 
             try {
-                const [productData, categoryData] =
+                const [productData, categoryData, styleData] =
                     await Promise.all([
                         adminRequest(
                             `/api/admin/product/products/${productId}`
@@ -122,6 +125,7 @@ function ProductEditModal({
                         adminRequest(
                             "/api/admin/product/categories"
                         ),
+                        adminRequest("/api/styles"),
                     ]);
 
                 if (!active) {
@@ -130,6 +134,7 @@ function ProductEditModal({
 
                 applyProduct(productData);
                 setCategories(categoryData || []);
+                setStyles(styleData || []);
             } catch (e) {
                 if (active) {
                     setError(e.message);
@@ -161,6 +166,9 @@ function ProductEditModal({
                     : String(data.origPrice),
             categoryId: String(
                 data.categoryId ?? ""
+            ),
+            styleIds: (data.styles || []).map(
+                style => style.id
             ),
             newArrival: Boolean(data.newArrival),
             hot: Boolean(data.hot),
@@ -259,6 +267,7 @@ function ProductEditModal({
                         price,
                         origPrice,
                         categoryId,
+                        styleIds: form.styleIds,
                         newArrival: form.newArrival,
                         hot: form.hot,
                     }),
@@ -652,11 +661,22 @@ function ProductEditModal({
                                 </h3>
 
                                 <div className="grid grid-cols-2 gap-4 max-[600px]:grid-cols-1">
-                                    <label className="col-span-2 flex flex-col gap-1.5 max-[600px]:col-span-1">
+                                    <ProductStyleSelector
+                                        styles={styles}
+                                        selectedStyleIds={form.styleIds}
+                                        onChange={styleIds =>
+                                            setForm(current => ({
+                                                ...current,
+                                                styleIds,
+                                            }))
+                                        }
+                                        disabled={busy}
+                                    />
+
+                                    <label className="flex flex-col gap-1.5">
                                         <span className="text-[11px] text-muted">
                                             商品名稱 *
                                         </span>
-
                                         <input
                                             name="name"
                                             value={form.name}
