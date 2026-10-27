@@ -57,7 +57,6 @@ public class AdminOrderController {
                 status,
                 shippingMethod
         );
-
         return adminOrderService.getOrders(filter, pageable);
     }
 
@@ -67,9 +66,7 @@ public class AdminOrderController {
      * orderId 是 orders 資料表的主鍵，不是顯示給使用者看的 orderNo。
      */
     @GetMapping("/{orderId}")
-    public AdminOrderDetailResponse getOrder(
-            @PathVariable Long orderId
-    ) {
+    public AdminOrderDetailResponse getOrder(@PathVariable Long orderId) {
         return adminOrderService.getOrder(orderId);
     }
 
@@ -88,14 +85,32 @@ public class AdminOrderController {
     }
 
     /**
+     * 在尚未出貨前取消訂單。
+     *
+     * 取消會回補庫存、釋放優惠券，但不會呼叫外部金流退款。
+     */
+    @PatchMapping("/{orderId}/cancel")
+    public AdminOrderDetailResponse cancelOrder(@PathVariable Long orderId) {
+        return adminOrderService.cancelOrder(orderId);
+    }
+
+    /**
      * 確認物流已送達。
      *
      * 不接收前端送來的時間，統一由後端記錄，避免使用者偽造送達時間。
      */
     @PatchMapping("/{orderId}/deliver")
-    public AdminOrderDetailResponse markDelivered(
-            @PathVariable Long orderId
-    ) {
+    public AdminOrderDetailResponse markDelivered(@PathVariable Long orderId) {
         return adminOrderService.markDelivered(orderId);
+    }
+
+    /**
+     * 手動確認會員已取貨。
+     *
+     * 目前尚未串接物流商，因此由物流人員在後台手動操作。
+     */
+    @PatchMapping("/{orderId}/pickup")
+    public AdminOrderDetailResponse markPickedUp(@PathVariable Long orderId) {
+        return adminOrderService.markPickedUp(orderId);
     }
 }
