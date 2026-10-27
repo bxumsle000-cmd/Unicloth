@@ -71,7 +71,13 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST,
                                 "/api/auth/firebase", "/api/auth/logout").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/admin/auth/login").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/products/**", "/api/categories/**").permitAll()
+                        // 商品、分類與風格允許訪客查詢
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/products/**",
+                                "/api/categories/**",
+                                "/api/styles/**"
+                        ).permitAll()
 
                         // 綠界付款結果通知：不需要會員 JWT
                         .requestMatchers(HttpMethod.POST,
