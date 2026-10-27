@@ -1,3 +1,101 @@
+-- 商品風格標籤：由 DataSeeder 在匯入商品後執行（Flyway 執行時商品還沒匯入，所以不放在 migration）。
+-- 每段都有 NOT EXISTS，重複執行不會產生重複資料。
+
+-- 第一批經圖片與商品名稱確認的風格標籤。
+INSERT INTO product_styles (
+    product_id,
+    style_id
+)
+SELECT
+    product.id,
+    style.id
+FROM (
+         VALUES
+             (N'women-488701', N'japanese'),
+             (N'women-488701', N'casual'),
+             (N'women-483890', N'natural'),
+             (N'women-483890', N'minimal'),
+             (N'women-484850', N'casual'),
+             (N'women-484850', N'preppy'),
+             (N'women-487286', N'sweet'),
+             (N'women-487286', N'casual'),
+             (N'women-487996', N'urban_work'),
+             (N'women-487996', N'minimal'),
+             (N'women-487855', N'minimal'),
+             (N'women-487855', N'urban_work'),
+             (N'men-487511', N'sporty'),
+             (N'men-487511', N'casual'),
+             (N'men-487488', N'minimal'),
+             (N'men-487488', N'urban_work'),
+             (N'men-486614', N'casual'),
+             (N'men-486614', N'urban_work'),
+             (N'men-486104', N'natural'),
+             (N'men-486104', N'casual'),
+             (N'kids-486666', N'preppy'),
+             (N'kids-486666', N'sweet'),
+             (N'kids-488239', N'sweet')
+     ) AS tag_data(
+                   product_slug,
+                   style_code
+    )
+         JOIN products product
+              ON product.slug = tag_data.product_slug
+         JOIN styles style
+              ON style.code = tag_data.style_code
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM product_styles existing_tag
+    WHERE existing_tag.product_id = product.id
+      AND existing_tag.style_id = style.id
+);
+-- 第二批經圖片與商品名稱確認的風格標籤。
+INSERT INTO product_styles (
+    product_id,
+    style_id
+)
+SELECT
+    product.id,
+    style.id
+FROM (
+         VALUES
+             (N'men-492035', N'minimal'),
+             (N'men-492035', N'urban_work'),
+             (N'men-488758', N'minimal'),
+             (N'men-488758', N'urban_work'),
+             (N'men-486300', N'sporty'),
+             (N'men-486300', N'casual'),
+             (N'men-488801', N'japanese'),
+             (N'men-488801', N'natural'),
+             (N'women-488700', N'natural'),
+             (N'women-488700', N'casual'),
+             (N'women-487995', N'japanese'),
+             (N'women-487995', N'natural'),
+             (N'women-487001', N'sweet'),
+             (N'women-487001', N'minimal'),
+             (N'women-483281', N'sporty'),
+             (N'women-483281', N'minimal'),
+             (N'kids-486675', N'preppy'),
+             (N'kids-486675', N'casual'),
+             (N'kids-483406', N'sporty'),
+             (N'kids-483406', N'casual'),
+             (N'kids-486668', N'natural'),
+             (N'kids-486668', N'preppy'),
+             (N'kids-490470', N'urban_work'),
+             (N'kids-490470', N'casual')
+     ) AS tag_data(
+                   product_slug,
+                   style_code
+    )
+         JOIN products product
+              ON product.slug = tag_data.product_slug
+         JOIN styles style
+              ON style.code = tag_data.style_code
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM product_styles existing_tag
+    WHERE existing_tag.product_id = product.id
+      AND existing_tag.style_id = style.id
+);
 -- 依商品名稱與分類替剩餘商品批次計算風格標籤。
 CREATE TABLE #style_candidates (
                                    product_id BIGINT NOT NULL,

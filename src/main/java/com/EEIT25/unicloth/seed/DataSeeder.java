@@ -11,10 +11,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
+import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.ObjectMapper;
 
+import javax.sql.DataSource;
 import java.io.InputStream;
 import java.util.List;
 
@@ -34,6 +37,7 @@ public class DataSeeder implements CommandLineRunner {
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
     private final ProductVariantRepository variantRepository;
+    private final DataSource dataSource;
 
     @Override
     @Transactional   // 整批一起成功或一起失敗，不會匯到一半
@@ -60,6 +64,22 @@ public class DataSeeder implements CommandLineRunner {
             inserted++;
         }
         log.info("[seed] 完成：新增 {} 件、跳過 {} 件（已存在）", inserted, skipped);
+
+        tagProductStyles();
+    }
+
+    /**
+     * 執行 data/product_styles.sql 幫商品貼風格標籤。
+     *
+     * 這段 SQL 是用 slug 去 products 表找商品，所以不能放在 Flyway（重建時 Flyway 先跑，商品還沒匯入），
+     * 要等商品匯完才執行；SQL 裡都有 NOT EXISTS，已經貼過的不會重複貼。
+     */
+    private void tagProductStyles() {
+        ResourceDatabasePopulator populator = new ResourceDatabasePopulator(
+                new ClassPathResource("data/product_styles.sql"));
+        populator.setSqlScriptEncoding("UTF-8");
+        DatabasePopulatorUtils.execute(populator, dataSource);
+        log.info("[seed] 商品風格標籤已補齊");
     }
 
     /**
