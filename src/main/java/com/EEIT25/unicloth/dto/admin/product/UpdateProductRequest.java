@@ -5,8 +5,9 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
-public record UpdateProductRequest(
+import java.util.Set;
 
+public record UpdateProductRequest(
         @NotBlank(message = "請輸入商品名稱")
         @Size(
                 max = 200,
@@ -26,9 +27,11 @@ public record UpdateProductRequest(
         @NotNull(message = "請選擇商品分類")
         Long categoryId,
 
+        // 商品選擇的風格標籤 ID
+        Set<Long> styleIds,
+
         boolean newArrival,
 
         boolean hot
-
 ) {
 }

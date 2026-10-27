@@ -1,14 +1,17 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { imgSrc } from "../../../js/kinu.js";
+import { useLanguage } from "../../../js/i18n.js";
 
 /**
  * 手機版分類選單：menu 是 Header 抓好的 /api/categories 整棵分類樹
- * 上排切換女裝、男裝、兒童，下面列出該分類的第 2 層
+ * 上排顯示新品、女裝、男裝、兒童與推薦，下面列出所選分類的第 2 層
  * 點了任何連結就呼叫 closeMenu，讓 Header 把選單收起來
  * 電腦版（761px 以上）隱藏，避免拉寬視窗時殘留在畫面上
  */
 function MobileMenu({ menu, closeMenu }) {
+    const { t } = useLanguage();
+
     // 目前選到哪個第 1 層分類的 code，null 代表還沒選，預設顯示第一個
     const [selectedCode, setSelectedCode] = useState(null);
     const selectedTop = menu.find((top) => top.code === selectedCode) ?? menu[0];
@@ -17,15 +20,33 @@ function MobileMenu({ menu, closeMenu }) {
 
     return (
         <div className="absolute inset-x-0 top-full z-40 border-b border-[#dfd9d2] bg-[#F6F5F2] px-[4%] pb-8 min-[761px]:hidden">
-            {/* 第 1 層分類切換 */}
-            <div className="mb-6 flex gap-6 border-b border-[#dfd9d2]">
+            {/* 新品、第 1 層分類與推薦入口 */}
+            <div className="mb-6 flex gap-6 overflow-x-auto border-b border-[#dfd9d2]">
+                {/* 新品直接前往新品列表。 */}
+                <Link
+                    to="/new-arrivals"
+                    onClick={closeMenu}
+                    className="-mb-px shrink-0 border-b border-transparent py-3 text-[14px] tracking-[.08em] text-[#76716c]"
+                >
+                    {t('newArrivals')}
+                </Link>
+
                 {menu.map((top) => (
                     <button key={top.code} onClick={() => setSelectedCode(top.code)}
-                            className={`-mb-px border-b py-3 text-[14px] tracking-[.08em]
+                            className={`-mb-px shrink-0 border-b py-3 text-[14px] tracking-[.08em]
                                         ${top.code === selectedTop.code ? "border-black" : "border-transparent text-[#76716c]"}`}>
                         {top.name}
                     </button>
                 ))}
+
+                {/* 推薦頁不是分類下拉選單，點擊後直接前往。 */}
+                <Link
+                    to="/recommendations"
+                    onClick={closeMenu}
+                    className="-mb-px shrink-0 border-b border-transparent py-3 text-[14px] tracking-[.08em] text-[#76716c]"
+                >
+                    {t('recommendations')}
+                </Link>
             </div>
 
             {/* 瀏覽全部 */}

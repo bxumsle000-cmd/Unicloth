@@ -19,20 +19,54 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/api/products")
 public class ProductController {
-
-    private final ProductService productService ;
+    private final ProductService productService;
 
     /** 搜尋商品名稱，分頁：/api/products?keyword=外套&page=0&size=20 */
     @GetMapping
-    public Page<ProductCardResponse> searchProducts(@RequestParam(defaultValue = "") String keyword,
-        @ParameterObject
-        @PageableDefault(size = 24, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
-        return productService.getProductsBySearch(keyword, pageable);
+    public Page<ProductCardResponse> searchProducts(
+            @RequestParam(defaultValue = "")
+            String keyword,
+            @ParameterObject
+            @PageableDefault(
+                    size = 24,
+                    sort = "id",
+                    direction = Sort.Direction.DESC
+            )
+            Pageable pageable
+    ) {
+        return productService
+                .getProductsBySearch(
+                        keyword,
+                        pageable
+                );
     }
 
-    @GetMapping("{slug}")
-    public ProductDetailResponse getProductDetail(@PathVariable String slug){
-        return  productService.getProductDetail(slug);
+    /**
+     * 查詢目前上架的新品，預設由新到舊。
+     */
+    @GetMapping("/new-arrivals")
+    public Page<ProductCardResponse> getNewArrivals(
+            @ParameterObject
+            @PageableDefault(
+                    size = 24,
+                    sort = "id",
+                    direction = Sort.Direction.DESC
+            )
+            Pageable pageable
+    ) {
+        return productService
+                .getNewArrivals(pageable);
     }
 
+    /**
+     * 依 slug 查詢上架商品詳細資料。
+     */
+    @GetMapping("/{slug}")
+    public ProductDetailResponse getProductDetail(
+            @PathVariable
+            String slug
+    ) {
+        return productService
+                .getProductDetail(slug);
+    }
 }

@@ -6,8 +6,9 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
-public record CreateProductRequest(
+import java.util.Set;
 
+public record CreateProductRequest(
         @NotBlank(message = "請輸入商品貨號")
         @Pattern(
                 regexp = "\\d{6}",
@@ -34,9 +35,11 @@ public record CreateProductRequest(
         @NotNull(message = "請選擇商品分類")
         Long categoryId,
 
+        // 商品選擇的風格標籤 ID
+        Set<Long> styleIds,
+
         boolean newArrival,
 
         boolean hot
-
 ) {
 }

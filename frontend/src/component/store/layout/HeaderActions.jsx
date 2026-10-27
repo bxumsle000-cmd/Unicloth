@@ -84,6 +84,14 @@ function HeaderActions() {
                 </Link>
             )}
 
+            {/* 推薦設定只有登入會員能使用，手機版縮短為「推薦」。 */}
+            {loggedIn && (
+                <Link to={"/recommendation-settings"} className={actionClass}>
+                    <span className="max-[760px]:hidden">推薦設定</span>
+                    <span className="hidden max-[760px]:inline">推薦</span>
+                </Link>
+            )}
+
             {loggedIn
                 ? <button onClick={logout} className={actionClass}>{t('logout')}</button>
                 : <Link to={"/login"} className={actionClass}>{t('login')}</Link>}
