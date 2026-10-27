@@ -44,9 +44,13 @@ function OrderDetailModal({ orderId, onClose, onOrderUpdated }) {
     const [shippingCarrier, setShippingCarrier] = useState("");
     const [trackingNumber, setTrackingNumber] = useState("");
     const [shippingError, setShippingError] = useState("");
+    const [cancelError, setCancelError] = useState("");
     const [deliveryError, setDeliveryError] = useState("");
+    const [pickupError, setPickupError] = useState("");
     const [isShipping, setIsShipping] = useState(false);
+    const [isCancelling, setIsCancelling] = useState(false);
     const [isDelivering, setIsDelivering] = useState(false);
+    const [isPickingUp, setIsPickingUp] = useState(false);
 
     useEffect(() => {
         let active = true;
@@ -54,7 +58,6 @@ function OrderDetailModal({ orderId, onClose, onOrderUpdated }) {
         adminApi(`/api/admin/order/orders/${orderId}`)
             .then(data => {
                 if (!active) return;
-
                 setOrder(data);
                 // 若訂單原本已有物流資料，表單預先帶入，方便確認或補正。
                 setShippingCarrier(data.shippingCarrier ?? "");
@@ -71,7 +74,7 @@ function OrderDetailModal({ orderId, onClose, onOrderUpdated }) {
 
     /**
      * 統一更新視窗與背景清單的訂單資料。
-     * 出貨、送達兩種操作都會回傳最新訂單，避免重複寫相同更新程式。
+     * 出貨、取消、送達、取貨四種操作都會回傳最新訂單。
      */
     function applyUpdatedOrder(updatedOrder) {
         setOrder(updatedOrder);
@@ -106,12 +109,38 @@ function OrderDetailModal({ orderId, onClose, onOrderUpdated }) {
                     },
                 }
             );
-
             applyUpdatedOrder(updatedOrder);
         } catch (e) {
             setShippingError(e.message);
         } finally {
             setIsShipping(false);
+        }
+    }
+
+    /**
+     * 取消尚未出貨的訂單。
+     * 已付款的訂單會先提醒退款仍需另外處理，避免誤以為已自動退款。
+     */
+    async function handleCancel() {
+        const confirmMessage = order?.paidAt
+            ? "此訂單已付款。取消後會回補庫存與釋放優惠券，但退款仍需另外處理。確定取消嗎？"
+            : "確定要取消此訂單嗎？取消後會回補庫存與釋放優惠券。";
+
+        if (!window.confirm(confirmMessage)) return;
+
+        setCancelError("");
+        setIsCancelling(true);
+
+        try {
+            const updatedOrder = await adminApi(
+                `/api/admin/order/orders/${orderId}/cancel`,
+                { method: "PATCH" }
+            );
+            applyUpdatedOrder(updatedOrder);
+        } catch (e) {
+            setCancelError(e.message);
+        } finally {
+            setIsCancelling(false);
         }
     }
 
@@ -128,12 +157,32 @@ function OrderDetailModal({ orderId, onClose, onOrderUpdated }) {
                 `/api/admin/order/orders/${orderId}/deliver`,
                 { method: "PATCH" }
             );
-
             applyUpdatedOrder(updatedOrder);
         } catch (e) {
             setDeliveryError(e.message);
         } finally {
             setIsDelivering(false);
+        }
+    }
+
+    /**
+     * 手動確認會員已取貨。
+     * 目前尚未串接物流商，因此由後台人員按下此按鈕完成訂單。
+     */
+    async function handlePickup() {
+        setPickupError("");
+        setIsPickingUp(true);
+
+        try {
+            const updatedOrder = await adminApi(
+                `/api/admin/order/orders/${orderId}/pickup`,
+                { method: "PATCH" }
+            );
+            applyUpdatedOrder(updatedOrder);
+        } catch (e) {
+            setPickupError(e.message);
+        } finally {
+            setIsPickingUp(false);
         }
     }
 
@@ -203,7 +252,7 @@ function OrderDetailModal({ orderId, onClose, onOrderUpdated }) {
                             </div>
                         </section>
 
-                        {/* 收件、物流資料與待出貨時的出貨表單 */}
+                        {/* 收件、物流資料與物流流程按鈕 */}
                         <section className="mb-5 border border-line bg-white p-5 max-[600px]:p-4">
                             <h3 className="mb-4 text-[14px] font-medium tracking-[.1em]">收件與物流</h3>
                             <div className="grid grid-cols-2 gap-x-6 gap-y-4 max-[600px]:grid-cols-1">
@@ -265,10 +314,24 @@ function OrderDetailModal({ orderId, onClose, onOrderUpdated }) {
                                         </p>
                                     )}
 
-                                    <div className="mt-4 flex justify-end">
+                                    {cancelError && (
+                                        <p className="mt-3 border border-[#b0413e] bg-[#fff5f3] px-3 py-2 text-[12px] text-[#9a3f30]">
+                                            {cancelError}
+                                        </p>
+                                    )}
+
+                                    <div className="mt-4 flex flex-wrap justify-end gap-3">
+                                        <button
+                                            type="button"
+                                            onClick={handleCancel}
+                                            disabled={isCancelling || isShipping}
+                                            className="border border-[#b0413e] bg-white px-5 py-2.5 text-[12px] tracking-[.08em] text-[#9a3f30] hover:bg-[#fff5f3] disabled:cursor-not-allowed disabled:opacity-40"
+                                        >
+                                            {isCancelling ? "取消處理中…" : "取消訂單"}
+                                        </button>
                                         <button
                                             type="submit"
-                                            disabled={isShipping}
+                                            disabled={isShipping || isCancelling}
                                             className="border border-black bg-black px-5 py-2.5 text-[12px] tracking-[.08em] text-white hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
                                         >
                                             {isShipping ? "出貨處理中…" : "確認出貨"}
@@ -300,6 +363,34 @@ function OrderDetailModal({ orderId, onClose, onOrderUpdated }) {
                                             className="border border-black bg-black px-5 py-2.5 text-[12px] tracking-[.08em] text-white hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
                                         >
                                             {isDelivering ? "送達處理中…" : "確認送達"}
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+
+                            {order.status === "DELIVERED" && (
+                                <div className="mt-5 border-t border-line pt-5">
+                                    <div className="mb-4">
+                                        <h4 className="text-[13px] font-medium tracking-[.08em]">確認取貨</h4>
+                                        <p className="mt-1 text-[11px] text-muted">
+                                            目前尚未串接物流商，確認會員已取貨後，訂單會改為「取貨完畢」。
+                                        </p>
+                                    </div>
+
+                                    {pickupError && (
+                                        <p className="mb-3 border border-[#b0413e] bg-[#fff5f3] px-3 py-2 text-[12px] text-[#9a3f30]">
+                                            {pickupError}
+                                        </p>
+                                    )}
+
+                                    <div className="flex justify-end">
+                                        <button
+                                            type="button"
+                                            onClick={handlePickup}
+                                            disabled={isPickingUp}
+                                            className="border border-black bg-black px-5 py-2.5 text-[12px] tracking-[.08em] text-white hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
+                                        >
+                                            {isPickingUp ? "取貨處理中…" : "確認取貨"}
                                         </button>
                                     </div>
                                 </div>
