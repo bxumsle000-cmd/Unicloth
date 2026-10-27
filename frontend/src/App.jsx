@@ -14,6 +14,7 @@ import Orders from "./pages/store/Orders.jsx";
 import Support from "./pages/store/Support.jsx";
 import Login from "./pages/store/Login.jsx";
 import CompleteProfile from "./pages/store/CompleteProfile.jsx";
+import NewArrivals from "./pages/store/NewArrivals.jsx";
 import Recommendations from "./pages/store/Recommendations.jsx";
 import RecommendationSettings from "./pages/store/RecommendationSettings.jsx";
 import ProfileGuard from "./component/ProfileGuard.jsx";
@@ -35,6 +36,8 @@ function StoreLayout(){
                 <ProfileGuard>
                     <Routes>
                         <Route path="/" element={<Home/>}/>
+                        {/* 新品頁只顯示目前上架且勾選新品標籤的商品。 */}
+                        <Route path="/new-arrivals" element={<NewArrivals/>}/>
                         <Route path="/category/:code" element={<Category/>}/>
                         <Route path="/wishlist/" element={<RequireLogin><Wishlist/></RequireLogin>}/>
                         <Route path="/product/:slug" element={<ProductDetail/>}/>

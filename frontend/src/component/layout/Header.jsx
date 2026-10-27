@@ -55,8 +55,17 @@ function Header () {
             <div ref={headerAreaRef} className="relative font-kinu">
                 <header className="grid h-[82px] grid-cols-[1fr_auto_1fr] items-center border-b border-line bg-paper px-[5.5%]
                            max-[760px]:h-auto max-[760px]:min-h-[65px] max-[760px]:gap-y-2 max-[760px]:px-[4%] max-[760px]:py-2.5">
-                    {/* 左：分類與推薦入口 */}
+                    {/* 左：新品、分類與推薦入口 */}
                     <div className="flex items-center gap-[26px] max-[760px]:hidden">
+                        {/* 新品直接前往新品列表，不展開分類選單。 */}
+                        <Link
+                            to="/new-arrivals"
+                            onClick={closeMenu}
+                            className="border-b border-transparent py-2.5 text-[11px] tracking-[.08em] whitespace-nowrap hover:border-black"
+                        >
+                            {t('newArrivals')}
+                        </Link>
+
                         {TOP_CATEGORIES.map((top) => (
                             <button key={top.code} onClick={() => setOpenCode(openCode === top.code ? null : top.code)}
                                     className={`border-b py-2.5 text-[11px] tracking-[.08em] whitespace-nowrap

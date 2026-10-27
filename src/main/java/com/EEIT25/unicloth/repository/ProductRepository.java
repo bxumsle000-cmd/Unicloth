@@ -90,6 +90,14 @@ public interface ProductRepository
     );
 
     /**
+     * 上架且標示為新品的商品（分頁）。
+     */
+    Page<Product> findByStatusAndNewArrivalTrue(
+            ProductStatus status,
+            Pageable pageable
+    );
+
+    /**
      * 使用商品名稱、風格名稱或風格代碼搜尋。
      */
     @Query("""

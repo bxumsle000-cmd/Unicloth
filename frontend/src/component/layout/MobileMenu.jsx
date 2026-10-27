@@ -5,7 +5,7 @@ import { useLanguage } from "../../js/i18n.js";
 
 /**
  * 手機版分類選單：menu 是 Header 抓好的 /api/categories 整棵分類樹
- * 上排切換女裝、男裝、兒童與推薦，下面列出所選分類的第 2 層
+ * 上排顯示新品、女裝、男裝、兒童與推薦，下面列出所選分類的第 2 層
  * 點了任何連結就呼叫 closeMenu，讓 Header 把選單收起來
  * 電腦版（761px 以上）隱藏，避免拉寬視窗時殘留在畫面上
  */
@@ -20,8 +20,17 @@ function MobileMenu({ menu, closeMenu }) {
 
     return (
         <div className="absolute inset-x-0 top-full z-40 border-b border-[#dfd9d2] bg-[#F6F5F2] px-[4%] pb-8 min-[761px]:hidden">
-            {/* 第 1 層分類切換與推薦入口 */}
+            {/* 新品、第 1 層分類與推薦入口 */}
             <div className="mb-6 flex gap-6 overflow-x-auto border-b border-[#dfd9d2]">
+                {/* 新品直接前往新品列表。 */}
+                <Link
+                    to="/new-arrivals"
+                    onClick={closeMenu}
+                    className="-mb-px shrink-0 border-b border-transparent py-3 text-[14px] tracking-[.08em] text-[#76716c]"
+                >
+                    {t('newArrivals')}
+                </Link>
+
                 {menu.map((top) => (
                     <button key={top.code} onClick={() => setSelectedCode(top.code)}
                             className={`-mb-px shrink-0 border-b py-3 text-[14px] tracking-[.08em]

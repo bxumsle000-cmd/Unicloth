@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 /**
  * 商品相關服務<br>
  * - {@link #getProductDetail(String)}：商品詳細頁，登入會員同時記錄瀏覽<br>
+ * - {@link #getNewArrivals(Pageable)}：查詢目前上架的新品<br>
  * - {@link #getProductsBySearch(String, Pageable)}：用商品名稱、直接風格與相關風格搜尋
  */
 @Service
@@ -68,6 +69,21 @@ public class ProductService {
                 product,
                 variants
         );
+    }
+
+    /**
+     * 查詢目前上架且標示為新品的商品。
+     */
+    @Transactional(readOnly = true)
+    public Page<ProductCardResponse> getNewArrivals(
+            Pageable pageable
+    ) {
+        return productRepository
+                .findByStatusAndNewArrivalTrue(
+                        ProductStatus.ON_SALE,
+                        pageable
+                )
+                .map(ProductCardResponse::from);
     }
 
     /**
