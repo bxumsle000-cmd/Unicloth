@@ -1,4 +1,5 @@
 import { useState } from "react";
+import ProductAnalyticsPanel from "../../component/admin/ProductAnalyticsPanel.jsx";
 import ProductCategoryPanel from "../../component/admin/ProductCategoryPanel.jsx";
 import ProductInventoryPanel from "../../component/admin/ProductInventoryPanel.jsx";
 import ProductSchedulePanel from "../../component/admin/ProductSchedulePanel.jsx";
@@ -7,6 +8,7 @@ import ProductHome from "./ProductHome.jsx";
 
 const TABS = [
     { key: "products", label: "商品列表" },
+    { key: "analytics", label: "銷售分析" },
     { key: "inventory", label: "進貨入庫" },
     { key: "stock-warning", label: "庫存警示" },
     { key: "schedule", label: "預定下架" },
@@ -72,6 +74,12 @@ function ProductDepartmentHome() {
             </header>
 
             {activeTab === "products" && <ProductHome />}
+
+            {activeTab === "analytics" && (
+                <main className="px-8 py-10 max-[760px]:px-4 max-[760px]:py-6">
+                    <ProductAnalyticsPanel />
+                </main>
+            )}
 
             {activeTab === "inventory" && (
                 <main className="px-8 py-10 max-[760px]:px-4 max-[760px]:py-6">
