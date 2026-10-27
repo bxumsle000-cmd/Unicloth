@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 public interface ProductRepository
@@ -179,6 +180,58 @@ public interface ProductRepository
             boolean hasRelatedStyles,
             @Param("relatedStyleIds")
             Collection<Long> relatedStyleIds,
+            Pageable pageable
+    );
+
+    /**
+     * 依會員各風格的累積瀏覽分數推薦尚未瀏覽的上架商品。
+     * 商品符合的風格分數會加總，同分時依最近偏好、熱門標記及商品 id 排序。
+     */
+    @Query(
+            value = """
+                    SELECT candidate_style.product_id
+                    FROM product_styles candidate_style
+                    JOIN products candidate_product
+                      ON candidate_product.id =
+                         candidate_style.product_id
+                    JOIN (
+                        SELECT viewed_style.style_id,
+                               SUM(product_view.view_count)
+                                   AS style_score,
+                               MAX(product_view.last_viewed_at)
+                                   AS last_viewed_at
+                        FROM member_product_views product_view
+                        JOIN product_styles viewed_style
+                          ON viewed_style.product_id =
+                             product_view.product_id
+                        WHERE product_view.member_id =
+                              :memberId
+                        GROUP BY viewed_style.style_id
+                    ) preference
+                      ON preference.style_id =
+                         candidate_style.style_id
+                    WHERE candidate_product.status =
+                          'ON_SALE'
+                      AND NOT EXISTS (
+                          SELECT 1
+                          FROM member_product_views viewed_product
+                          WHERE viewed_product.member_id =
+                                :memberId
+                            AND viewed_product.product_id =
+                                candidate_style.product_id
+                      )
+                    GROUP BY candidate_style.product_id,
+                             candidate_product.is_hot
+                    ORDER BY
+                        SUM(preference.style_score) DESC,
+                        MAX(preference.last_viewed_at) DESC,
+                        candidate_product.is_hot DESC,
+                        candidate_style.product_id DESC
+                    """,
+            nativeQuery = true
+    )
+    List<Long> findRecommendationProductIds(
+            @Param("memberId") Long memberId,
             Pageable pageable
     );
 

@@ -1,4 +1,3 @@
-
 package com.EEIT25.unicloth.security;
 
 import com.EEIT25.unicloth.repository.MemberProfileRepository;
@@ -19,7 +18,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -29,7 +27,7 @@ import java.nio.charset.StandardCharsets;
  * 不適合前後端分離 + JWT，所以這裡改成：
  * <ul>
  *   <li>每個請求先經過 {@link JwtAuthFilter}，有帶有效 token 就標記身分</li>
- *   <li>看商品、看分類、登入（含 Google 登入）、註冊不用登入；其餘 /api/** 一律要登入</li>
+ *   <li>看商品、分類、風格、推薦、登入（含 Google 登入）、註冊不用登入；其餘 /api/** 一律要登入</li>
  *   <li>登入了但還沒補填個人資料：只能查自己的資料、補填資料，其他 /api/** 回 403</li>
  *   <li>/api/admin/** 只有員工 token 能用（員工登入除外），/api/admin/部門/** 還要屬於該部門（ADMIN 管理者例外，所有部門都能進）；員工 token 也不能用會員的 API</li>
  *   <li>/api 以外（圖片、影片、Swagger、/error）都放行</li>
@@ -71,12 +69,13 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST,
                                 "/api/auth/login", "/api/auth/firebase", "/api/auth/register", "/api/auth/logout").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/admin/auth/login").permitAll()
-                        // 商品、分類與風格允許訪客查詢
+                        // 商品、分類、風格與推薦允許訪客查詢
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/api/products/**",
                                 "/api/categories/**",
-                                "/api/styles/**"
+                                "/api/styles/**",
+                                "/api/recommendations/**"
                         ).permitAll()
 
                         // 綠界付款結果通知：不需要會員 JWT
