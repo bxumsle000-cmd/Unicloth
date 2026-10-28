@@ -37,3 +37,7 @@ __pycache__/
 
 ### branch ###
 .claude/worktrees/
+
+# Codex 製作簡報時產生的暫存與輸出檔，不提交到專案 Git
+.codex-build/
+reports/
