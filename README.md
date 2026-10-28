@@ -34,9 +34,13 @@ docker compose down -v
 docker compose up -d
 ```
 
-> `docker compose up -d` 會啟動兩個容器：
+> `docker compose up -d` 會啟動三個容器：
 > - `unicloth-db`：SQL Server 資料庫
 > - `unicloth-tunnel`：綠界付款通知用的對外 HTTPS 網址（不用另外安裝 cloudflared，詳見 [README-ECPAY.md](README-ECPAY.md)）
+> - `unicloth-analytics`：行銷後台「銷售數據」用的 Python 分析服務（第一次要建映像檔，要等幾分鐘）
+>
+> 已經跑過上面指令的人，拉到新增 `unicloth-analytics` 的版本後，要再執行一次 `docker compose up -d`（不用 `down -v`），才會建出這個新容器。
+> 改了 `analytics/` 的 Python 程式，要執行 `docker compose up -d --build analytics` 才會生效。
 >
 > ⚠️ `docker compose down -v` 會**清空整個資料庫**，只有第一次或想整組重來時才用。
 

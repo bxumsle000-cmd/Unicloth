@@ -40,6 +40,14 @@ export const MEMBER_COUPON_STATUSES = [
     { key: 'EXPIRED', name: '已過期', color: 'text-[#b0413e]' },
 ];
 
+// 銷售數據各頁共用的期間選項：key 要跟 Python（analytics/）收的 range 一樣
+export const SALES_RANGE_OPTIONS = [
+    { key: '7d',  name: '近 7 天' },
+    { key: '30d', name: '近 30 天' },
+    { key: '90d', name: '近 90 天' },
+    { key: '12m', name: '近 12 個月' },
+];
+
 /** 折價券折扣的文字：AMOUNT → 折 100 元；PERCENT → 10% off（打 9 折） */
 export function discountText(coupon) {
     return coupon.type === 'AMOUNT'
@@ -64,9 +72,38 @@ export function fmtDateTime(s) {
     return s ? String(s).slice(0, 16).replace('T', ' ').replace(/-/g, '/') : '—';
 }
 
+/** 後端的 LocalDate：2026-10-27 → 2026/10/27 */
+export function fmtDate(s) {
+    return String(s).replace(/-/g, '/');
+}
+
 /** 呼叫後台 API：跟 kinu.js 的 api() 一樣，只是帶的是員工 token */
 export function adminApi(path, options = {}) {
     return api(path, { ...options, token: getAdminToken() });
+}
+
+/**
+ * 下載後台 API 回的檔案（例如匯出 Excel）。
+ * 不能直接 window.location 過去，因為那樣不會帶員工 token，所以先用 fetch 拿到檔案再讓瀏覽器存檔
+ */
+export async function adminDownload(path, fileName) {
+    const res = await fetch(path, { headers: { Authorization: 'Bearer ' + getAdminToken() } });
+    if (!res.ok) {
+        let message = '下載失敗（' + res.status + '），請稍後再試';
+        try {
+            const err = await res.json();
+            if (err.message) message = err.message;
+        } catch {
+            // 回應不是 JSON，就用上面預設的 message
+        }
+        throw new Error(message);
+    }
+    const url = URL.createObjectURL(await res.blob());
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    link.click();
+    URL.revokeObjectURL(url);
 }
 
 /** 員工登出：四個都刪掉 */
