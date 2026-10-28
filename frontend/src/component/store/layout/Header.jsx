@@ -4,10 +4,10 @@ import { api } from "../../../js/kinu.js";
 import MegaMenu from "./MegaMenu.jsx";
 import MobileMenu from "./MobileMenu.jsx";
 import HeaderActions from "./HeaderActions.jsx";
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useLanguage } from "../../../js/i18n.js";
 
-function Header () {
+function Header() {
     /** 導覽列的三個分類，對應資料庫第 1 層分類的 code */
     const TOP_CATEGORIES = [
         { code: 'all_women', i18n: 'women' },
@@ -39,16 +39,30 @@ function Header () {
     const headerAreaRef = useRef(null);
     useEffect(() => {
         if (!openCode && !mobileMenuOpen) return;
+
         function closeOnOutsideClick(e) {
-            if (!headerAreaRef.current.contains(e.target)) closeMenu();
+            if (!headerAreaRef.current.contains(e.target)) {
+                closeMenu();
+            }
         }
+
         document.addEventListener('click', closeOnOutsideClick);
-        return () => document.removeEventListener('click', closeOnOutsideClick);
+        return () =>
+            document.removeEventListener(
+                'click',
+                closeOnOutsideClick
+            );
     }, [openCode, mobileMenuOpen]);
+
+    // 統一左側導覽列的手指游標與滑過底線效果。
+    const navLinkClass =
+        "cursor-pointer border-b border-transparent py-2.5 text-[11px] " +
+        "tracking-[.08em] whitespace-nowrap transition-colors duration-200 " +
+        "hover:border-black";
 
     return (
         <>
-            <div className="flex h-8 items-center justify-center bg-black font-kinu text-white text-[10px] tracking-[.12em]">
+            <div className="flex h-8 items-center justify-center bg-black font-kinu text-[10px] tracking-[.12em] text-white">
                 {t('topBanner')}
             </div>
 
@@ -57,46 +71,85 @@ function Header () {
                            max-[760px]:h-auto max-[760px]:min-h-[65px] max-[760px]:gap-y-2 max-[760px]:px-[4%] max-[760px]:py-2.5">
                     {/* 左：新品、分類與推薦入口 */}
                     <div className="flex items-center gap-[26px] max-[760px]:hidden">
-                        {/* 新品直接前往新品列表，不展開分類選單。 */}
                         <Link
                             to="/new-arrivals"
                             onClick={closeMenu}
-                            className="border-b border-transparent py-2.5 text-[11px] tracking-[.08em] whitespace-nowrap hover:border-black"
+                            className={navLinkClass}
                         >
                             {t('newArrivals')}
                         </Link>
 
                         {TOP_CATEGORIES.map((top) => (
-                            <button key={top.code} onClick={() => setOpenCode(openCode === top.code ? null : top.code)}
-                                    className={`border-b py-2.5 text-[11px] tracking-[.08em] whitespace-nowrap
-                                        ${openCode === top.code ? "border-black" : "border-transparent"}`}>
+                            <button
+                                key={top.code}
+                                onClick={() =>
+                                    setOpenCode(
+                                        openCode === top.code
+                                            ? null
+                                            : top.code
+                                    )
+                                }
+                                className={
+                                    navLinkClass + " " +
+                                    (
+                                        openCode === top.code
+                                            ? "border-black"
+                                            : ""
+                                    )
+                                }
+                            >
                                 {t(top.i18n)}
                             </button>
                         ))}
 
-                        {/* 推薦屬於公開商品瀏覽入口，放在兒童分類右側。 */}
                         <Link
                             to="/recommendations"
                             onClick={closeMenu}
-                            className="border-b border-transparent py-2.5 text-[11px] tracking-[.08em] whitespace-nowrap hover:border-black"
+                            className={navLinkClass}
                         >
                             {t('recommendations')}
                         </Link>
                     </div>
 
                     {/* 手機版：分類收進漢堡選單按鈕（電腦版隱藏） */}
-                    <button aria-label={mobileMenuOpen ? t('closeMenu') : t('menu')} onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                            className="-ml-[7px] hidden size-11 place-items-center max-[760px]:grid">
-                        {mobileMenuOpen ? <MdClose className="size-5" /> : <MdMenu className="size-5" />}
+                    <button
+                        aria-label={
+                            mobileMenuOpen
+                                ? t('closeMenu')
+                                : t('menu')
+                        }
+                        onClick={() =>
+                            setMobileMenuOpen(!mobileMenuOpen)
+                        }
+                        className="-ml-[7px] hidden size-11 cursor-pointer place-items-center max-[760px]:grid"
+                    >
+                        {mobileMenuOpen
+                            ? <MdClose className="size-5" />
+                            : <MdMenu className="size-5" />}
                     </button>
 
                     {/* 分類選單 */}
-                    {openTop && <MegaMenu top={openTop} closeMenu={closeMenu} />}
-                    {mobileMenuOpen && <MobileMenu menu={menu} closeMenu={closeMenu} />}
+                    {openTop && (
+                        <MegaMenu
+                            top={openTop}
+                            closeMenu={closeMenu}
+                        />
+                    )}
+
+                    {mobileMenuOpen && (
+                        <MobileMenu
+                            menu={menu}
+                            closeMenu={closeMenu}
+                        />
+                    )}
 
                     {/* 中：Logo */}
                     <Link onClick={closeMenu} to="/">
-                        <img src="/img/logo.png" alt="KINU" className="block h-auto w-[119px] justify-self-center mix-blend-multiply max-[760px]:w-[96px]" />
+                        <img
+                            src="/img/logo.png"
+                            alt="KINU"
+                            className="block h-auto w-[119px] justify-self-center mix-blend-multiply max-[760px]:w-[96px]"
+                        />
                     </Link>
 
                     {/* 右：搜尋、天氣、各功能 */}
@@ -104,6 +157,7 @@ function Header () {
                 </header>
             </div>
         </>
-    )
+    );
 }
+
 export default Header;
