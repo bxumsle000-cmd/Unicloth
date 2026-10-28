@@ -1,0 +1,680 @@
+<!doctype html>
+<!--
+  銷售數據 > 折價券成效（前端範例，只用假資料，沒有接後端）
+
+  直接用瀏覽器打開這個檔案就能看（要有網路，因為 Tailwind 從 CDN 載入）。
+
+  優惠分兩種：折價券、特價活動。
+
+  - 假資料有六種，之後換成 Python 從資料庫查出來的 DataFrame：
+      折價券：coupons（id、code、title、type、value、min_subtotal、valid_days、auto_trigger、is_active）
+      發出的券：member_coupons（id、coupon_id、received_at、expire_at、used_at）
+      特價活動：promotions（id、name、start_at、end_at）
+      活動商品：promotion_products（promotion_id、product_id、sale_price）
+      訂單：orders（status、subtotal、discount、member_coupon_id、created_at）
+      訂單明細：order_items（product_name、unit_price、orig_price、promotion_id、qty）+ 透過 variant_id 接回的 product_id
+      （商品名稱有重複，例如男裝、女裝都有「繭型牛仔褲」，所以認商品要用 product_id，不能用 product_name）
+  - 特價活動的資料表、order_items 的 orig_price / promotion_id，這頁先假設後端已經加好了
+      見 docs/sales-data-plan.md「要改後端的部分：特價活動」
+      特價明細 = promotion_id 有值；特價讓利 = SUM((orig_price - unit_price) * qty)
+  - 每個活動的成效在另一頁：活動成效（campaign-performance.html），兩頁用同一份假資料
+  - 這頁用到兩種時間，畫面上都有寫：
+      使用率：看「這段期間發出的券」（received_at），現在有幾張用掉了
+      其他（訂單、營業額、折扣、特價讓利）：看「這段期間下的訂單」（created_at），跟營收總覽一樣
+    所以同一張券，「已使用」和「訂單數」不一定一樣（例如上個月發的券，這個月才用）
+  - 已使用 = used_at IS NOT NULL（跟後台發券紀錄頁的狀態一樣，MemberCouponStatus）
+      訂單取消時 OrderService.cancelOrder() 會把券還給會員（used_at 清成 NULL），所以已取消的訂單不算用過
+      還在等付款（UNPAID）的訂單 used_at 有值，所以算已使用；但它不是有效訂單，不算進訂單數、營業額
+  - 只算有效訂單（排除 UNPAID、CANCELLED）
+      營業額跟營收總覽一樣 = subtotal - discount，不含運費
+      折價券折扣 = SUM(orders.discount)，等於營收總覽的「折扣總額」
+      商品銷售金額 = SUM(unit_price * qty)，是折價券折抵之前的金額
+-->
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>折價券成效</title>
+    <!-- 跟專案 frontend/index.html 一樣的 Tailwind 和字型 -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style type="text/tailwindcss">
+        @theme {
+            --color-paper: #F6F5F2;
+            --color-cream: #F0EBE3;
+            --color-stone: #D9CFC7;
+            --color-muted: #76716c;
+            --color-line: #dfd9d2;
+            --font-kinu: 'DM Sans', 'Noto Sans TC', sans-serif;
+        }
+    </style>
+    <style>
+        /* 圖表用的顏色，集中放這裡方便之後換 */
+        :root {
+            --series-current: #2a78d6;   /* 使用率長條 */
+            --series-track: #e8eef7;     /* 使用率長條的底色 */
+        }
+    </style>
+    <!-- 商品資料（跟商品銷售範例共用），只拿來產生假的訂單明細 -->
+    <script src="data/products.js"></script>
+</head>
+<body class="bg-paper">
+<div class="flex min-h-screen bg-paper font-kinu text-[#111] max-[760px]:flex-col">
+
+    <!-- 左邊：側邊選單（樣式照 component/admin/mkt/SideMenu.jsx） -->
+    <aside class="w-[220px] shrink-0 border-r border-line bg-white max-[760px]:w-full max-[760px]:border-r-0 max-[760px]:border-b">
+        <nav class="flex flex-col pb-6 max-[760px]:pb-3">
+            <button type="button" class="flex items-center justify-between px-6 py-3 text-left text-[13px] font-medium tracking-[.08em] hover:bg-paper max-[760px]:px-4">
+                <span>Coupon</span>
+                <span class="text-[10px] text-muted">▶</span>
+            </button>
+            <button type="button" class="flex items-center justify-between px-6 py-3 text-left text-[13px] font-medium tracking-[.08em] hover:bg-paper max-[760px]:px-4">
+                <span>銷售數據</span>
+                <span class="rotate-90 text-[10px] text-muted">▶</span>
+            </button>
+            <a href="sales-overview.html" class="border-l-2 border-transparent py-2.5 pl-10 pr-6 text-left text-[13px] tracking-[.08em] text-muted hover:text-[#111] max-[760px]:pl-8">
+                營收總覽
+            </a>
+            <a href="product-sales.html" class="border-l-2 border-transparent py-2.5 pl-10 pr-6 text-left text-[13px] tracking-[.08em] text-muted hover:text-[#111] max-[760px]:pl-8">
+                商品銷售
+            </a>
+            <a href="order-structure.html" class="border-l-2 border-transparent py-2.5 pl-10 pr-6 text-left text-[13px] tracking-[.08em] text-muted hover:text-[#111] max-[760px]:pl-8">
+                訂單結構
+            </a>
+            <a href="member-customers.html" class="border-l-2 border-transparent py-2.5 pl-10 pr-6 text-left text-[13px] tracking-[.08em] text-muted hover:text-[#111] max-[760px]:pl-8">
+                會員與顧客
+            </a>
+            <a href="coupon-performance.html" class="border-l-2 border-black bg-paper py-2.5 pl-10 pr-6 text-left text-[13px] font-medium tracking-[.08em] max-[760px]:pl-8">
+                折價券成效
+            </a>
+            <a href="campaign-performance.html" class="border-l-2 border-transparent py-2.5 pl-10 pr-6 text-left text-[13px] tracking-[.08em] text-muted hover:text-[#111] max-[760px]:pl-8">
+                活動成效
+            </a>
+        </nav>
+    </aside>
+
+    <!-- 右邊：頂部列 + 內容區 -->
+    <div class="flex min-w-0 flex-1 flex-col">
+        <header class="flex items-center justify-end gap-4 border-b border-line bg-white px-8 py-4 max-[760px]:px-4">
+            <span class="text-[12px] tracking-[.06em] text-muted">
+                目前登入：<b class="font-medium text-[#111]">行銷測試員（mkt01）</b>
+            </span>
+        </header>
+
+        <main class="flex-1 px-8 py-8 max-[760px]:px-4">
+            <!-- 標題 + 期間篩選 -->
+            <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
+                <div>
+                    <h1 class="text-[20px] font-medium tracking-[.08em]">折價券成效</h1>
+                    <p id="period-text" class="mt-1 text-[12px] tracking-[.06em] text-muted"></p>
+                </div>
+                <div id="range-buttons" class="flex flex-wrap border border-line bg-white"></div>
+            </div>
+
+            <!-- 優惠總覽：折價券 + 商品特價 -->
+            <section id="overview-cards" class="mb-10 grid grid-cols-3 gap-4 max-[1100px]:grid-cols-1"></section>
+
+            <!-- ==================== 折價券 ==================== -->
+            <h2 class="mb-4 text-[16px] font-medium tracking-[.08em]">折價券</h2>
+            <section id="coupon-cards" class="mb-6 grid grid-cols-3 gap-4 max-[1100px]:grid-cols-1"></section>
+
+            <!-- 每張券的成效 -->
+            <section class="mb-6 border border-line bg-white p-6 max-[760px]:p-4">
+                <h3 class="text-[14px] font-medium tracking-[.08em]">每張券的成效</h3>
+                <p class="mt-1 text-[12px] tracking-[.06em] text-muted">
+                    發出、使用率：這段期間發出的券；訂單數、營業額、折扣成本：這段期間用這張券下的有效訂單。依營業額排序
+                </p>
+                <div class="mt-4 overflow-x-auto">
+                    <table class="w-full min-w-[880px] text-[13px] tracking-[.04em]">
+                        <thead>
+                        <tr class="border-b border-line text-left text-muted">
+                            <th class="py-2.5 pr-4 font-normal">折價券</th>
+                            <th class="py-2.5 pr-4 font-normal">發送方式</th>
+                            <th class="py-2.5 pr-4 text-right font-normal">發出</th>
+                            <th class="py-2.5 pr-4 font-normal">使用率</th>
+                            <th class="py-2.5 pr-4 text-right font-normal">訂單數</th>
+                            <th class="py-2.5 pr-4 text-right font-normal">營業額</th>
+                            <th class="py-2.5 pr-4 text-right font-normal">折扣成本</th>
+                            <th class="py-2.5 text-right font-normal">平均每筆折扣</th>
+                        </tr>
+                        </thead>
+                        <tbody id="coupon-rows" class="tabular-nums"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 有用券 vs 沒用券 -->
+            <section class="border border-line bg-white p-6 max-[760px]:p-4">
+                <h3 class="text-[14px] font-medium tracking-[.08em]">有用券與沒用券的訂單</h3>
+                <p class="mt-1 text-[12px] tracking-[.06em] text-muted">
+                    這段期間的有效訂單。券都有消費門檻，有用券的訂單本來就比較大，客單價差距不全是券的功勞
+                </p>
+                <p id="aov-diff" class="mt-4 text-[14px] tracking-[.04em]"></p>
+                <div class="mt-4 overflow-x-auto">
+                    <table class="w-full min-w-[640px] text-[13px] tracking-[.04em]">
+                        <thead>
+                        <tr class="border-b border-line text-left text-muted">
+                            <th class="py-2.5 pr-4 font-normal">訂單</th>
+                            <th class="py-2.5 pr-4 text-right font-normal">訂單數</th>
+                            <th class="py-2.5 pr-4 text-right font-normal">訂單佔比</th>
+                            <th class="py-2.5 pr-4 text-right font-normal">營業額</th>
+                            <th class="py-2.5 pr-4 text-right font-normal">平均折扣</th>
+                            <th class="py-2.5 text-right font-normal">客單價</th>
+                        </tr>
+                        </thead>
+                        <tbody id="aov-rows" class="tabular-nums"></tbody>
+                    </table>
+                </div>
+            </section>
+
+        </main>
+    </div>
+</div>
+
+<script>
+    // ==================== 假資料 ====================
+    // 之後這一段整個換成呼叫 Python 的 API，例如 fetch('/api/admin/sales/promotions?range=30d')
+
+    const RANGE_OPTIONS = [
+        { key: '7d', name: '近 7 天', days: 7, start: '2026/10/20' },
+        { key: '30d', name: '近 30 天', days: 30, start: '2026/09/27' },
+        { key: '90d', name: '近 90 天', days: 90, start: '2026/07/29' },
+        { key: '12m', name: '近 12 個月', days: 365, start: '2025/10/27' },
+    ];
+    const END_DATE = '2026/10/26';
+    const TOTAL_DAYS = 400;  // 假資料共幾天；要比 12 個月長，才有「期間之前發的券，期間內才用」的情況
+
+    // 時間用「第幾天」表示：0 = 假資料第一天的 00:00，TOTAL_DAYS = 現在（2026/10/27 00:00）
+    const NOW = TOTAL_DAYS;
+
+    // 固定種子的亂數，每次打開數字都一樣，方便對照
+    let seed = 20261027;
+    function random() {
+        seed = (seed * 16807) % 2147483647;
+        return seed / 2147483647;
+    }
+
+    // 照比例隨機挑一個，例如 pick({ DELIVERED: 90, SHIPPED: 10 })
+    function pick(weightMap) {
+        const total = Object.values(weightMap).reduce((sum, weight) => sum + weight, 0);
+        let r = random() * total;
+        for (const [key, weight] of Object.entries(weightMap)) {
+            r -= weight;
+            if (r < 0) return key;
+        }
+        return Object.keys(weightMap)[0];
+    }
+
+    // 折價券（coupons），欄位跟資料表一樣
+    const COUPON_LIST = [
+        { id: 1, code: 'WELCOME100', title: '新會員 100 元折價券', type: 'AMOUNT', value: 100, minSubtotal: 990, validDays: 30, autoTrigger: null, isActive: true },
+        { id: 2, code: 'SAVE10', title: '全館 9 折券', type: 'PERCENT', value: 10, minSubtotal: 1490, validDays: 14, autoTrigger: null, isActive: true },
+        { id: 3, code: 'BDAY200', title: '生日禮 200 元折價券', type: 'AMOUNT', value: 200, minSubtotal: 1000, validDays: 30, autoTrigger: 'BIRTHDAY', isActive: true },
+        { id: 4, code: 'BDAY15', title: '生日禮 85 折券', type: 'PERCENT', value: 15, minSubtotal: 2000, validDays: 30, autoTrigger: 'BIRTHDAY', isActive: true },
+        { id: 5, code: 'AUTUMN150', title: '秋季 150 元折價券', type: 'AMOUNT', value: 150, minSubtotal: 1490, validDays: 14, autoTrigger: null, isActive: true },
+        { id: 6, code: 'SUMMER20', title: '夏季 8 折券', type: 'PERCENT', value: 20, minSubtotal: 2490, validDays: 7, autoTrigger: null, isActive: false },
+    ];
+
+    // 只有產生假資料用：每種券被用掉的機率（真的資料不需要）
+    const USE_CHANCE_MAP = { 1: 0.34, 2: 0.22, 3: 0.52, 4: 0.31, 5: 0.27, 6: 0.18 };
+
+    // 手動發送的紀錄：哪一天（幾天前）、發哪張券、發給幾位
+    const MANUAL_SEND_LIST = [];
+    for (let daysAgo = 395; daysAgo > 0; daysAgo -= 14) {
+        MANUAL_SEND_LIST.push({ couponId: 1, daysAgo: daysAgo, count: 60 + Math.floor(random() * 40) });  // 每兩週發給新會員
+    }
+    for (let daysAgo = 390; daysAgo > 0; daysAgo -= 30) {
+        MANUAL_SEND_LIST.push({ couponId: 2, daysAgo: daysAgo, count: 300 + Math.floor(random() * 200) });  // 每個月一次全館活動
+    }
+    MANUAL_SEND_LIST.push({ couponId: 6, daysAgo: 110, count: 800 });  // 夏季活動，活動結束後停用
+    MANUAL_SEND_LIST.push({ couponId: 6, daysAgo: 85, count: 650 });
+    MANUAL_SEND_LIST.push({ couponId: 5, daysAgo: 48, count: 900 });   // 秋季活動
+    MANUAL_SEND_LIST.push({ couponId: 5, daysAgo: 18, count: 1100 });
+    MANUAL_SEND_LIST.push({ couponId: 5, daysAgo: 5, count: 400 });
+
+    // 日期 → 第幾天，例如 2026/10/27 → NOW
+    function dateToDay(year, month, day) {
+        return NOW - Math.round((new Date(2026, 9, 27) - new Date(year, month - 1, day)) / 86400000);
+    }
+
+    // 特價活動（promotions）：活動期間 start_at <= 時間 < end_at，所以 end_at 是結束日的隔天 00:00
+    const PROMOTION_LIST = [
+        { id: 1, name: '雙 11 限時特賣', startAt: dateToDay(2025, 11, 1), endAt: dateToDay(2025, 11, 12) },
+        { id: 2, name: '春季新裝特價', startAt: dateToDay(2026, 3, 20), endAt: dateToDay(2026, 4, 6) },
+        { id: 3, name: '夏季特賣', startAt: dateToDay(2026, 7, 10), endAt: dateToDay(2026, 8, 1) },
+        { id: 4, name: '秋季特賣', startAt: dateToDay(2026, 9, 20), endAt: dateToDay(2026, 11, 1) },
+        { id: 5, name: '週年慶', startAt: dateToDay(2026, 10, 15), endAt: dateToDay(2026, 10, 23) },
+    ];
+
+    // 原價 × 折扣，尾數改成 90，例如 1290 × 0.75 → 990
+    function salePriceOf(regularPrice, rate) {
+        const price = Math.floor(regularPrice * rate / 100) * 100 + 90;
+        return price < regularPrice ? price : price - 100;
+    }
+
+    // 活動商品（promotion_products）：哪個活動、哪件商品、特價多少
+    // products.price 改成原價：products.js 裡有 origPrice 的商品，原價是 origPrice
+    //   秋季特賣：products.js 現在有特價的 17 件商品，特價 = products.js 的 price
+    //   週年慶跟秋季特賣時間重疊，所以挑不一樣的商品（同一件商品不能同時在兩個活動裡）
+    const PROMOTION_PRODUCT_LIST = [];
+    PRODUCT_LIST.forEach((product, index) => {
+        const regularPrice = product.origPrice !== null ? product.origPrice : product.price;
+        if (product.origPrice !== null) {
+            PROMOTION_PRODUCT_LIST.push({ promotionId: 4, productId: product.slug, salePrice: product.price });
+        } else if (index % 6 === 1) {
+            PROMOTION_PRODUCT_LIST.push({ promotionId: 5, productId: product.slug, salePrice: salePriceOf(regularPrice, 0.8) });
+        }
+        if (index % 5 === 0) PROMOTION_PRODUCT_LIST.push({ promotionId: 3, productId: product.slug, salePrice: salePriceOf(regularPrice, 0.7) });
+        if (index % 8 === 3) PROMOTION_PRODUCT_LIST.push({ promotionId: 2, productId: product.slug, salePrice: salePriceOf(regularPrice, 0.85) });
+        if (index % 6 === 2) PROMOTION_PRODUCT_LIST.push({ promotionId: 1, productId: product.slug, salePrice: salePriceOf(regularPrice, 0.75) });
+    });
+
+    const promotionMap = new Map(PROMOTION_LIST.map(promotion => [promotion.id, promotion]));
+
+    // 只有產生假資料用：popularity = 商品本來有多好賣；活動期間會賣得比較好
+    const productInfoList = PRODUCT_LIST.map(product => ({
+        product: product,
+        popularity: 0.5 + random(),
+        regularPrice: product.origPrice !== null ? product.origPrice : product.price,
+        promotionProductList: PROMOTION_PRODUCT_LIST.filter(row => row.productId === product.slug),
+    }));
+
+    // 某一天這件商品賣多少，跟之後結帳的規則一樣：在進行中的活動裡 → 活動特價；否則 → 原價
+    // 回傳 { unitPrice, origPrice, promotionId }，沒特價時 origPrice、promotionId 是 null
+    function priceAt(info, day) {
+        const row = info.promotionProductList.find(row => {
+            const promotion = promotionMap.get(row.promotionId);
+            return day >= promotion.startAt && day < promotion.endAt;
+        });
+        return row
+            ? { unitPrice: row.salePrice, origPrice: info.regularPrice, promotionId: row.promotionId }
+            : { unitPrice: info.regularPrice, origPrice: null, promotionId: null };
+    }
+
+    // 這一天有幾個活動在進行（活動期間整站的人會多一點）
+    function activePromotionCount(day) {
+        return PROMOTION_LIST.filter(promotion => day >= promotion.startAt && day < promotion.endAt).length;
+    }
+
+    // 隨機挑一件商品（活動中的商品機率是 2.5 倍），產生一筆訂單明細（order_items 的一列）
+    function randomItem(day) {
+        const weightList = productInfoList.map(info => info.popularity * (priceAt(info, day).promotionId !== null ? 2.5 : 1));
+        let r = random() * weightList.reduce((total, weight) => total + weight, 0);
+        let index = 0;
+        while (r >= weightList[index] && index < weightList.length - 1) {
+            r -= weightList[index];
+            index++;
+        }
+        const info = productInfoList[index];
+        const price = priceAt(info, day);
+        return {
+            productId: info.product.slug,  // 真的資料：variant_id → product_variants.product_id
+            productName: info.product.name,
+            mainCategory: info.product.main,  // 真的資料：product_id → categories，同名商品靠它分辨
+            unitPrice: price.unitPrice,
+            origPrice: price.origPrice,
+            promotionId: price.promotionId,
+            qty: random() < 0.85 ? 1 : 2,
+        };
+    }
+
+    // 產生一張訂單的明細；minSubtotal 有值時，會一直加商品直到小計超過它（用券要達到門檻）
+    function randomItemList(day, minSubtotal) {
+        const itemList = [];
+        let subtotal = 0;
+        const count = 1 + Math.floor(random() * random() * 4);
+        while (itemList.length < count || subtotal < minSubtotal) {
+            const item = randomItem(day);
+            itemList.push(item);
+            subtotal += item.unitPrice * item.qty;
+        }
+        return itemList;
+    }
+
+    // 發出的券（member_coupons 的一列，只放這頁用得到的欄位）
+    const allMemberCouponList = [];
+    // 訂單（orders 的一列，itemList 是這張訂單的 order_items）
+    const allOrderList = [];
+
+    // 依券的規則算折扣，跟 CheckoutService 一樣
+    function discountOf(coupon, subtotal) {
+        return coupon.type === 'AMOUNT'
+            ? Math.min(coupon.value, subtotal)
+            : Math.floor(subtotal * coupon.value / 100);
+    }
+
+    // 建一張訂單：小計 = 明細的 unit_price × qty 加總
+    function addOrder(status, itemList, coupon, memberCouponId, createdAt) {
+        const subtotal = itemList.reduce((total, item) => total + item.unitPrice * item.qty, 0);
+        allOrderList.push({
+            status: status,
+            subtotal: subtotal,
+            discount: coupon === null ? 0 : discountOf(coupon, subtotal),
+            memberCouponId: memberCouponId,
+            createdAt: createdAt,
+            itemList: itemList,
+        });
+    }
+
+    // 發一張券；有機會被用掉的話，順便產生用這張券的訂單
+    function issue(coupon, receivedAt) {
+        const memberCoupon = {
+            id: allMemberCouponList.length + 1,
+            couponId: coupon.id,
+            receivedAt: receivedAt,
+            expireAt: receivedAt + coupon.validDays,
+            usedAt: null,
+        };
+        allMemberCouponList.push(memberCoupon);
+
+        if (random() >= USE_CHANCE_MAP[coupon.id]) return;
+        // 大部分人領券後沒幾天就用；還沒到的時間代表「之後才會用」，現在還是可使用
+        const usedAt = receivedAt + coupon.validDays * Math.pow(random(), 1.6);
+        if (usedAt >= NOW) return;
+
+        // 已取消的訂單券會被還回去，所以用過券的訂單不會是 CANCELLED
+        memberCoupon.usedAt = usedAt;
+        addOrder(
+            usedAt > NOW - 3 ? pick({ UNPAID: 15, PENDING: 55, SHIPPED: 30 }) : pick({ DELIVERED: 93, SHIPPED: 7 }),
+            randomItemList(usedAt, coupon.minSubtotal + random() * 600),
+            coupon, memberCoupon.id, usedAt);
+    }
+
+    for (const send of MANUAL_SEND_LIST) {
+        const coupon = COUPON_LIST.find(coupon => coupon.id === send.couponId);
+        for (let i = 0; i < send.count; i++) {
+            issue(coupon, NOW - send.daysAgo + random() * 0.05);
+        }
+    }
+
+    // 生日禮：BirthdayCouponScheduler 每天檢查，當月壽星在月初（或剛註冊）就會收到
+    // 假資料簡化成：每 30 天發一次，每次 220 ~ 280 位壽星，兩張生日券都發
+    for (let day = 5; day < NOW; day += 30) {
+        const count = 220 + Math.floor(random() * 60);
+        for (let i = 0; i < count; i++) {
+            const receivedAt = day + random() * 3;
+            if (receivedAt >= NOW) continue;
+            issue(COUPON_LIST[2], receivedAt);
+            issue(COUPON_LIST[3], receivedAt);
+        }
+    }
+
+    // 沒用券的訂單：每天 80 ~ 110 筆；每多一個進行中的活動，多 12%
+    for (let day = 0; day < NOW; day++) {
+        const count = Math.round((80 + random() * 31) * (1 + 0.12 * activePromotionCount(day)));
+        for (let i = 0; i < count; i++) {
+            const createdAt = day + random();
+            addOrder(pick({ DELIVERED: 84, SHIPPED: 6, PENDING: 2, CANCELLED: 6, UNPAID: 2 }),
+                randomItemList(createdAt, 0), null, null, createdAt);
+        }
+    }
+
+    // 模擬 API：回傳這段期間發出的券（依 received_at）、這段期間下的訂單（依 created_at）
+    function fakeApi(range) {
+        const periodStart = NOW - range.days;
+        return {
+            memberCouponList: allMemberCouponList.filter(memberCoupon => memberCoupon.receivedAt >= periodStart),
+            orderList: allOrderList.filter(order => order.createdAt >= periodStart),
+        };
+    }
+
+    // ==================== 畫面 ====================
+
+    let currentRange = RANGE_OPTIONS[1];
+
+    // 用 id 找券（pandas 會直接 merge）
+    const couponMap = new Map(COUPON_LIST.map(coupon => [coupon.id, coupon]));
+    const memberCouponMap = new Map(allMemberCouponList.map(memberCoupon => [memberCoupon.id, memberCoupon]));
+
+    // 有效訂單：排除未付款、已取消（跟營收總覽一樣的定義）
+    function isValid(order) {
+        return order.status !== 'UNPAID' && order.status !== 'CANCELLED';
+    }
+
+    // 這張訂單用的是哪種券；沒用券回傳 null
+    function couponOf(order) {
+        if (order.memberCouponId === null) return null;
+        return couponMap.get(memberCouponMap.get(order.memberCouponId).couponId);
+    }
+
+    // 券現在的狀態，跟 MemberCouponStatus.of() 一樣：用過 → 已使用；沒用、過期 → 已過期；其他 → 可使用
+    function statusOf(memberCoupon) {
+        if (memberCoupon.usedAt !== null) return 'USED';
+        if (memberCoupon.expireAt < NOW) return 'EXPIRED';
+        return 'USABLE';
+    }
+
+    // 營業額 = 商品小計 - 折價券折抵，不含運費
+    function revenueOf(order) {
+        return order.subtotal - order.discount;
+    }
+
+    // 特價明細：下單當時商品在活動裡（order_items.promotion_id 有值）
+    function isSaleItem(item) {
+        return item.promotionId !== null;
+    }
+
+    // 這筆明細的銷售金額（= order_items.total_price）
+    function amountOf(item) {
+        return item.unitPrice * item.qty;
+    }
+
+    // 這筆明細如果用原價賣是多少；沒特價就是售價
+    function origAmountOf(item) {
+        return (isSaleItem(item) ? item.origPrice : item.unitPrice) * item.qty;
+    }
+
+    // 特價讓利 = (原價 - 售價) × 件數
+    function markdownOf(item) {
+        return origAmountOf(item) - amountOf(item);
+    }
+
+    // 券的使用條件，例如「滿 990 折 100 元」「滿 2000 打 85 折」
+    function ruleText(coupon) {
+        if (coupon.type === 'AMOUNT') return `滿 ${formatNumber(coupon.minSubtotal)} 折 ${coupon.value} 元`;
+        const rest = 100 - coupon.value;  // value = 10 → 剩 90% → 9 折
+        return `滿 ${formatNumber(coupon.minSubtotal)} 打 ${rest % 10 === 0 ? rest / 10 : rest} 折`;
+    }
+
+    function formatNumber(n) {
+        return n.toLocaleString('zh-TW');
+    }
+
+    function formatMoney(n) {
+        return `NT$ ${formatNumber(Math.round(n))}`;
+    }
+
+    function formatPercent(part, total) {
+        return total === 0 ? '—' : `${(part / total * 100).toFixed(1)}%`;
+    }
+
+    function sum(list, getValue) {
+        return list.reduce((total, item) => total + getValue(item), 0);
+    }
+
+    // 一組切換按鈕
+    function renderToggle(boxId, optionList, currentKey, onChange) {
+        const box = document.getElementById(boxId);
+        box.innerHTML = '';
+        for (const option of optionList) {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.textContent = option.name;
+            button.className = 'px-4 py-2 text-[12px] tracking-[.06em] '
+                + (option.key === currentKey ? 'bg-black text-white' : 'text-muted hover:text-[#111]');
+            button.onclick = () => onChange(option.key);
+            box.appendChild(button);
+        }
+    }
+
+    // 一排指標卡片
+    function renderCards(boxId, cardList) {
+        document.getElementById(boxId).innerHTML = cardList.map(card => `
+            <div class="border border-line bg-white p-6 max-[760px]:p-4">
+                <div class="text-[12px] tracking-[.08em] text-muted">${card.name}</div>
+                <div class="mt-2 text-[28px] font-semibold tracking-[.02em]">${card.value}</div>
+                <div class="mt-1 text-[12px] tracking-[.04em] text-muted">${card.note}</div>
+            </div>`).join('');
+    }
+
+    // 把發出的券依狀態數一數，回傳 { issued, USED, USABLE, EXPIRED }
+    function countStatus(memberCouponList) {
+        const count = { issued: memberCouponList.length, USED: 0, USABLE: 0, EXPIRED: 0 };
+        for (const memberCoupon of memberCouponList) count[statusOf(memberCoupon)]++;
+        return count;
+    }
+
+    // 優惠總覽：優惠總額 = 折價券折扣 + 活動特價讓利
+    function renderOverview(validOrderList, itemList) {
+        const couponOrderList = validOrderList.filter(order => order.memberCouponId !== null);
+        const couponDiscount = sum(couponOrderList, order => order.discount);
+        const saleItemList = itemList.filter(isSaleItem);
+        const markdown = sum(saleItemList, markdownOf);
+        const total = couponDiscount + markdown;
+
+        renderCards('overview-cards', [
+            { name: '優惠總額', value: formatMoney(total), note: `佔商品原價金額 ${formatPercent(total, sum(itemList, origAmountOf))}` },
+            {
+                name: '折價券折扣',
+                value: formatMoney(couponDiscount),
+                note: `佔優惠總額 ${formatPercent(couponDiscount, total)}・${formatNumber(couponOrderList.length)} 筆訂單用券`,
+            },
+            {
+                name: '活動特價讓利',
+                value: formatMoney(markdown),
+                note: `佔優惠總額 ${formatPercent(markdown, total)}・特價賣出 ${formatNumber(sum(saleItemList, item => item.qty))} 件`,
+            },
+        ]);
+    }
+
+    function renderCouponCards(memberCouponList, validOrderList) {
+        const count = countStatus(memberCouponList);
+        const couponOrderList = validOrderList.filter(order => order.memberCouponId !== null);
+        const couponRevenue = sum(couponOrderList, revenueOf);
+        const discount = sum(couponOrderList, order => order.discount);
+
+        renderCards('coupon-cards', [
+            { name: '發出張數', value: formatNumber(count.issued), note: `目前還有 ${formatNumber(count.USABLE)} 張可使用` },
+            { name: '使用率', value: formatPercent(count.USED, count.issued), note: `已使用 ${formatNumber(count.USED)} 張` },
+            {
+                name: '用券訂單營業額',
+                value: formatMoney(couponRevenue),
+                note: `佔營業額 ${formatPercent(couponRevenue, sum(validOrderList, revenueOf))}・平均每筆折 ${couponOrderList.length === 0 ? '—' : formatMoney(discount / couponOrderList.length)}`,
+            },
+        ]);
+    }
+
+    // 每張券一列（pandas：用 coupon_id groupby，發券和訂單各算一次再 merge）
+    function renderCouponTable(memberCouponList, validOrderList) {
+        const rowList = COUPON_LIST.map(coupon => {
+            const count = countStatus(memberCouponList.filter(memberCoupon => memberCoupon.couponId === coupon.id));
+            const orderList = validOrderList.filter(order => couponOf(order) === coupon);
+            return {
+                coupon: coupon,
+                count: count,
+                orderCount: orderList.length,
+                revenue: sum(orderList, revenueOf),
+                discount: sum(orderList, order => order.discount),
+            };
+        })
+            // 這段期間沒發、也沒人用的券就不列出來
+            .filter(row => row.count.issued > 0 || row.orderCount > 0)
+            .sort((a, b) => b.revenue - a.revenue);
+
+        if (rowList.length === 0) {
+            document.getElementById('coupon-rows').innerHTML =
+                `<tr><td colspan="8" class="py-6 text-center text-muted">這段期間沒有發券，也沒有人用券</td></tr>`;
+            return;
+        }
+        document.getElementById('coupon-rows').innerHTML = rowList.map(row => {
+            const coupon = row.coupon;
+            const useRate = row.count.issued === 0 ? 0 : row.count.USED / row.count.issued;
+            return `
+            <tr class="border-b border-line last:border-b-0">
+                <td class="py-3 pr-4">
+                    <div class="flex items-center">
+                        <span class="font-medium">${coupon.code}</span>
+                        ${coupon.isActive ? '' : '<span class="ml-2 border border-line px-1.5 py-0.5 text-[11px] text-muted">已停用</span>'}
+                    </div>
+                    <div class="mt-0.5 text-[12px] text-muted">${coupon.title}・${ruleText(coupon)}</div>
+                </td>
+                <td class="py-3 pr-4">${coupon.autoTrigger === 'BIRTHDAY' ? '生日禮' : '手動'}</td>
+                <td class="py-3 pr-4 text-right">${formatNumber(row.count.issued)}</td>
+                <td class="py-3 pr-4">
+                    <div class="flex items-center gap-2">
+                        <div class="h-1.5 w-[72px] rounded-full" style="background: var(--series-track)">
+                            <div class="h-1.5 rounded-full" style="width: ${useRate * 100}%; background: var(--series-current)"></div>
+                        </div>
+                        <span>${formatPercent(row.count.USED, row.count.issued)}</span>
+                    </div>
+                </td>
+                <td class="py-3 pr-4 text-right">${formatNumber(row.orderCount)}</td>
+                <td class="py-3 pr-4 text-right font-medium">${formatMoney(row.revenue)}</td>
+                <td class="py-3 pr-4 text-right">${formatMoney(row.discount)}</td>
+                <td class="py-3 text-right">${row.orderCount === 0 ? '—' : formatMoney(row.discount / row.orderCount)}</td>
+            </tr>`;
+        }).join('');
+    }
+
+    // 有用券 vs 沒用券（pandas：df.groupby(df['member_coupon_id'].notna())）
+    function renderAov(validOrderList) {
+        const groupList = [
+            { name: '有用券', orderList: validOrderList.filter(order => order.memberCouponId !== null) },
+            { name: '沒用券', orderList: validOrderList.filter(order => order.memberCouponId === null) },
+        ].map(group => {
+            const revenue = sum(group.orderList, revenueOf);
+            return {
+                name: group.name,
+                orderCount: group.orderList.length,
+                revenue: revenue,
+                discount: sum(group.orderList, order => order.discount),
+                aov: group.orderList.length === 0 ? null : revenue / group.orderList.length,
+            };
+        });
+
+        const [withCoupon, withoutCoupon] = groupList;
+        const diffText = document.getElementById('aov-diff');
+        if (withCoupon.aov === null || withoutCoupon.aov === null) {
+            diffText.textContent = '這段期間沒有足夠的訂單可以比較';
+        } else {
+            const diff = withCoupon.aov - withoutCoupon.aov;
+            diffText.innerHTML = `有用券的訂單，客單價比沒用券的${diff >= 0 ? '高' : '低'}
+                <b class="font-semibold">${formatMoney(Math.abs(diff))}</b>
+                <span class="text-muted">（${diff >= 0 ? '+' : '−'}${formatPercent(Math.abs(diff), withoutCoupon.aov)}）</span>`;
+        }
+
+        document.getElementById('aov-rows').innerHTML = groupList.map(group => `
+            <tr class="border-b border-line last:border-b-0">
+                <td class="py-2.5 pr-4">${group.name}</td>
+                <td class="py-2.5 pr-4 text-right">${formatNumber(group.orderCount)}</td>
+                <td class="py-2.5 pr-4 text-right">${formatPercent(group.orderCount, validOrderList.length)}</td>
+                <td class="py-2.5 pr-4 text-right">${formatMoney(group.revenue)}</td>
+                <td class="py-2.5 pr-4 text-right">${group.orderCount === 0 ? '—' : formatMoney(group.discount / group.orderCount)}</td>
+                <td class="py-2.5 text-right font-medium">${group.aov === null ? '—' : formatMoney(group.aov)}</td>
+            </tr>`).join('');
+    }
+
+    function render() {
+        const data = fakeApi(currentRange);
+        const validOrderList = data.orderList.filter(isValid);
+        // 有效訂單的全部明細（pandas：order_items merge orders 後篩有效訂單）
+        const itemList = validOrderList.flatMap(order => order.itemList);
+
+        document.getElementById('period-text').textContent =
+            `${currentRange.start} ～ ${END_DATE}　・　券依發出時間（received_at），訂單依下單時間（created_at）`;
+        renderToggle('range-buttons', RANGE_OPTIONS, currentRange.key, key => {
+            currentRange = RANGE_OPTIONS.find(range => range.key === key);
+            render();
+        });
+        renderOverview(validOrderList, itemList);
+        renderCouponCards(data.memberCouponList, validOrderList);
+        renderCouponTable(data.memberCouponList, validOrderList);
+        renderAov(validOrderList);
+    }
+
+    render();
+</script>
+</body>
+</html>
