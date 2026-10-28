@@ -8,7 +8,6 @@
 - 訂單結構：`sample/order-structure.html`
 - 會員與顧客：`sample/member-customers.html`
 - 折價券成效：`sample/coupon-performance.html`
-- 活動成效：`sample/campaign-performance.html`（特價活動假設後端已經改好，見「要改後端的部分：特價活動」）
 
 ---
 
@@ -96,25 +95,9 @@
 
 **活動特價**
 
-- 活動特價讓利：`SUM((orig_price - unit_price) * qty)`，只算 `promotion_id IS NOT NULL` 的明細；每個活動的成效在「6. 活動成效」
+- 活動特價讓利：`SUM((orig_price - unit_price) * qty)`，只算 `promotion_id IS NOT NULL` 的明細
 
-### 6. 活動成效
-
-資料來源：`promotions`、`promotion_products`、`orders`、`order_items`（要先改後端，見下方「要改後端的部分：特價活動」）
-
-- 特價銷售件數、金額、平均折數：依下單時間 `created_at`，只算有效訂單；特價明細 = `promotion_id IS NOT NULL`
-  - 平均折數：特價明細的 `SUM(unit_price * qty) ÷ SUM(orig_price * qty)`
-- 每個活動的成效：列出跟期間重疊的活動，數字算整個活動（`start_at` ～ `end_at`，進行中的算到昨天）
-  - 特價銷售件數、金額、讓利
-  - 活動商品日均金額：活動前 30 天 → 活動中
-  - 全站日均營業額：活動前 30 天 → 活動中（同時有其他活動或折價券時，不全是這個活動的功勞）
-- 點一個活動，看各商品類別的成效：件數、金額、讓利、日均件數和日均金額（活動前 → 活動中）
-  - 類別用主分類 + 副分類（副分類名稱會重複，例如男裝、女裝都有外套類）；只算參加活動的商品
-  - 活動前：參加活動的商品 `promotion_id IS NULL` 的明細；要另外查期間之前的資料
-  - 件數變多、金額變少，代表降價的損失沒有被銷量補回來
-  - 認同一件商品要用 `variant_id` 接回 `product_id`，**不能用 `product_name`**（商品名稱有重複，例如男裝、女裝都有「繭型牛仔褲」）；SKU 被刪掉時接不回來
-
-### 7. 購買意向（簡單版）
+### 6. 購買意向（簡單版）
 
 資料來源：`cart_items`、`wishlist_items`
 
@@ -205,9 +188,6 @@
 
 **改完可以算的**：
 
-- 每個活動的特價銷售件數、金額、讓利
-- 活動前後比較（活動商品、全站）
-- 每個活動裡每件商品的成效
 - 折扣總額可以分成「折價券」和「活動特價」兩項
 
 ### 要改後端的部分：貨到付款未取貨

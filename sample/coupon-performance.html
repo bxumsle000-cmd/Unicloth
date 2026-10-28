@@ -17,7 +17,6 @@
   - 特價活動的資料表、order_items 的 orig_price / promotion_id，這頁先假設後端已經加好了
       見 docs/sales-data-plan.md「要改後端的部分：特價活動」
       特價明細 = promotion_id 有值；特價讓利 = SUM((orig_price - unit_price) * qty)
-  - 每個活動的成效在另一頁：活動成效（campaign-performance.html），兩頁用同一份假資料
   - 這頁用到兩種時間，畫面上都有寫：
       使用率：看「這段期間發出的券」（received_at），現在有幾張用掉了
       其他（訂單、營業額、折扣、特價讓利）：看「這段期間下的訂單」（created_at），跟營收總覽一樣
@@ -88,9 +87,6 @@
             </a>
             <a href="coupon-performance.html" class="border-l-2 border-black bg-paper py-2.5 pl-10 pr-6 text-left text-[13px] font-medium tracking-[.08em] max-[760px]:pl-8">
                 折價券成效
-            </a>
-            <a href="campaign-performance.html" class="border-l-2 border-transparent py-2.5 pl-10 pr-6 text-left text-[13px] tracking-[.08em] text-muted hover:text-[#111] max-[760px]:pl-8">
-                活動成效
             </a>
         </nav>
     </aside>
