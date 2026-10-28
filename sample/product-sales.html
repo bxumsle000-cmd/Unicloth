@@ -1,0 +1,629 @@
+<!doctype html>
+<!--
+  銷售數據 > 商品銷售（前端範例，只用假資料，沒有接後端）
+
+  直接用瀏覽器打開這個檔案就能看（要有網路，因為 Tailwind、Plotly 從 CDN 載入）。
+
+  - 商品名稱、分類、售價、原價、庫存、圖片：用 data/products.js（從專案的 products.json 挑出來的真實資料）
+  - 賣出幾件：假的，用亂數產生
+  - 之後接 Python：fakeApi() 換成呼叫後端；pandas 算好每個 SKU 賣了幾件，前端照現在的程式碼畫
+-->
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>商品銷售</title>
+    <!-- 跟專案 frontend/index.html 一樣的 Tailwind 和字型 -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style type="text/tailwindcss">
+        @theme {
+            --color-paper: #F6F5F2;
+            --color-cream: #F0EBE3;
+            --color-stone: #D9CFC7;
+            --color-muted: #76716c;
+            --color-line: #dfd9d2;
+            --font-kinu: 'DM Sans', 'Noto Sans TC', sans-serif;
+        }
+    </style>
+    <style>
+        /* 圖表用的顏色，集中放這裡方便之後換 */
+        :root {
+            --series-current: #2a78d6;   /* 長條、排行的顏色 */
+            --series-track: #e6eef9;     /* 排行長條的底色（同一個藍色的淺色） */
+            --series-faded: #c5d9f2;     /* 有篩選時，沒被選到的長條 */
+        }
+        /* 分類圖的長條可以點：游標改成手指（Plotly 預設是十字） */
+        .clickable-chart .nsewdrag {
+            cursor: pointer !important;
+        }
+    </style>
+    <script src="data/products.js"></script>
+</head>
+<body class="bg-paper">
+<div class="flex min-h-screen bg-paper font-kinu text-[#111] max-[760px]:flex-col">
+
+    <!-- 左邊：側邊選單（樣式照 component/admin/mkt/SideMenu.jsx） -->
+    <aside class="w-[220px] shrink-0 border-r border-line bg-white max-[760px]:w-full max-[760px]:border-r-0 max-[760px]:border-b">
+        <nav class="flex flex-col pb-6 max-[760px]:pb-3">
+            <button type="button" class="flex items-center justify-between px-6 py-3 text-left text-[13px] font-medium tracking-[.08em] hover:bg-paper max-[760px]:px-4">
+                <span>Coupon</span>
+                <span class="text-[10px] text-muted">▶</span>
+            </button>
+            <button type="button" class="flex items-center justify-between px-6 py-3 text-left text-[13px] font-medium tracking-[.08em] hover:bg-paper max-[760px]:px-4">
+                <span>銷售數據</span>
+                <span class="rotate-90 text-[10px] text-muted">▶</span>
+            </button>
+            <a href="sales-overview.html" class="border-l-2 border-transparent py-2.5 pl-10 pr-6 text-left text-[13px] tracking-[.08em] text-muted hover:text-[#111] max-[760px]:pl-8">
+                營收總覽
+            </a>
+            <a href="product-sales.html" class="border-l-2 border-black bg-paper py-2.5 pl-10 pr-6 text-left text-[13px] font-medium tracking-[.08em] max-[760px]:pl-8">
+                商品銷售
+            </a>
+            <a href="order-structure.html" class="border-l-2 border-transparent py-2.5 pl-10 pr-6 text-left text-[13px] tracking-[.08em] text-muted hover:text-[#111] max-[760px]:pl-8">
+                訂單結構
+            </a>
+            <a href="member-customers.html" class="border-l-2 border-transparent py-2.5 pl-10 pr-6 text-left text-[13px] tracking-[.08em] text-muted hover:text-[#111] max-[760px]:pl-8">
+                會員與顧客
+            </a>
+            <a href="coupon-performance.html" class="border-l-2 border-transparent py-2.5 pl-10 pr-6 text-left text-[13px] tracking-[.08em] text-muted hover:text-[#111] max-[760px]:pl-8">
+                折價券成效
+            </a>
+        </nav>
+    </aside>
+
+    <!-- 右邊：頂部列 + 內容區 -->
+    <div class="flex min-w-0 flex-1 flex-col">
+        <header class="flex items-center justify-end gap-4 border-b border-line bg-white px-8 py-4 max-[760px]:px-4">
+            <span class="text-[12px] tracking-[.06em] text-muted">
+                目前登入：<b class="font-medium text-[#111]">行銷測試員（mkt01）</b>
+            </span>
+        </header>
+
+        <main class="flex-1 px-8 py-8 max-[760px]:px-4">
+            <!-- 標題 + 期間篩選 -->
+            <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
+                <div>
+                    <h1 class="text-[20px] font-medium tracking-[.08em]">商品銷售</h1>
+                    <p id="period-text" class="mt-1 text-[12px] tracking-[.06em] text-muted"></p>
+                </div>
+                <div id="range-buttons" class="flex flex-wrap border border-line bg-white"></div>
+            </div>
+
+            <!-- 目前的篩選條件；點分類圖的長條會改變 -->
+            <div id="filter-bar" class="mb-6 flex min-h-[40px] flex-wrap items-center gap-3 text-[12px] tracking-[.06em]"></div>
+
+            <!-- 指標卡片 -->
+            <section id="kpi-cards" class="mb-6 grid grid-cols-3 gap-4 max-[1100px]:grid-cols-2 max-[560px]:grid-cols-1"></section>
+
+            <!-- 分類 -->
+            <div class="mb-6 grid grid-cols-[2fr_3fr] gap-6 max-[1100px]:grid-cols-1">
+                <section class="border border-line bg-white p-6 max-[760px]:p-4">
+                    <h2 class="text-[14px] font-medium tracking-[.08em]">主分類銷售額</h2>
+                    <p class="mt-1 text-[12px] tracking-[.06em] text-muted">點長條可以篩選，再點一次取消</p>
+                    <div id="main-category-chart" class="clickable-chart mt-4 h-[300px]"></div>
+                </section>
+                <section class="border border-line bg-white p-6 max-[760px]:p-4">
+                    <h2 class="text-[14px] font-medium tracking-[.08em]">副分類銷售額</h2>
+                    <p id="sub-category-note" class="mt-1 text-[12px] tracking-[.06em] text-muted"></p>
+                    <div id="sub-category-chart" class="clickable-chart mt-4 h-[300px]"></div>
+                </section>
+            </div>
+
+            <!-- 熱銷排行 Top 10 -->
+            <section class="mb-6 border border-line bg-white p-6 max-[760px]:p-4">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <h2 class="text-[14px] font-medium tracking-[.08em]">熱銷排行 Top 10</h2>
+                    <div id="rank-buttons" class="flex border border-line"></div>
+                </div>
+                <ol id="rank-list" class="mt-4"></ol>
+            </section>
+
+            <!-- 顏色、尺寸 -->
+            <div class="mb-6 grid grid-cols-2 gap-6 max-[1100px]:grid-cols-1">
+                <section class="border border-line bg-white p-6 max-[760px]:p-4">
+                    <h2 class="text-[14px] font-medium tracking-[.08em]">依顏色（銷售件數）</h2>
+                    <p id="color-note" class="mt-1 text-[12px] tracking-[.06em] text-muted"></p>
+                    <div id="color-chart" class="mt-4 h-[300px]"></div>
+                </section>
+                <section class="border border-line bg-white p-6 max-[760px]:p-4">
+                    <div class="flex flex-wrap items-center justify-between gap-3">
+                        <h2 class="text-[14px] font-medium tracking-[.08em]">依尺寸（銷售件數）</h2>
+                        <div id="size-buttons" class="flex border border-line"></div>
+                    </div>
+                    <p id="size-note" class="mt-1 text-[12px] tracking-[.06em] text-muted"></p>
+                    <div id="size-chart" class="mt-4 h-[300px]"></div>
+                </section>
+            </div>
+
+            <!-- 滯銷商品 -->
+            <section class="border border-line bg-white p-6 max-[760px]:p-4">
+                <h2 class="text-[14px] font-medium tracking-[.08em]">滯銷商品</h2>
+                <p class="mt-1 text-[12px] tracking-[.06em] text-muted">上架中，但這段期間一件都沒賣出</p>
+                <div class="mt-4 overflow-x-auto">
+                    <table class="w-full min-w-[640px] text-[13px] tracking-[.04em]">
+                        <thead>
+                        <tr class="border-b border-line text-left text-muted">
+                            <th class="py-2.5 pr-4 font-normal">商品</th>
+                            <th class="py-2.5 pr-4 font-normal">分類</th>
+                            <th class="py-2.5 pr-4 text-right font-normal">售價</th>
+                            <th class="py-2.5 text-right font-normal">庫存總數</th>
+                        </tr>
+                        </thead>
+                        <tbody id="slow-rows" class="tabular-nums"></tbody>
+                    </table>
+                </div>
+            </section>
+
+        </main>
+    </div>
+</div>
+
+<script>
+    // ==================== 假資料 ====================
+    // 之後這一段整個換成呼叫 Python 的 API，例如 fetch('/api/admin/sales/products?range=30d')
+
+    const RANGE_OPTIONS = [
+        { key: '7d', name: '近 7 天', days: 7, start: '2026/10/20' },
+        { key: '30d', name: '近 30 天', days: 30, start: '2026/09/27' },
+        { key: '90d', name: '近 90 天', days: 90, start: '2026/07/29' },
+        { key: '12m', name: '近 12 個月', days: 365, start: '2025/10/27' },
+    ];
+    const END_DATE = '2026/10/26';
+    const IMAGE_ROOT = '../src/main/resources/static/';
+
+    // 同樣的數字丟進去，永遠得到同樣的亂數（0 ~ 1），每次打開畫面數字都一樣
+    function hashRandom(a, b, c) {
+        let h = 2166136261;
+        for (const n of [a, b, c]) {
+            h = Math.imul(h ^ n, 16777619);
+        }
+        h ^= h >>> 15;
+        h = Math.imul(h, 2246822507);
+        h ^= h >>> 13;
+        h = Math.imul(h, 3266489909);
+        h ^= h >>> 16;
+        return (h >>> 0) / 4294967296;
+    }
+
+    // M、L 比較好賣
+    const SIZE_WEIGHT = { M: 1.5, L: 1.4, S: 1.1, XL: 1.1 };
+
+    // 模擬 API：回傳每個 SKU 在這段期間賣了幾件
+    // 對應 SQL：order_items JOIN orders（排除未付款、已取消），依 variant_id GROUP BY，SUM(qty)、SUM(total_price)
+    function fakeApi(range) {
+        const skuSalesList = [];
+        PRODUCT_LIST.forEach((product, productIndex) => {
+            // 每 9 件商品有 1 件完全賣不動，做出滯銷的例子
+            const isSlow = productIndex % 9 === 4;
+            // 這件商品平均一天賣幾件；特價商品賣得比較好
+            let perDay = isSlow ? 0 : 0.3 + hashRandom(productIndex, 1, 0) ** 2 * 1.6;
+            if (product.origPrice) {
+                perDay *= 1.5;
+            }
+
+            let weightSum = 0;
+            const weightList = product.skuList.map((sku, skuIndex) => {
+                const weight = (SIZE_WEIGHT[sku[1]] ?? 0.7) * (0.3 + hashRandom(productIndex, skuIndex, 2));
+                weightSum += weight;
+                return weight;
+            });
+
+            product.skuList.forEach((sku, skuIndex) => {
+                const noise = 0.6 + hashRandom(productIndex, skuIndex, range.days) * 0.8;
+                const qty = Math.round(perDay * range.days * weightList[skuIndex] / weightSum * noise);
+                skuSalesList.push({
+                    product: product,
+                    color: sku[0],
+                    size: sku[1],
+                    stock: sku[2],
+                    qty: qty,
+                    amount: qty * product.price,
+                });
+            });
+        });
+        return skuSalesList;
+    }
+
+    // ==================== 計算 ====================
+    // 這些之後都是 Python（pandas）在後端做的事，註解寫的是對應的 pandas 寫法
+
+    // 依商品加總（df.groupby('product').agg(...)）
+    function groupByProduct(skuSalesList) {
+        const map = new Map();
+        for (const sku of skuSalesList) {
+            if (!map.has(sku.product)) {
+                map.set(sku.product, { product: sku.product, qty: 0, amount: 0, stock: 0 });
+            }
+            const row = map.get(sku.product);
+            row.qty += sku.qty;
+            row.amount += sku.amount;
+            row.stock += sku.stock;
+        }
+        return [...map.values()];
+    }
+
+    // 依某個欄位加總件數和金額（df.groupby(key)[['qty', 'amount']].sum()）
+    function sumBy(skuSalesList, getKey) {
+        const map = new Map();
+        for (const sku of skuSalesList) {
+            const key = getKey(sku);
+            if (!map.has(key)) {
+                map.set(key, { key: key, qty: 0, amount: 0 });
+            }
+            map.get(key).qty += sku.qty;
+            map.get(key).amount += sku.amount;
+        }
+        return [...map.values()];
+    }
+
+    // ==================== 畫面 ====================
+
+    const style = getComputedStyle(document.documentElement);
+    const COLOR_BAR = style.getPropertyValue('--series-current').trim();
+    const COLOR_FADED = style.getPropertyValue('--series-faded').trim();
+
+    const MAIN_CATEGORY_LIST = ['女裝', '男裝', '童裝'];
+    const ADULT_SIZE_LIST = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL'];
+    const KIDS_SIZE_LIST = ['100cm', '110cm', '120cm', '130cm', '140cm', '150cm', '160cm'];
+
+    let currentRange = RANGE_OPTIONS[1];
+    let rankBy = 'qty';            // 熱銷排行：'qty' 依件數、'amount' 依金額
+    let sizeGroup = 'adult';       // 尺寸圖：'adult' 成人、'kids' 童裝
+
+    // 篩選條件：點分類圖的長條會改變；null = 不篩選
+    let filterMain = null;         // 主分類，例如 '女裝'
+    let filterSub = null;          // 副分類，例如 '下身類'（一定搭配 filterMain）
+
+    // 這個 SKU 有沒有符合目前的篩選
+    function matchFilter(sku) {
+        if (filterMain && sku.product.main !== filterMain) return false;
+        if (filterSub && sku.product.sub !== filterSub) return false;
+        return true;
+    }
+
+    // 點主分類：點同一個（而且沒選副分類）就取消，否則換成這個主分類
+    function clickMainCategory(main) {
+        if (filterMain === main && !filterSub) {
+            filterMain = null;
+        } else {
+            filterMain = main;
+        }
+        filterSub = null;
+        render();
+    }
+
+    // 點副分類：點同一個就取消副分類（主分類保留），否則換成這個副分類
+    function clickSubCategory(main, sub) {
+        if (filterMain === main && filterSub === sub) {
+            filterSub = null;
+        } else {
+            filterMain = main;
+            filterSub = sub;
+        }
+        render();
+    }
+
+    function clearFilter() {
+        filterMain = null;
+        filterSub = null;
+        render();
+    }
+
+    function formatNumber(n) {
+        return n.toLocaleString('zh-TW');
+    }
+
+    // 一組切換按鈕（期間、排行依據……都用這個）
+    function renderToggle(boxId, optionList, currentKey, onChange) {
+        const box = document.getElementById(boxId);
+        box.innerHTML = '';
+        for (const option of optionList) {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.textContent = option.name;
+            button.className = 'px-4 py-2 text-[12px] tracking-[.06em] '
+                + (option.key === currentKey ? 'bg-black text-white' : 'text-muted hover:text-[#111]');
+            button.onclick = () => onChange(option.key);
+            box.appendChild(button);
+        }
+    }
+
+    // 篩選條件列：有篩選時顯示「女裝 / 下身類 ✕」和清除按鈕
+    function renderFilterBar() {
+        const bar = document.getElementById('filter-bar');
+        if (!filterMain) {
+            bar.innerHTML = `<span class="text-muted">目前顯示全部商品。點下方「主分類」或「副分類」的長條，整頁會跟著篩選</span>`;
+            return;
+        }
+        const label = filterSub ? `${filterMain} / ${filterSub}` : filterMain;
+        bar.innerHTML = `
+            <span class="text-muted">篩選中：</span>
+            <span class="flex items-center gap-2 border border-black bg-white px-3 py-1.5 text-[#111]">
+                ${label}
+                <button type="button" id="filter-remove" aria-label="取消篩選" class="text-muted hover:text-[#111]">✕</button>
+            </span>
+            <button type="button" id="filter-clear" class="text-muted underline underline-offset-4 hover:text-[#111]">清除篩選</button>`;
+        document.getElementById('filter-remove').onclick = clearFilter;
+        document.getElementById('filter-clear').onclick = clearFilter;
+    }
+
+    function renderKpiCards(skuSalesList, productSalesList, slowList) {
+        const totalQty = skuSalesList.reduce((sum, sku) => sum + sku.qty, 0);
+        const soldCount = productSalesList.filter(row => row.qty > 0).length;
+        const cardList = [
+            { name: '銷售件數', value: formatNumber(totalQty), note: '' },
+            { name: '有賣出的商品', value: formatNumber(soldCount), note: `/ 上架中 ${productSalesList.length} 件` },
+            { name: '滯銷商品', value: formatNumber(slowList.length), note: '見下方滯銷商品' },
+        ];
+        document.getElementById('kpi-cards').innerHTML = cardList.map(card => `
+            <div class="border border-line bg-white p-6 max-[760px]:p-4">
+                <div class="text-[12px] tracking-[.08em] text-muted">${card.name}</div>
+                <div class="mt-2 text-[28px] font-semibold tracking-[.02em]">${card.value}</div>
+                <div class="mt-1 text-[12px] tracking-[.04em] text-muted">${card.note}</div>
+            </div>`).join('');
+    }
+
+    // 熱銷排行：圖片 + 名稱 + 長條。長條長度 = 跟第 1 名比的比例
+    function renderRank(productSalesList) {
+        renderToggle('rank-buttons', [{ key: 'qty', name: '依件數' }, { key: 'amount', name: '依金額' }], rankBy, key => {
+            rankBy = key;
+            render();
+        });
+
+        // df.nlargest(10, 'qty')；一件都沒賣出的不列入
+        const topList = productSalesList.filter(row => row.qty > 0)
+            .sort((a, b) => b[rankBy] - a[rankBy]).slice(0, 10);
+        if (topList.length === 0) {
+            document.getElementById('rank-list').innerHTML =
+                `<li class="py-6 text-center text-[13px] text-muted">這段期間沒有賣出的商品</li>`;
+            return;
+        }
+        const max = topList[0][rankBy];
+        document.getElementById('rank-list').innerHTML = topList.map((row, index) => {
+            const product = row.product;
+            const percent = row[rankBy] / max * 100;
+            const priceTag = product.origPrice
+                ? `<span class="ml-2 border border-line px-1.5 py-0.5 text-[11px] text-muted">特價</span>`
+                : '';
+            return `
+            <li class="flex items-center gap-4 border-b border-line py-3 last:border-b-0">
+                <span class="w-6 text-right text-[14px] font-semibold tabular-nums ${index < 3 ? '' : 'text-muted'}">${index + 1}</span>
+                <img src="${IMAGE_ROOT + product.image}" alt="" class="h-12 w-12 shrink-0 bg-paper object-cover"/>
+                <div class="min-w-0 flex-1">
+                    <div class="flex items-center text-[13px] tracking-[.04em]">
+                        <span class="truncate">${product.name}</span>${priceTag}
+                    </div>
+                    <div class="mt-0.5 text-[12px] tracking-[.04em] text-muted">${product.main} / ${product.sub}</div>
+                    <div class="mt-1.5 h-1.5 w-full rounded-full" style="background: var(--series-track)">
+                        <div class="h-1.5 rounded-full" style="width: ${percent}%; background: var(--series-current)"></div>
+                    </div>
+                </div>
+                <div class="w-[120px] shrink-0 text-right tabular-nums max-[560px]:w-[88px]">
+                    <div class="text-[14px] font-semibold">${formatNumber(row.qty)} 件</div>
+                    <div class="text-[12px] text-muted">NT$ ${formatNumber(row.amount)}</div>
+                </div>
+            </li>`;
+        }).join('');
+    }
+
+    // Plotly 共用的版面設定（Python 的 fig.update_layout(...) 可以設一樣的東西）
+    function baseLayout() {
+        return {
+            margin: { l: 16, r: 16, t: 8, b: 32 },
+            paper_bgcolor: '#fff',
+            plot_bgcolor: '#fff',
+            font: { family: "'DM Sans', 'Noto Sans TC', sans-serif", size: 12, color: '#76716c' },
+            hoverlabel: { bgcolor: '#fff', bordercolor: '#dfd9d2', font: { color: '#111' } },
+            xaxis: { showgrid: false, linecolor: '#dfd9d2', automargin: true },
+            yaxis: { gridcolor: '#efebe6', zeroline: false, automargin: true, separatethousands: true },
+            showlegend: false,
+        };
+    }
+
+    const PLOTLY_CONFIG = { displayModeBar: false, responsive: true };
+
+    // 有篩選時，被選到的長條維持原色，其他變淡；isSelectedList 全部是 false 代表沒篩選，全部原色
+    function barColorList(isSelectedList) {
+        const hasSelected = isSelectedList.some(isSelected => isSelected);
+        return isSelectedList.map(isSelected => (!hasSelected || isSelected) ? COLOR_BAR : COLOR_FADED);
+    }
+
+    // 直的長條圖；valueList 是數字，textList 是長條上面顯示的字；colorList 不給就全部原色
+    function drawColumnChart(elementId, labelList, valueList, textList, hoverTemplate, colorList) {
+        const traces = [{
+            x: labelList,
+            y: valueList,
+            type: 'bar',
+            marker: { color: colorList ?? COLOR_BAR },
+            text: textList,
+            textposition: 'outside',
+            cliponaxis: false,
+            hovertemplate: hoverTemplate + '<extra></extra>',
+        }];
+        const layout = baseLayout();
+        layout.bargap = 0.35;
+        layout.yaxis.showticklabels = false;
+        layout.yaxis.showgrid = false;
+        // 不能拖曳放大，點下去就是篩選
+        layout.dragmode = false;
+        Plotly.react(elementId, traces, layout, PLOTLY_CONFIG);
+    }
+
+    // 主分類圖：永遠顯示全部主分類（它自己是篩選器，不被篩選）
+    function renderMainCategory(skuSalesList) {
+        const rowList = sumBy(skuSalesList, sku => sku.product.main);
+        const total = rowList.reduce((sum, row) => sum + row.amount, 0);
+        // 固定照 女裝 / 男裝 / 童裝 排，不依金額重排
+        const sortedList = MAIN_CATEGORY_LIST.map(name => rowList.find(row => row.key === name));
+        drawColumnChart('main-category-chart',
+            MAIN_CATEGORY_LIST,
+            sortedList.map(row => row.amount),
+            sortedList.map(row => `${(row.amount / total * 100).toFixed(1)}%`),
+            '%{x}<br>NT$ %{y:,}',
+            barColorList(MAIN_CATEGORY_LIST.map(name => name === filterMain)));
+    }
+
+    // 副分類圖：沒選主分類時顯示全部副分類的前 10 名；選了主分類就只顯示它底下的副分類
+    function renderSubCategory(skuSalesList) {
+        const sourceList = filterMain ? skuSalesList.filter(sku => sku.product.main === filterMain) : skuSalesList;
+        let rowList = sumBy(sourceList, sku => sku.product.main + '|' + sku.product.sub)
+            .sort((a, b) => b.amount - a.amount);
+        if (!filterMain) {
+            rowList = rowList.slice(0, 10);
+        }
+        rowList.reverse();  // 橫條圖由下往上畫，所以小的放前面，最大的才會在最上面
+
+        // key 是「主分類|副分類」，拆開來用
+        const pairList = rowList.map(row => row.key.split('|'));
+        document.getElementById('sub-category-note').textContent = filterMain
+            ? `${filterMain}底下的副分類；點長條可以再篩選`
+            : '全部副分類的前 10 名；點長條可以篩選';
+
+        const traces = [{
+            x: rowList.map(row => row.amount),
+            // 沒選主分類時，不同主分類可能有同名的副分類（例如都有「外套類」），所以名稱前面加主分類
+            y: pairList.map(pair => filterMain ? pair[1] : `${pair[0]}・${pair[1]}`),
+            customdata: pairList,
+            type: 'bar',
+            orientation: 'h',
+            marker: { color: barColorList(pairList.map(pair => pair[0] === filterMain && pair[1] === filterSub)) },
+            text: rowList.map(row => `NT$ ${formatNumber(row.amount)}`),
+            textposition: 'outside',
+            cliponaxis: false,
+            hovertemplate: '%{y}<br>NT$ %{x:,}<extra></extra>',
+        }];
+        const layout = baseLayout();
+        layout.bargap = 0.35;
+        layout.margin.r = 96;  // 留空間給長條右邊的金額
+        layout.xaxis = { showticklabels: false, showgrid: false, zeroline: false };
+        layout.yaxis = { automargin: true, linecolor: '#dfd9d2' };
+        layout.dragmode = false;
+        Plotly.react('sub-category-chart', traces, layout, PLOTLY_CONFIG);
+    }
+
+    function renderColor(skuSalesList) {
+        // 一件都沒賣出的顏色不畫
+        const rowList = sumBy(skuSalesList, sku => sku.color).filter(row => row.qty > 0).sort((a, b) => b.qty - a.qty);
+        // 顏色種類很多，「其他」加起來會比前幾名還大，畫成長條反而看不出重點，所以只寫在說明文字
+        const topList = rowList.slice(0, 10);
+        const otherList = rowList.slice(10);
+        const otherQty = otherList.reduce((sum, row) => sum + row.qty, 0);
+        document.getElementById('color-note').textContent = otherList.length > 0
+            ? `前 10 名；其餘 ${otherList.length} 種顏色合計 ${formatNumber(otherQty)} 件`
+            : `共 ${topList.length} 種顏色`;
+        drawColumnChart('color-chart',
+            topList.map(row => row.key),
+            topList.map(row => row.qty),
+            topList.map(row => formatNumber(row.qty)),
+            '%{x}<br>%{y:,} 件');
+    }
+
+    // 把各種尺寸排成合理的順序：XS～4XL → 100～160cm → 腰圍 inch（數字小到大）→ 其他
+    function sortSizeList(sizeList) {
+        function rank(size) {
+            if (ADULT_SIZE_LIST.includes(size)) return [0, ADULT_SIZE_LIST.indexOf(size)];
+            if (KIDS_SIZE_LIST.includes(size)) return [1, KIDS_SIZE_LIST.indexOf(size)];
+            if (size.endsWith('inch')) return [2, parseInt(size)];
+            return [3, 0];
+        }
+        return sizeList.slice().sort((a, b) => {
+            const rankA = rank(a);
+            const rankB = rank(b);
+            return rankA[0] - rankB[0] || rankA[1] - rankB[1] || a.localeCompare(b);
+        });
+    }
+
+    function renderSize(skuSalesList) {
+        // 篩選了主分類時，尺寸跟著決定：童裝只有 cm，女裝、男裝只有 XS～4XL，所以不用再讓人切換
+        const sizeButtons = document.getElementById('size-buttons');
+        let group = sizeGroup;
+        if (filterMain) {
+            group = filterMain === '童裝' ? 'kids' : 'adult';
+            sizeButtons.classList.add('hidden');
+        } else {
+            sizeButtons.classList.remove('hidden');
+            renderToggle('size-buttons', [{ key: 'adult', name: '成人' }, { key: 'kids', name: '童裝' }], sizeGroup, key => {
+                sizeGroup = key;
+                render();
+            });
+        }
+        // 尺寸照大小順序排，不依件數重排
+        let sizeList = group === 'adult' ? ADULT_SIZE_LIST : KIDS_SIZE_LIST;
+        let note = (group === 'adult' ? '成人尺寸 XS～4XL' : '童裝尺寸 100～160cm') + '；褲子腰圍（inch）、單一尺寸不列入';
+        // 選到副分類時，尺寸種類比較單純（例如下身類幾乎都是腰圍 inch），改成顯示這個分類實際有的尺寸
+        if (filterSub) {
+            sizeList = sortSizeList([...new Set(skuSalesList.filter(sku => sku.qty > 0).map(sku => sku.size))]);
+            note = `${filterSub}有賣出的尺寸`;
+        }
+        document.getElementById('size-note').textContent = note;
+        const rowList = sumBy(skuSalesList.filter(sku => sizeList.includes(sku.size)), sku => sku.size);
+        const qtyList = sizeList.map(size => rowList.find(row => row.key === size)?.qty ?? 0);
+        drawColumnChart('size-chart',
+            sizeList,
+            qtyList,
+            qtyList.map(qty => formatNumber(qty)),
+            '%{x}<br>%{y:,} 件');
+    }
+
+    function renderSlow(slowList) {
+        const tbody = document.getElementById('slow-rows');
+        if (slowList.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" class="py-6 text-center text-muted">這段期間沒有滯銷商品</td></tr>`;
+            return;
+        }
+        // 庫存多的排上面：壓著越多貨越要處理
+        tbody.innerHTML = slowList.slice().sort((a, b) => b.stock - a.stock).map(row => `
+            <tr class="border-b border-line last:border-b-0">
+                <td class="py-2.5 pr-4">
+                    <div class="flex items-center gap-3">
+                        <img src="${IMAGE_ROOT + row.product.image}" alt="" class="h-10 w-10 shrink-0 bg-paper object-cover"/>
+                        <span>${row.product.name}</span>
+                    </div>
+                </td>
+                <td class="py-2.5 pr-4 text-muted">${row.product.main} / ${row.product.sub}</td>
+                <td class="py-2.5 pr-4 text-right">NT$ ${formatNumber(row.product.price)}</td>
+                <td class="py-2.5 text-right">${formatNumber(row.stock)}</td>
+            </tr>`).join('');
+    }
+
+    function render() {
+        const skuSalesList = fakeApi(currentRange);
+        // 篩選後的資料：除了兩張分類圖（它們是篩選器），其他區塊都用這份
+        // 篩選在前端做，不用重新呼叫後端（pandas 裡就是 df[df['main'] == '女裝']）
+        const filteredList = skuSalesList.filter(matchFilter);
+        const productSalesList = groupByProduct(filteredList);
+        const slowList = productSalesList.filter(row => row.qty === 0);
+
+        document.getElementById('period-text').textContent =
+            `${currentRange.start} ～ ${END_DATE}　・　只計算有效訂單（不含未付款、已取消）`;
+        renderToggle('range-buttons', RANGE_OPTIONS, currentRange.key, key => {
+            currentRange = RANGE_OPTIONS.find(range => range.key === key);
+            render();
+        });
+        renderFilterBar();
+        renderKpiCards(filteredList, productSalesList, slowList);
+        renderMainCategory(skuSalesList);
+        renderSubCategory(skuSalesList);
+        renderRank(productSalesList);
+        renderColor(filteredList);
+        renderSize(filteredList);
+        renderSlow(slowList);
+    }
+
+    render();
+
+    // 點分類圖的長條 → 篩選。圖第一次畫完之後才能綁事件，之後 Plotly.react 重畫也會保留
+    document.getElementById('main-category-chart').on('plotly_click', event => {
+        clickMainCategory(event.points[0].x);
+    });
+    document.getElementById('sub-category-chart').on('plotly_click', event => {
+        const pair = event.points[0].customdata;
+        clickSubCategory(pair[0], pair[1]);
+    });
+</script>
+</body>
+</html>

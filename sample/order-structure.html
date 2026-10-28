@@ -1,0 +1,616 @@
+<!doctype html>
+<!--
+  銷售數據 > 訂單結構（前端範例，只用假資料，沒有接後端）
+
+  直接用瀏覽器打開這個檔案就能看（要有網路，因為 Tailwind、Plotly 從 CDN 載入）。
+
+  - 假資料是一張一張的訂單，欄位跟資料庫 orders 表一樣（payment_method、shipping_method、status、
+    created_at、paid_at、shipped_at、delivered_at），之後換成 Python 從資料庫查出來的 DataFrame
+  - 依「下單時間 created_at」決定訂單屬於哪個期間
+  - 規則：
+      信用卡 30 分鐘、ATM 4 天沒付款就自動取消（目前後端已經有）
+      宅配：已出貨 → 已送達（DELIVERED）
+      超商取貨：已出貨 → 已送達（DELIVERED，代表到店）→ 取貨完畢（PICKED_UP，寫入 completed_at）
+      貨到付款：超商未取貨、宅配拒收會被取消；收到錢時寫入 paid_at（宅配是送達時，超商是取貨時）
+    其中「取貨完畢」和「貨到付款取消、寫入 paid_at」目前後端還沒有，這裡「當作已經做好了」，
+    要改的地方見 docs/sales-data-plan.md
+  - 點「配送方式」的長條可以篩選整頁（篩選在前端做，不用重新呼叫後端）
+-->
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>訂單結構</title>
+    <!-- 跟專案 frontend/index.html 一樣的 Tailwind 和字型 -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style type="text/tailwindcss">
+        @theme {
+            --color-paper: #F6F5F2;
+            --color-cream: #F0EBE3;
+            --color-stone: #D9CFC7;
+            --color-muted: #76716c;
+            --color-line: #dfd9d2;
+            --font-kinu: 'DM Sans', 'Noto Sans TC', sans-serif;
+        }
+    </style>
+    <style>
+        /* 圖表用的顏色，集中放這裡方便之後換 */
+        :root {
+            --series-current: #2a78d6;   /* 長條的顏色 */
+            --status-warning: #b26a00;   /* 需要注意（例如待出貨太久） */
+            --series-faded: #c5d9f2;     /* 有篩選時，沒被選到的長條 */
+        }
+        /* 配送方式的長條可以點：游標改成手指（Plotly 預設是十字） */
+        .clickable-chart .nsewdrag {
+            cursor: pointer !important;
+        }
+    </style>
+</head>
+<body class="bg-paper">
+<div class="flex min-h-screen bg-paper font-kinu text-[#111] max-[760px]:flex-col">
+
+    <!-- 左邊：側邊選單（樣式照 component/admin/mkt/SideMenu.jsx） -->
+    <aside class="w-[220px] shrink-0 border-r border-line bg-white max-[760px]:w-full max-[760px]:border-r-0 max-[760px]:border-b">
+        <nav class="flex flex-col pb-6 max-[760px]:pb-3">
+            <button type="button" class="flex items-center justify-between px-6 py-3 text-left text-[13px] font-medium tracking-[.08em] hover:bg-paper max-[760px]:px-4">
+                <span>Coupon</span>
+                <span class="text-[10px] text-muted">▶</span>
+            </button>
+            <button type="button" class="flex items-center justify-between px-6 py-3 text-left text-[13px] font-medium tracking-[.08em] hover:bg-paper max-[760px]:px-4">
+                <span>銷售數據</span>
+                <span class="rotate-90 text-[10px] text-muted">▶</span>
+            </button>
+            <a href="sales-overview.html" class="border-l-2 border-transparent py-2.5 pl-10 pr-6 text-left text-[13px] tracking-[.08em] text-muted hover:text-[#111] max-[760px]:pl-8">
+                營收總覽
+            </a>
+            <a href="product-sales.html" class="border-l-2 border-transparent py-2.5 pl-10 pr-6 text-left text-[13px] tracking-[.08em] text-muted hover:text-[#111] max-[760px]:pl-8">
+                商品銷售
+            </a>
+            <a href="order-structure.html" class="border-l-2 border-black bg-paper py-2.5 pl-10 pr-6 text-left text-[13px] font-medium tracking-[.08em] max-[760px]:pl-8">
+                訂單結構
+            </a>
+            <a href="member-customers.html" class="border-l-2 border-transparent py-2.5 pl-10 pr-6 text-left text-[13px] tracking-[.08em] text-muted hover:text-[#111] max-[760px]:pl-8">
+                會員與顧客
+            </a>
+            <a href="coupon-performance.html" class="border-l-2 border-transparent py-2.5 pl-10 pr-6 text-left text-[13px] tracking-[.08em] text-muted hover:text-[#111] max-[760px]:pl-8">
+                折價券成效
+            </a>
+        </nav>
+    </aside>
+
+    <!-- 右邊：頂部列 + 內容區 -->
+    <div class="flex min-w-0 flex-1 flex-col">
+        <header class="flex items-center justify-end gap-4 border-b border-line bg-white px-8 py-4 max-[760px]:px-4">
+            <span class="text-[12px] tracking-[.06em] text-muted">
+                目前登入：<b class="font-medium text-[#111]">行銷測試員（mkt01）</b>
+            </span>
+        </header>
+
+        <main class="flex-1 px-8 py-8 max-[760px]:px-4">
+            <!-- 標題 + 期間篩選 -->
+            <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
+                <div>
+                    <h1 class="text-[20px] font-medium tracking-[.08em]">訂單結構</h1>
+                    <p id="period-text" class="mt-1 text-[12px] tracking-[.06em] text-muted"></p>
+                </div>
+                <div id="range-buttons" class="flex flex-wrap border border-line bg-white"></div>
+            </div>
+
+            <!-- 目前的篩選條件；點配送方式的長條會改變 -->
+            <div id="filter-bar" class="mb-6 flex min-h-[40px] flex-wrap items-center gap-3 text-[12px] tracking-[.06em]"></div>
+
+            <!-- 指標卡片 -->
+            <section id="kpi-cards" class="mb-6 grid grid-cols-4 gap-4 max-[1100px]:grid-cols-2 max-[560px]:grid-cols-1"></section>
+
+            <!-- 配送方式（篩選器）、付款方式 -->
+            <div class="mb-6 grid grid-cols-2 gap-6 max-[1100px]:grid-cols-1">
+                <section class="border border-line bg-white p-6 max-[760px]:p-4">
+                    <h2 class="text-[14px] font-medium tracking-[.08em]">配送方式</h2>
+                    <p class="mt-1 text-[12px] tracking-[.06em] text-muted">有效訂單的筆數和佔比；點長條可以篩選整頁，再點一次取消</p>
+                    <div id="shipping-chart" class="clickable-chart mt-4 h-[200px]"></div>
+                </section>
+                <section class="border border-line bg-white p-6 max-[760px]:p-4">
+                    <h2 class="text-[14px] font-medium tracking-[.08em]">付款方式</h2>
+                    <p class="mt-1 text-[12px] tracking-[.06em] text-muted">有效訂單（不含未付款、已取消）的筆數和佔比</p>
+                    <div id="payment-chart" class="mt-4 h-[200px]"></div>
+                </section>
+            </div>
+
+            <!-- 訂單狀態分布 -->
+            <section class="mb-6 border border-line bg-white p-6 max-[760px]:p-4">
+                <h2 class="text-[14px] font-medium tracking-[.08em]">訂單狀態分布</h2>
+                <p class="mt-1 text-[12px] tracking-[.06em] text-muted">
+                    這段期間下的全部訂單，現在停在哪個狀態；照訂單流程排序。超商取貨的「已送達」代表已到店、還沒取貨
+                </p>
+                <div id="status-chart" class="mt-4 h-[280px]"></div>
+            </section>
+
+            <!-- 出貨速度、配送天數 -->
+            <div class="mb-6 grid grid-cols-[3fr_2fr] gap-6 max-[1100px]:grid-cols-1">
+                <section class="border border-line bg-white p-6 max-[760px]:p-4">
+                    <h2 class="text-[14px] font-medium tracking-[.08em]">出貨速度</h2>
+                    <p class="mt-1 text-[12px] tracking-[.06em] text-muted">
+                        從訂單成立到出貨花了幾天。訂單成立：信用卡、ATM 是付款時間（paid_at），貨到付款是下單時間（created_at）
+                    </p>
+                    <div id="ship-chart" class="mt-4 h-[260px]"></div>
+                </section>
+                <section class="border border-line bg-white p-6 max-[760px]:p-4">
+                    <h2 class="text-[14px] font-medium tracking-[.08em]">配送天數</h2>
+                    <p class="mt-1 text-[12px] tracking-[.06em] text-muted">
+                        出貨 → 送達：delivered_at - shipped_at；到店 → 取貨：completed_at - delivered_at
+                    </p>
+                    <div id="deliver-list" class="mt-6 flex flex-col gap-6"></div>
+                </section>
+            </div>
+
+            <!-- 取消分析 -->
+            <section class="border border-line bg-white p-6 max-[760px]:p-4">
+                <h2 class="text-[14px] font-medium tracking-[.08em]">取消分析</h2>
+                <p class="mt-1 text-[12px] tracking-[.06em] text-muted">
+                    取消率 = 已取消 ÷ 下單數。「還沒有結果」是還不知道會不會被取消的訂單：線上付款是還在等付款，貨到付款是已出貨、還沒送達或還沒取貨
+                </p>
+                <p class="mt-2 inline-block border border-[#e8c9a0] bg-[#fdf6ec] px-3 py-1.5 text-[12px] tracking-[.06em] text-[#7a4a00]">
+                    ⚠ 貨到付款的取消（超商未取貨、宅配拒收）要先改後端才有資料，這裡先用假資料。見 docs/sales-data-plan.md
+                </p>
+                <div class="mt-4 overflow-x-auto">
+                    <table class="w-full min-w-[640px] text-[13px] tracking-[.04em]">
+                        <thead>
+                        <tr class="border-b border-line text-left text-muted">
+                            <th class="py-2.5 pr-4 font-normal">付款方式</th>
+                            <th class="py-2.5 pr-4 font-normal">取消原因</th>
+                            <th class="py-2.5 pr-4 text-right font-normal">下單數</th>
+                            <th class="py-2.5 pr-4 text-right font-normal">已取消</th>
+                            <th class="py-2.5 pr-4 text-right font-normal">還沒有結果</th>
+                            <th class="py-2.5 text-right font-normal">取消率</th>
+                        </tr>
+                        </thead>
+                        <tbody id="cancel-rows" class="tabular-nums"></tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+</div>
+
+<script>
+    // ==================== 假資料 ====================
+    // 之後這一段整個換成呼叫 Python 的 API，例如 fetch('/api/admin/sales/orders?range=30d')
+
+    const RANGE_OPTIONS = [
+        { key: '7d', name: '近 7 天', days: 7, start: '2026/10/20' },
+        { key: '30d', name: '近 30 天', days: 30, start: '2026/09/27' },
+        { key: '90d', name: '近 90 天', days: 90, start: '2026/07/29' },
+        { key: '12m', name: '近 12 個月', days: 365, start: '2025/10/27' },
+    ];
+    const END_DATE = '2026/10/26';
+    const TOTAL_DAYS = 400;  // 假資料共幾天
+
+    // 固定種子的亂數，每次打開數字都一樣，方便對照
+    let seed = 20261026;
+    function random() {
+        seed = (seed * 16807) % 2147483647;
+        return seed / 2147483647;
+    }
+
+    // 照比例隨機挑一個，例如 pick({ CREDIT: 55, ATM: 25, COD: 20 })
+    function pick(weightMap) {
+        const total = Object.values(weightMap).reduce((sum, weight) => sum + weight, 0);
+        let r = random() * total;
+        for (const [key, weight] of Object.entries(weightMap)) {
+            r -= weight;
+            if (r < 0) return key;
+        }
+        return Object.keys(weightMap)[0];
+    }
+
+    // 產生一張一張的訂單（對應 orders 表的一列）
+    // 時間用「第幾天」表示：0 = 假資料第一天的 00:00，TOTAL_DAYS = 現在；1.5 = 第 2 天中午
+    const NOW = TOTAL_DAYS;
+    const allOrderList = [];
+    for (let day = 0; day < TOTAL_DAYS; day++) {
+        const count = 40 + Math.round(random() * 25);
+        for (let i = 0; i < count; i++) {
+            const createdAt = day + random();
+            const paymentMethod = pick({ CREDIT: 55, ATM: 25, COD: 20 });
+            const shippingMethod = pick({ HOME: 40, CVS: 60 });
+
+            // 付款：信用卡當下付或放棄；ATM 0 ~ 3 天內轉帳，或一直沒轉；貨到付款不經過綠界
+            let paidAt = null;
+            let cancelledAt = null;
+            let status;
+            if (paymentMethod === 'COD') {
+                status = 'PENDING';
+            } else if (paymentMethod === 'CREDIT') {
+                if (random() < 0.06) {
+                    status = 'CANCELLED';
+                    cancelledAt = createdAt + 0.02;  // 30 分鐘後被排程取消
+                } else {
+                    paidAt = createdAt + random() * 0.01;
+                    status = 'PENDING';
+                }
+            } else {
+                if (random() < 0.18) {
+                    // 4 天內還沒到期的是「等待付款中」，超過就被排程取消
+                    status = NOW - createdAt < 4 ? 'UNPAID' : 'CANCELLED';
+                    if (status === 'CANCELLED') cancelledAt = createdAt + 4;  // 4 天後被排程取消
+                } else {
+                    paidAt = createdAt + random() * 3;
+                    status = paidAt <= NOW ? 'PENDING' : 'UNPAID';
+                    if (status === 'UNPAID') paidAt = null;
+                }
+            }
+
+            // 出貨：訂單成立後大多 1 ~ 2 天出貨
+            // 宅配：出貨後 1 ~ 2 天送達；貨到付款 4% 拒收（送到當下取消）
+            // 超商：出貨後 2 ~ 4 天到店（delivered_at），到店後 0 ~ 6 天取貨（completed_at）；
+            //       貨到付款 7% 沒去取貨，到店後 7 天取消（天數是假設的）
+            let shippedAt = null;
+            let deliveredAt = null;
+            let completedAt = null;
+            if (status === 'PENDING') {
+                const confirmedAt = paymentMethod === 'COD' ? createdAt : paidAt;
+                const shipAt = confirmedAt + Number(pick({ 0: 15, 1: 40, 2: 25, 3: 10, 4: 6, 6: 4 })) + random() * 0.9;
+                if (shipAt <= NOW) {
+                    shippedAt = shipAt;
+                    status = 'SHIPPED';
+                    if (shippingMethod === 'HOME') {
+                        const deliverAt = shipAt + 1 + random() * 1.2;
+                        const isRefused = paymentMethod === 'COD' && random() < 0.04;
+                        if (deliverAt <= NOW) {
+                            if (isRefused) {
+                                cancelledAt = deliverAt;
+                                status = 'CANCELLED';
+                            } else {
+                                deliveredAt = deliverAt;
+                                status = 'DELIVERED';
+                                if (paymentMethod === 'COD') paidAt = deliverAt;  // 貨到付款：送達時收錢
+                            }
+                        }
+                    } else {
+                        const arriveAt = shipAt + 2 + random() * 2.2;
+                        const isNotPicked = paymentMethod === 'COD' && random() < 0.07;
+                        const pickupAt = arriveAt + Number(pick({ 0: 30, 1: 30, 2: 15, 3: 10, 4: 7, 5: 5, 6: 3 })) + random() * 0.9;
+                        if (arriveAt <= NOW) {
+                            deliveredAt = arriveAt;
+                            status = 'DELIVERED';
+                            if (isNotPicked && arriveAt + 7 <= NOW) {
+                                cancelledAt = arriveAt + 7;
+                                status = 'CANCELLED';
+                            } else if (!isNotPicked && pickupAt <= NOW) {
+                                completedAt = pickupAt;
+                                status = 'PICKED_UP';
+                                if (paymentMethod === 'COD') paidAt = pickupAt;  // 貨到付款：取貨時收錢
+                            }
+                        }
+                    }
+                }
+            }
+
+            allOrderList.push({
+                paymentMethod: paymentMethod,
+                shippingMethod: shippingMethod,
+                status: status,
+                createdAt: createdAt,
+                paidAt: paidAt,
+                shippedAt: shippedAt,
+                deliveredAt: deliveredAt,
+                completedAt: completedAt,
+                cancelledAt: cancelledAt,
+            });
+        }
+    }
+
+    // 模擬 API：回傳這段期間下的訂單（依 created_at）
+    function fakeApi(range) {
+        return allOrderList.filter(order => order.createdAt >= NOW - range.days);
+    }
+
+    // ==================== 畫面 ====================
+
+    const style = getComputedStyle(document.documentElement);
+    const COLOR_BAR = style.getPropertyValue('--series-current').trim();
+    const COLOR_FADED = style.getPropertyValue('--series-faded').trim();
+
+    // 畫面上顯示的中文，跟後端 enum 的 label 一樣
+    const PAYMENT_LABEL = { CREDIT: '信用卡', ATM: 'ATM 轉帳', COD: '貨到付款' };
+    const SHIPPING_LABEL = { HOME: '宅配', CVS: '超商取貨' };
+    // 照訂單流程排序
+    const STATUS_LABEL = {
+        UNPAID: '未付款',
+        PENDING: '訂單確認中',
+        SHIPPED: '已出貨',
+        DELIVERED: '已送達',
+        PICKED_UP: '取貨完畢',
+        CANCELLED: '已取消',
+    };
+
+    let currentRange = RANGE_OPTIONS[1];
+    let filterShipping = null;  // 篩選的配送方式：null = 不篩選、'HOME'、'CVS'
+
+    // 點配送方式：點同一個就取消，否則換成這個
+    function clickShipping(method) {
+        filterShipping = filterShipping === method ? null : method;
+        render();
+    }
+
+    function formatNumber(n) {
+        return n.toLocaleString('zh-TW');
+    }
+
+    function formatPercent(part, total) {
+        return total === 0 ? '—' : `${(part / total * 100).toFixed(1)}%`;
+    }
+
+    function average(numberList) {
+        return numberList.length === 0 ? null : numberList.reduce((sum, n) => sum + n, 0) / numberList.length;
+    }
+
+    // 訂單成立時間：信用卡、ATM 看付款時間；貨到付款看下單時間（它的 paid_at 是送達收錢的時間）
+    function confirmedAt(order) {
+        return order.paymentMethod === 'COD' ? order.createdAt : order.paidAt;
+    }
+
+    // 出貨天數 = 出貨時間 - 訂單成立時間
+    function shipDays(order) {
+        return order.shippedAt - confirmedAt(order);
+    }
+
+    // 有效訂單：排除未付款、已取消（跟營收總覽一樣的定義）
+    function isValid(order) {
+        return order.status !== 'UNPAID' && order.status !== 'CANCELLED';
+    }
+
+    // 一組切換按鈕
+    function renderToggle(boxId, optionList, currentKey, onChange) {
+        const box = document.getElementById(boxId);
+        box.innerHTML = '';
+        for (const option of optionList) {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.textContent = option.name;
+            button.className = 'px-4 py-2 text-[12px] tracking-[.06em] '
+                + (option.key === currentKey ? 'bg-black text-white' : 'text-muted hover:text-[#111]');
+            button.onclick = () => onChange(option.key);
+            box.appendChild(button);
+        }
+    }
+
+    // 篩選條件列：有篩選時顯示「宅配 ✕」和清除按鈕
+    function renderFilterBar() {
+        const bar = document.getElementById('filter-bar');
+        if (!filterShipping) {
+            bar.innerHTML = `<span class="text-muted">目前顯示全部訂單。點下方「配送方式」的長條，整頁會跟著篩選</span>`;
+            return;
+        }
+        bar.innerHTML = `
+            <span class="text-muted">篩選中：</span>
+            <span class="flex items-center gap-2 border border-black bg-white px-3 py-1.5 text-[#111]">
+                ${SHIPPING_LABEL[filterShipping]}
+                <button type="button" id="filter-remove" aria-label="取消篩選" class="text-muted hover:text-[#111]">✕</button>
+            </span>
+            <button type="button" id="filter-clear" class="text-muted underline underline-offset-4 hover:text-[#111]">清除篩選</button>`;
+        document.getElementById('filter-remove').onclick = () => clickShipping(filterShipping);
+        document.getElementById('filter-clear').onclick = () => clickShipping(filterShipping);
+    }
+
+    function renderKpiCards(orderList) {
+        const cancelledCount = orderList.filter(order => order.status === 'CANCELLED').length;
+        const avgShip = average(orderList.filter(order => order.shippedAt !== null).map(shipDays));
+
+        // 「目前」待出貨太久的：不看期間，看現在所有訂單確認中的訂單（之後 Python 查 status = 'PENDING' 的訂單）
+        // 有篩選配送方式的話也跟著篩選
+        const lateList = allOrderList.filter(order => order.status === 'PENDING' && NOW - confirmedAt(order) > 3
+            && (!filterShipping || order.shippingMethod === filterShipping));
+
+        const cardList = [
+            { name: '訂單數', value: formatNumber(orderList.length), note: '全部訂單，含未付款、已取消' },
+            { name: '取消率', value: formatPercent(cancelledCount, orderList.length), note: '未付款取消 + 貨到付款未取貨、拒收' },
+            { name: '平均出貨天數', value: avgShip === null ? '—' : `${avgShip.toFixed(1)} 天`, note: '訂單成立 → 出貨' },
+            {
+                name: '待出貨超過 3 天',
+                value: formatNumber(lateList.length),
+                note: '目前的數字，不受期間影響',
+                warning: lateList.length > 0,
+            },
+        ];
+        document.getElementById('kpi-cards').innerHTML = cardList.map(card => `
+            <div class="border border-line bg-white p-6 max-[760px]:p-4">
+                <div class="text-[12px] tracking-[.08em] text-muted">${card.name}</div>
+                <div class="mt-2 text-[28px] font-semibold tracking-[.02em]">
+                    ${card.value}${card.warning ? `<span class="ml-2 text-[12px] font-medium" style="color: var(--status-warning)">▲ 需要處理</span>` : ''}
+                </div>
+                <div class="mt-1 text-[12px] tracking-[.04em] text-muted">${card.note}</div>
+            </div>`).join('');
+    }
+
+    // Plotly 共用的版面設定（Python 的 fig.update_layout(...) 可以設一樣的東西）
+    function baseLayout() {
+        return {
+            margin: { l: 16, r: 16, t: 8, b: 32 },
+            paper_bgcolor: '#fff',
+            plot_bgcolor: '#fff',
+            font: { family: "'DM Sans', 'Noto Sans TC', sans-serif", size: 12, color: '#76716c' },
+            hoverlabel: { bgcolor: '#fff', bordercolor: '#dfd9d2', font: { color: '#111' } },
+            showlegend: false,
+            dragmode: false,
+        };
+    }
+
+    const PLOTLY_CONFIG = { displayModeBar: false, responsive: true };
+
+    // 橫條圖；labelList 由上往下排，長條右邊顯示「筆數（佔比）」
+    // colorList 不給就全部原色；有給的話是每條長條的顏色（篩選時用來把沒選到的變淡）
+    function drawBarChart(elementId, labelList, countList, colorList) {
+        const total = countList.reduce((sum, n) => sum + n, 0);
+        const traces = [{
+            // 橫條圖由下往上畫，所以反過來，第一個才會在最上面
+            x: countList.slice().reverse(),
+            y: labelList.slice().reverse(),
+            type: 'bar',
+            orientation: 'h',
+            marker: { color: colorList ? colorList.slice().reverse() : COLOR_BAR },
+            text: countList.map(n => `${formatNumber(n)} 筆（${formatPercent(n, total)}）`).reverse(),
+            textposition: 'outside',
+            cliponaxis: false,
+            hovertemplate: '%{y}<br>%{x:,} 筆<extra></extra>',
+        }];
+        const layout = baseLayout();
+        layout.bargap = 0.4;
+        layout.margin.r = 130;  // 留空間給長條右邊的字
+        layout.margin.b = 8;
+        layout.xaxis = { showticklabels: false, showgrid: false, zeroline: false };
+        layout.yaxis = { automargin: true, linecolor: '#dfd9d2' };
+        Plotly.react(elementId, traces, layout, PLOTLY_CONFIG);
+    }
+
+    // 依某個欄位數筆數（pandas：df['payment_method'].value_counts()）
+    function countBy(orderList, keyList, getKey) {
+        return keyList.map(key => orderList.filter(order => getKey(order) === key).length);
+    }
+
+    // 配送方式圖：它自己是篩選器，所以用沒篩選的資料；被選到的維持原色，其他變淡
+    function renderShipping(orderList) {
+        const shippingKeyList = Object.keys(SHIPPING_LABEL);
+        drawBarChart('shipping-chart',
+            shippingKeyList.map(key => SHIPPING_LABEL[key]),
+            countBy(orderList.filter(isValid), shippingKeyList, order => order.shippingMethod),
+            shippingKeyList.map(key => (!filterShipping || key === filterShipping) ? COLOR_BAR : COLOR_FADED));
+    }
+
+    function renderPayment(orderList) {
+        const paymentKeyList = Object.keys(PAYMENT_LABEL);
+        drawBarChart('payment-chart',
+            paymentKeyList.map(key => PAYMENT_LABEL[key]),
+            countBy(orderList.filter(isValid), paymentKeyList, order => order.paymentMethod));
+    }
+
+    function renderStatus(orderList) {
+        const statusKeyList = Object.keys(STATUS_LABEL);
+        drawBarChart('status-chart',
+            statusKeyList.map(key => STATUS_LABEL[key]),
+            countBy(orderList, statusKeyList, order => order.status));
+    }
+
+    // 取消分析：每一列是「付款方式 + 取消原因」
+    // shipping：這一列只跟哪種配送方式有關（null = 都有關），篩選配送方式時不相關的列會隱藏
+    // 還沒有結果：線上付款是 UNPAID（等付款）；宅配貨到付款是 SHIPPED（還沒送達）；超商貨到付款是 SHIPPED、DELIVERED（還沒取貨）
+    const CANCEL_ROW_LIST = [
+        { name: '信用卡', reason: '未付款（30 分鐘）', shipping: null, waitingStatusList: ['UNPAID'],
+            match: order => order.paymentMethod === 'CREDIT' },
+        { name: 'ATM 轉帳', reason: '未付款（4 天）', shipping: null, waitingStatusList: ['UNPAID'],
+            match: order => order.paymentMethod === 'ATM' },
+        { name: '貨到付款・宅配', reason: '拒收', shipping: 'HOME', waitingStatusList: ['SHIPPED'],
+            match: order => order.paymentMethod === 'COD' && order.shippingMethod === 'HOME' },
+        { name: '貨到付款・超商', reason: '未取貨', shipping: 'CVS', waitingStatusList: ['SHIPPED', 'DELIVERED'],
+            match: order => order.paymentMethod === 'COD' && order.shippingMethod === 'CVS' },
+    ];
+
+    function renderCancel(orderList) {
+        const rowList = CANCEL_ROW_LIST.filter(row => !filterShipping || !row.shipping || row.shipping === filterShipping);
+        document.getElementById('cancel-rows').innerHTML = rowList.map(row => {
+            const rowOrderList = orderList.filter(row.match);
+            const cancelled = rowOrderList.filter(order => order.status === 'CANCELLED').length;
+            const waiting = rowOrderList.filter(order => row.waitingStatusList.includes(order.status)).length;
+            return `
+            <tr class="border-b border-line last:border-b-0">
+                <td class="py-2.5 pr-4">${row.name}</td>
+                <td class="py-2.5 pr-4 text-muted">${row.reason}</td>
+                <td class="py-2.5 pr-4 text-right">${formatNumber(rowOrderList.length)}</td>
+                <td class="py-2.5 pr-4 text-right">${formatNumber(cancelled)}</td>
+                <td class="py-2.5 pr-4 text-right">${formatNumber(waiting)}</td>
+                <td class="py-2.5 text-right font-medium">${formatPercent(cancelled, rowOrderList.length)}</td>
+            </tr>`;
+        }).join('');
+    }
+
+    // 出貨天數分布：當天、1 天、2 天……5 天以上，各有幾筆
+    function renderShipSpeed(orderList) {
+        const labelList = ['當天', '1 天', '2 天', '3 天', '4 天', '5 天以上'];
+        const countList = labelList.map(() => 0);
+        for (const order of orderList.filter(order => order.shippedAt !== null)) {
+            const days = Math.min(Math.floor(shipDays(order)), 5);
+            countList[days]++;
+        }
+        const total = countList.reduce((sum, n) => sum + n, 0);
+        const traces = [{
+            x: labelList,
+            y: countList,
+            type: 'bar',
+            marker: { color: COLOR_BAR },
+            text: countList.map(n => formatPercent(n, total)),
+            textposition: 'outside',
+            cliponaxis: false,
+            hovertemplate: '%{x}出貨<br>%{y:,} 筆<extra></extra>',
+        }];
+        const layout = baseLayout();
+        layout.bargap = 0.35;
+        layout.xaxis = { showgrid: false, linecolor: '#dfd9d2' };
+        layout.yaxis = { showticklabels: false, showgrid: false, zeroline: false };
+        Plotly.react('ship-chart', traces, layout, PLOTLY_CONFIG);
+    }
+
+    // 配送天數：宅配看「出貨 → 送達」；超商看「出貨 → 到店」和「到店 → 取貨」
+    // 有篩選配送方式時，只顯示那一種
+    const DELIVER_ITEM_LIST = [
+        { shipping: 'HOME', name: '宅配：出貨 → 送達', unit: '已送達',
+            has: order => order.deliveredAt !== null, days: order => order.deliveredAt - order.shippedAt },
+        { shipping: 'CVS', name: '超商：出貨 → 到店', unit: '已到店',
+            has: order => order.deliveredAt !== null, days: order => order.deliveredAt - order.shippedAt },
+        { shipping: 'CVS', name: '超商：到店 → 取貨', unit: '已取貨',
+            has: order => order.completedAt !== null, days: order => order.completedAt - order.deliveredAt },
+    ];
+
+    function renderDeliver(orderList) {
+        const itemList = DELIVER_ITEM_LIST.filter(item => !filterShipping || item.shipping === filterShipping);
+        document.getElementById('deliver-list').innerHTML = itemList.map(item => {
+            const dayList = orderList
+                .filter(order => order.shippingMethod === item.shipping && item.has(order))
+                .map(item.days);
+            const avg = average(dayList);
+            return `
+            <div>
+                <div class="text-[12px] tracking-[.08em] text-muted">${item.name}</div>
+                <div class="mt-1 text-[28px] font-semibold tracking-[.02em]">${avg === null ? '—' : `${avg.toFixed(1)} 天`}</div>
+                <div class="text-[12px] tracking-[.04em] text-muted">${item.unit} ${formatNumber(dayList.length)} 筆</div>
+            </div>`;
+        }).join('');
+    }
+
+    function render() {
+        const orderList = fakeApi(currentRange);
+        // 篩選後的資料：除了配送方式圖（它是篩選器），其他區塊都用這份（pandas：df[df['shipping_method'] == 'CVS']）
+        const filteredList = filterShipping
+            ? orderList.filter(order => order.shippingMethod === filterShipping)
+            : orderList;
+
+        document.getElementById('period-text').textContent =
+            `${currentRange.start} ～ ${END_DATE}　・　依下單時間（created_at）`;
+        renderToggle('range-buttons', RANGE_OPTIONS, currentRange.key, key => {
+            currentRange = RANGE_OPTIONS.find(range => range.key === key);
+            render();
+        });
+        renderFilterBar();
+        renderKpiCards(filteredList);
+        renderShipping(orderList);
+        renderPayment(filteredList);
+        renderStatus(filteredList);
+        renderShipSpeed(filteredList);
+        renderDeliver(filteredList);
+        renderCancel(filteredList);
+    }
+
+    render();
+
+    // 點配送方式的長條 → 篩選。圖第一次畫完之後才能綁事件，之後 Plotly.react 重畫也會保留
+    // 長條的 y 是中文（宅配 / 超商取貨），換回 HOME / CVS
+    document.getElementById('shipping-chart').on('plotly_click', event => {
+        const label = event.points[0].y;
+        clickShipping(Object.keys(SHIPPING_LABEL).find(key => SHIPPING_LABEL[key] === label));
+    });
+</script>
+</body>
+</html>

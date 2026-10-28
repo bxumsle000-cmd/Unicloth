@@ -1,0 +1,411 @@
+<!doctype html>
+<!--
+  銷售數據 > 營收總覽（前端範例，只用假資料，沒有接後端）
+
+  直接用瀏覽器打開這個檔案就能看（要有網路，因為 Tailwind、Plotly 從 CDN 載入）。
+
+  之後接 Python 的想法：
+  - 圖表用 Plotly.js 畫。Python 也有 plotly 套件，而且兩邊用的是同一套圖表格式，
+    Python 那邊 fig.to_json() 產生的 JSON，前端可以直接丟給 Plotly.newPlot() 畫出來。
+  - 下面 FAKE_RESPONSE 的格式，就是之後 Python（pandas）要回傳的資料格式：
+      summary  → 本期 / 上期的各項指標（pandas 做 sum、count 算出來）
+      daily    → 每天一筆，等於 df.to_dict(orient="records") 的樣子
+  - 營業額只算有效訂單：排除 UNPAID（未付款）和 CANCELLED（已取消）
+-->
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>營收總覽</title>
+    <!-- 跟專案 frontend/index.html 一樣的 Tailwind 和字型 -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style type="text/tailwindcss">
+        @theme {
+            --color-paper: #F6F5F2;
+            --color-cream: #F0EBE3;
+            --color-stone: #D9CFC7;
+            --color-muted: #76716c;
+            --color-line: #dfd9d2;
+            --font-kinu: 'DM Sans', 'Noto Sans TC', sans-serif;
+        }
+    </style>
+    <style>
+        /* 圖表用的顏色，集中放這裡方便之後換 */
+        :root {
+            --series-current: #2a78d6;   /* 本期 */
+            --series-previous: #b5afa8;  /* 上期（比較用，刻意淡一點） */
+            --delta-up: #008300;         /* 指標變好 */
+            --delta-down: #c0392b;       /* 指標變差 */
+        }
+    </style>
+</head>
+<body class="bg-paper">
+<div class="flex min-h-screen bg-paper font-kinu text-[#111] max-[760px]:flex-col">
+
+    <!-- 左邊：側邊選單（樣式照 component/admin/mkt/SideMenu.jsx） -->
+    <aside class="w-[220px] shrink-0 border-r border-line bg-white max-[760px]:w-full max-[760px]:border-r-0 max-[760px]:border-b">
+        <nav class="flex flex-col pb-6 max-[760px]:pb-3">
+            <button type="button" class="flex items-center justify-between px-6 py-3 text-left text-[13px] font-medium tracking-[.08em] hover:bg-paper max-[760px]:px-4">
+                <span>Coupon</span>
+                <span class="text-[10px] text-muted">▶</span>
+            </button>
+            <button type="button" class="flex items-center justify-between px-6 py-3 text-left text-[13px] font-medium tracking-[.08em] hover:bg-paper max-[760px]:px-4">
+                <span>銷售數據</span>
+                <span class="rotate-90 text-[10px] text-muted">▶</span>
+            </button>
+            <a href="sales-overview.html" class="border-l-2 border-black bg-paper py-2.5 pl-10 pr-6 text-left text-[13px] font-medium tracking-[.08em] max-[760px]:pl-8">
+                營收總覽
+            </a>
+            <a href="product-sales.html" class="border-l-2 border-transparent py-2.5 pl-10 pr-6 text-left text-[13px] tracking-[.08em] text-muted hover:text-[#111] max-[760px]:pl-8">
+                商品銷售
+            </a>
+            <a href="order-structure.html" class="border-l-2 border-transparent py-2.5 pl-10 pr-6 text-left text-[13px] tracking-[.08em] text-muted hover:text-[#111] max-[760px]:pl-8">
+                訂單結構
+            </a>
+            <a href="member-customers.html" class="border-l-2 border-transparent py-2.5 pl-10 pr-6 text-left text-[13px] tracking-[.08em] text-muted hover:text-[#111] max-[760px]:pl-8">
+                會員與顧客
+            </a>
+            <a href="coupon-performance.html" class="border-l-2 border-transparent py-2.5 pl-10 pr-6 text-left text-[13px] tracking-[.08em] text-muted hover:text-[#111] max-[760px]:pl-8">
+                折價券成效
+            </a>
+        </nav>
+    </aside>
+
+    <!-- 右邊：頂部列 + 內容區 -->
+    <div class="flex min-w-0 flex-1 flex-col">
+        <header class="flex items-center justify-end gap-4 border-b border-line bg-white px-8 py-4 max-[760px]:px-4">
+            <span class="text-[12px] tracking-[.06em] text-muted">
+                目前登入：<b class="font-medium text-[#111]">行銷測試員（mkt01）</b>
+            </span>
+        </header>
+
+        <main class="flex-1 px-8 py-8 max-[760px]:px-4">
+            <!-- 標題 + 期間篩選 -->
+            <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
+                <div>
+                    <h1 class="text-[20px] font-medium tracking-[.08em]">營收總覽</h1>
+                    <p id="period-text" class="mt-1 text-[12px] tracking-[.06em] text-muted"></p>
+                </div>
+                <div id="range-buttons" class="flex flex-wrap border border-line bg-white"></div>
+            </div>
+
+            <!-- 指標卡片：第一張是主要數字（營業額），放大顯示 -->
+            <section id="kpi-cards" class="mb-6 grid grid-cols-[1.6fr_1fr_1fr_1fr] gap-4 max-[1200px]:grid-cols-3 max-[760px]:grid-cols-1"></section>
+
+            <!-- 營業額趨勢 -->
+            <section class="mb-6 border border-line bg-white p-6 max-[760px]:p-4">
+                <h2 class="text-[14px] font-medium tracking-[.08em]">營業額趨勢</h2>
+                <p class="mt-1 text-[12px] tracking-[.06em] text-muted">實線是本期，灰色虛線是上一期同樣長度的期間</p>
+                <div id="revenue-chart" class="mt-4 h-[320px]"></div>
+            </section>
+
+            <!-- 匯出 Excel（範本，按鈕還沒有真的功能） -->
+            <section class="border border-line bg-white p-6 max-[760px]:p-4">
+                <h2 class="text-[14px] font-medium tracking-[.08em]">匯出 Excel</h2>
+                <p class="mt-1 text-[12px] tracking-[.06em] text-muted">每天一列：日期、營業額、客單價、銷售件數、折扣總額</p>
+                <div class="mt-4 flex flex-wrap items-end gap-4">
+                    <label class="flex flex-col gap-1.5 text-[12px] tracking-[.06em] text-muted">
+                        開始日期
+                        <input id="export-start" type="date" class="border border-line px-3 py-2 text-[13px] text-[#111] focus:border-black focus:outline-none"/>
+                    </label>
+                    <span class="pb-2.5 text-muted">～</span>
+                    <label class="flex flex-col gap-1.5 text-[12px] tracking-[.06em] text-muted">
+                        結束日期
+                        <input id="export-end" type="date" class="border border-line px-3 py-2 text-[13px] text-[#111] focus:border-black focus:outline-none"/>
+                    </label>
+                    <button id="export-button" type="button" class="bg-black px-6 py-2.5 text-[13px] tracking-[.08em] text-white hover:bg-[#333]">
+                        匯出 Excel
+                    </button>
+                </div>
+                <p id="export-message" class="mt-3 hidden text-[12px] tracking-[.06em] text-muted"></p>
+            </section>
+        </main>
+    </div>
+</div>
+
+<script>
+    // ==================== 假資料 ====================
+    // 之後這一段整個換成呼叫 Python 的 API，例如 fetch('/api/admin/sales/overview?range=30d')
+
+    // 期間選項；unit = 'day' 一天一筆，'month' 一個月一筆
+    const RANGE_OPTIONS = [
+        { key: '7d', name: '近 7 天', days: 7, unit: 'day' },
+        { key: '30d', name: '近 30 天', days: 30, unit: 'day' },
+        { key: '90d', name: '近 90 天', days: 90, unit: 'day' },
+        { key: '12m', name: '近 12 個月', days: 365, unit: 'month' },
+    ];
+
+    // 假資料的最後一天（昨天，資料才是完整的一天）
+    const LAST_DATE = new Date(2026, 9, 26);
+
+    // 固定種子的亂數，每次打開數字都一樣，方便對照
+    let seed = 20261026;
+    function random() {
+        seed = (seed * 16807) % 2147483647;
+        return seed / 2147483647;
+    }
+
+    // 產生兩年多、每天一筆的假訂單統計（對應 orders + order_items 依日期 GROUP BY 的結果）
+    const allDailyList = [];
+    for (let i = 799; i >= 0; i--) {
+        const date = new Date(LAST_DATE);
+        date.setDate(date.getDate() - i);
+        const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+        const growth = 1 + (799 - i) / 799 * 0.25;  // 慢慢成長一點
+        const orders = Math.round((isWeekend ? 62 : 44) * growth * (0.8 + random() * 0.4));
+        const avgPrice = 1150 + random() * 300;
+        const subtotal = Math.round(orders * avgPrice);
+        const discount = Math.round(subtotal * (0.03 + random() * 0.03));
+        allDailyList.push({
+            date: date,
+            revenue: subtotal - discount,                  // 先不算運費，讓營業額 = 商品實收
+            orders: orders,
+            items: Math.round(orders * (2.1 + random() * 0.6)),
+            discount: discount,
+        });
+    }
+
+    // 模擬 API：給期間，回傳「本期、上期指標」和「每天（或每月）的明細」
+    function fakeApi(range) {
+        let currentList;
+        let previousList;
+        let end;
+        if (range.unit === 'month') {
+            // 按月只算「已經過完的月份」，這個月還沒結束先不放，不然最後一個月會看起來掉很多
+            const monthList = groupByMonth(allDailyList)
+                .filter(month => month.date < new Date(LAST_DATE.getFullYear(), LAST_DATE.getMonth(), 1));
+            currentList = monthList.slice(-12);
+            previousList = monthList.slice(-24, -12);
+            end = new Date(LAST_DATE.getFullYear(), LAST_DATE.getMonth(), 0);  // 上個月最後一天
+        } else {
+            currentList = allDailyList.slice(-range.days);
+            previousList = allDailyList.slice(-range.days * 2, -range.days);
+            end = currentList[currentList.length - 1].date;
+        }
+        return {
+            start: currentList[0].date,
+            end: end,
+            summary: {
+                current: summarize(currentList),
+                previous: summarize(previousList),
+            },
+            daily: currentList,
+            previousDaily: previousList,
+        };
+    }
+
+    // 加總成一組指標（Python 裡就是 df.sum()）
+    // 訂單數不顯示在畫面上，但客單價 = 營業額 ÷ 訂單數，所以資料裡還是要有
+    function summarize(dayList) {
+        let revenue = 0, orders = 0, items = 0, discount = 0;
+        for (const day of dayList) {
+            revenue += day.revenue;
+            orders += day.orders;
+            items += day.items;
+            discount += day.discount;
+        }
+        return {
+            revenue: revenue,
+            orders: orders,
+            avgOrderValue: Math.round(revenue / orders),
+            items: items,
+            discount: discount,
+        };
+    }
+
+    // 每天的資料併成每月一筆（Python 裡就是 df.resample('MS').sum()）
+    function groupByMonth(dayList) {
+        const monthList = [];
+        for (const day of dayList) {
+            const last = monthList[monthList.length - 1];
+            if (last && last.date.getMonth() === day.date.getMonth()) {
+                last.revenue += day.revenue;
+                last.orders += day.orders;
+                last.items += day.items;
+                last.discount += day.discount;
+            } else {
+                monthList.push({
+                    date: new Date(day.date.getFullYear(), day.date.getMonth(), 1),
+                    revenue: day.revenue,
+                    orders: day.orders,
+                    items: day.items,
+                    discount: day.discount,
+                });
+            }
+        }
+        return monthList;
+    }
+
+    // ==================== 畫面 ====================
+
+    // 指標卡片；upIsGood = 數字變大是不是好事（折扣變多就不一定是好事，所以不上色）
+    const KPI_LIST = [
+        { key: 'revenue', name: '營業額', money: true, upIsGood: true },
+        { key: 'avgOrderValue', name: '客單價', money: true, upIsGood: true },
+        { key: 'items', name: '銷售件數', money: false, upIsGood: true },
+        { key: 'discount', name: '折扣總額', money: true, upIsGood: null },
+    ];
+
+    const style = getComputedStyle(document.documentElement);
+    const COLOR_CURRENT = style.getPropertyValue('--series-current').trim();
+    const COLOR_PREVIOUS = style.getPropertyValue('--series-previous').trim();
+
+    let currentRange = RANGE_OPTIONS[1];
+
+    function formatNumber(n) {
+        return n.toLocaleString('zh-TW');
+    }
+
+    function formatDate(date, unit) {
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2, '0');
+        return unit === 'month' ? `${y}/${m}` : `${y}/${m}/${d}`;
+    }
+
+    function renderRangeButtons() {
+        const box = document.getElementById('range-buttons');
+        box.innerHTML = '';
+        for (const range of RANGE_OPTIONS) {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.textContent = range.name;
+            button.className = 'px-4 py-2 text-[12px] tracking-[.06em] '
+                + (range.key === currentRange.key ? 'bg-black text-white' : 'text-muted hover:text-[#111]');
+            button.onclick = () => {
+                currentRange = range;
+                render();
+            };
+            box.appendChild(button);
+        }
+    }
+
+    function renderKpiCards(summary) {
+        const box = document.getElementById('kpi-cards');
+        box.innerHTML = '';
+        KPI_LIST.forEach((kpi, index) => {
+            const now = summary.current[kpi.key];
+            const before = summary.previous[kpi.key];
+            const percent = (now - before) / before * 100;
+            const isUp = percent >= 0;
+
+            let deltaColor = 'var(--color-muted)';
+            if (kpi.upIsGood !== null) {
+                deltaColor = isUp === kpi.upIsGood ? 'var(--delta-up)' : 'var(--delta-down)';
+            }
+
+            const isHero = index === 0;
+            const card = document.createElement('div');
+            // 寬度不夠排成一列時，營業額自己佔滿一整列
+            card.className = 'border border-line bg-white p-6 max-[760px]:p-4' + (isHero ? ' max-[1200px]:col-span-3 max-[760px]:col-span-1' : '');
+            card.innerHTML = `
+                <div class="text-[12px] tracking-[.08em] text-muted">${kpi.name}</div>
+                <div class="mt-2 font-semibold tracking-[.02em] ${isHero ? 'text-[48px] leading-none' : 'text-[24px]'}">
+                    ${kpi.money ? '<span class="mr-1 text-[0.5em] font-medium">NT$</span>' : ''}${formatNumber(now)}
+                </div>
+                <div class="mt-2 text-[12px] tracking-[.04em]">
+                    <span style="color: ${deltaColor}">${isUp ? '▲' : '▼'} ${Math.abs(percent).toFixed(1)}%</span>
+                    <span class="text-muted">對比上一期<span class="whitespace-nowrap">（${kpi.money ? 'NT$ ' : ''}${formatNumber(before)}）</span></span>
+                </div>`;
+            box.appendChild(card);
+        });
+    }
+
+    // Plotly 共用的版面設定（Python 的 fig.update_layout(...) 可以設一樣的東西）
+    function baseLayout() {
+        return {
+            margin: { l: 56, r: 16, t: 8, b: 40 },
+            paper_bgcolor: '#fff',
+            plot_bgcolor: '#fff',
+            font: { family: "'DM Sans', 'Noto Sans TC', sans-serif", size: 12, color: '#76716c' },
+            hovermode: 'x unified',
+            hoverlabel: { bgcolor: '#fff', bordercolor: '#dfd9d2', font: { color: '#111' } },
+            xaxis: { showgrid: false, linecolor: '#dfd9d2', tickformat: currentRange.unit === 'month' ? '%Y/%m' : '%m/%d', hoverformat: currentRange.unit === 'month' ? '%Y/%m' : '%Y/%m/%d' },
+            yaxis: { gridcolor: '#efebe6', zeroline: false, rangemode: 'tozero', separatethousands: true },
+            legend: { orientation: 'h', x: 0, y: 1.12 },
+        };
+    }
+
+    const PLOTLY_CONFIG = { displayModeBar: false, responsive: true };
+
+    function renderRevenueChart(data) {
+        const dateList = data.daily.map(day => day.date);
+        const traces = [
+            {
+                name: '本期',
+                x: dateList,
+                y: data.daily.map(day => day.revenue),
+                type: 'scatter',
+                // 點太多時只畫線，不畫圓點
+                mode: data.daily.length > 31 ? 'lines' : 'lines+markers',
+                line: { color: COLOR_CURRENT, width: 2 },
+                marker: { size: 8 },
+                hovertemplate: 'NT$ %{y:,}',
+            },
+            {
+                // 上期畫在本期的日期上，才能對齊比較；hover 時顯示真正的上期日期
+                name: '上一期',
+                x: dateList,
+                y: data.previousDaily.map(day => day.revenue),
+                customdata: data.previousDaily.map(day => formatDate(day.date, currentRange.unit)),
+                type: 'scatter',
+                mode: 'lines',
+                line: { color: COLOR_PREVIOUS, width: 2, dash: 'dash' },
+                hovertemplate: 'NT$ %{y:,}（%{customdata}）',
+            },
+        ];
+        const layout = baseLayout();
+        layout.yaxis.tickprefix = 'NT$ ';
+        Plotly.react('revenue-chart', traces, layout, PLOTLY_CONFIG);
+    }
+
+    // input type="date" 用的格式：2026-10-26
+    function toInputDate(date) {
+        return formatDate(date, 'day').replaceAll('/', '-');
+    }
+
+    // 匯出區的日期預設帶入目前選的期間；可選的範圍限制在有資料的日子
+    function renderExportDates(data) {
+        const startInput = document.getElementById('export-start');
+        const endInput = document.getElementById('export-end');
+        startInput.value = toInputDate(data.start);
+        endInput.value = toInputDate(data.end);
+        startInput.min = endInput.min = toInputDate(allDailyList[0].date);
+        startInput.max = endInput.max = toInputDate(LAST_DATE);
+    }
+
+    // 範本：還沒有真的匯出，只檢查日期、顯示訊息
+    // 之後改成呼叫後端，例如 window.location = '/api/admin/sales/export?start=...&end=...'
+    // 後端用 Python 的 pandas 產生：df.to_excel('sales.xlsx', index=False)
+    document.getElementById('export-button').onclick = () => {
+        const start = document.getElementById('export-start').value;
+        const end = document.getElementById('export-end').value;
+        const message = document.getElementById('export-message');
+        message.classList.remove('hidden');
+        if (!start || !end) {
+            message.textContent = '請選擇開始和結束日期';
+        } else if (start > end) {
+            message.textContent = '開始日期不能晚於結束日期';
+        } else {
+            message.textContent = `（範本）會匯出 ${start.replaceAll('-', '/')} ～ ${end.replaceAll('-', '/')} 的資料，匯出功能還沒做`;
+        }
+    };
+
+    function render() {
+        const data = fakeApi(currentRange);
+        document.getElementById('period-text').textContent =
+            `${formatDate(data.start, 'day')} ～ ${formatDate(data.end, 'day')}　・　只計算有效訂單（不含未付款、已取消）`;
+        renderRangeButtons();
+        renderKpiCards(data.summary);
+        renderRevenueChart(data);
+        renderExportDates(data);
+    }
+
+    render();
+</script>
+</body>
+</html>
