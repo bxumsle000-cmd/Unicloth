@@ -436,7 +436,7 @@ function MobileProductCards({
     );
 }
 
-function ProductHome() {
+function ProductHome({ tabNavigation }) {
     const [products, setProducts] = useState([]);
 
     const [page, setPage] = useState(0);
@@ -725,7 +725,7 @@ function ProductHome() {
 
     return (
         <div className="min-h-screen bg-paper px-8 py-10 font-kinu text-[#111] max-[760px]:px-4 max-[760px]:py-6">
-            <div className="mb-6 flex items-end justify-between gap-4 max-[520px]:items-stretch">
+            <div className="mb-6 flex items-end justify-between gap-4 max-[760px]:flex-col max-[760px]:items-stretch">
                 <div>
                     <div className="text-[10px] tracking-[.22em] text-muted">
                         KINU ADMIN · PRODUCT
@@ -740,16 +740,20 @@ function ProductHome() {
                     </p>
                 </div>
 
-                <button
-                    type="button"
-                    onClick={() =>
-                        setCreatingProduct(true)
-                    }
-                    disabled={batchProcessing}
-                    className="border border-black bg-black px-5 py-2.5 text-[12px] text-white hover:opacity-80 disabled:opacity-40"
-                >
-                    ＋ 新增商品
-                </button>
+                <div className="flex min-w-0 flex-col items-end gap-3 max-[760px]:items-stretch">
+                    {tabNavigation}
+
+                    <button
+                        type="button"
+                        onClick={() =>
+                            setCreatingProduct(true)
+                        }
+                        disabled={batchProcessing}
+                        className="self-end border border-black bg-black px-5 py-2.5 text-[12px] text-white hover:opacity-80 disabled:opacity-40 max-[760px]:w-full"
+                    >
+                        ＋ 新增商品
+                    </button>
+                </div>
             </div>
 
             <div className="mb-4 border border-line bg-white p-4">
