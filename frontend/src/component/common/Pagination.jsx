@@ -1,8 +1,10 @@
 /**
  * 換頁按鈕：page 從 0 開始（跟後端一樣），畫面上顯示成 1、2、3…<br>
- * totalPages 是 /products 回來的 page.totalPages
+ * totalPages 是 /products 回來的 page.totalPages<br>
+ * scrollToTop：換頁後捲回頁面最上面（預設會）；放在頁面中間的區塊用 false，換頁時畫面不會跳走<br>
+ * marginClass：跟上面內容的距離
  */
-function Pagination({ page, totalPages, setPage }) {
+function Pagination({ page, totalPages, setPage, scrollToTop = true, marginClass = 'mt-14' }) {
     // 只有一頁（或還沒載入）就不用顯示
     if (!totalPages || totalPages <= 1) return null;
 
@@ -10,7 +12,7 @@ function Pagination({ page, totalPages, setPage }) {
 
     function goTo(newPage) {
         setPage(newPage);
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        if (scrollToTop) window.scrollTo({ top: 0, behavior: "smooth" });
     }
     /**
      * 要顯示哪些頁碼：第一頁、最後一頁、目前頁前後各 2 頁，中間跳過的用 "…"<br>
@@ -31,7 +33,7 @@ function Pagination({ page, totalPages, setPage }) {
     }
 
     return (
-        <nav className="mt-14 flex flex-wrap items-center justify-center gap-2">
+        <nav className={`${marginClass} flex flex-wrap items-center justify-center gap-2`}>
             <button onClick={() => goTo(page - 1)} disabled={page === 0}
                     className={`${buttonClass} border-[#dfd9d2] hover:border-black disabled:pointer-events-none disabled:opacity-40`}>
                 上一頁

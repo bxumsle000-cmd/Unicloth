@@ -7,7 +7,13 @@ const MENU_GROUPS = [
         { key: 'issue',   name: '發券給會員' },
         { key: 'records', name: '發券紀錄' },
     ] },
-    { key: 'sales', name: '銷售數據', pages: [] }, // 先擱置，之後再放頁面
+    { key: 'sales', name: '銷售數據', pages: [
+        { key: 'salesOverview', name: '營收總覽' },
+        { key: 'productSales',  name: '商品銷售' },
+        { key: 'orderStructure', name: '訂單結構' },
+        { key: 'memberCustomers', name: '會員與顧客' },
+        { key: 'couponPerformance', name: '折價券成效' },
+    ] },
 ];
 
 /**

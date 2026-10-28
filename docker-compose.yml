@@ -90,5 +90,27 @@ services:
       - "host.docker.internal:host-gateway"   # Linux 的 Docker 沒有內建這個名稱，加上才通用
     restart: unless-stopped
 
+  # --------------------------------------------------------------------------
+  # 銷售分析服務（Python，analytics/main.py）
+  #
+  # 行銷後台「銷售數據」的數字由它計算：React → Spring Boot（擋權限）→ 這裡。
+  # 第一次會先建映像檔（下載 Python 和微軟的 ODBC 驅動程式，要幾分鐘）。
+  # 改了 analytics/ 的程式要重建才會生效：docker compose up -d --build analytics
+  # --------------------------------------------------------------------------
+  analytics:
+    build: ./analytics
+    container_name: unicloth-analytics
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ANALYTICS_HOST: "0.0.0.0"       # 容器裡要聽 0.0.0.0，下面的 ports 才轉得進來
+      DB_HOST: "db"                   # 容器之間用服務名稱連，不是 localhost
+      DB_PORT: "1433"                 # 容器內的埠號，不是你電腦的 14321
+      DB_PASSWORD: "Eeit25@Unicloth"
+    ports:
+      - "127.0.0.1:8000:8000"         # 只開給本機，Spring Boot 用 http://127.0.0.1:8000 連
+    restart: unless-stopped
+
 volumes:
   mssql-data:
