@@ -2,7 +2,7 @@ import Header from "./component/store/layout/Header.jsx";
 import Footer from "./component/store/layout/Footer.jsx";
 import Home from "./pages/store/Home.jsx";
 import Category from "./pages/store/Category.jsx";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Wishlist from "./pages/store/Wishlist.jsx";
 import ProductDetail from "./pages/store/ProductDetail.jsx";
 import Coupons from "./pages/store/Coupons.jsx";
@@ -21,6 +21,8 @@ import RequireLogin from "./component/guard/RequireLogin.jsx";
 import NewArrivals from "./pages/store/NewArrivals.jsx";
 import Recommendations from "./pages/store/Recommendations.jsx";
 import RecommendationSettings from "./pages/store/RecommendationSettings.jsx";
+import MemberLayout from "./pages/store/MemberLayout.jsx";
+import MemberProfile from "./pages/store/MemberProfile.jsx";
 import { LanguageProvider } from "./js/LanguageProvider.jsx";
 import { CountProvider } from "./js/CountProvider.jsx";
 import AdminLogin from "./pages/admin/AdminLogin.jsx";
@@ -59,8 +61,13 @@ function StoreLayout(){
                             <Route path="/faq" element={<Faq/>}/>
                             {/* 訪客看熱門商品，登入會員則取得個人化推薦。 */}
                             <Route path="/recommendations" element={<Recommendations/>}/>
-                            {/* 推薦設定包含會員瀏覽紀錄管理，必須登入才能使用。 */}
-                            <Route path="/recommendation-settings" element={<RequireLogin><RecommendationSettings/></RequireLogin>}/>
+                            {/* 會員中心：外框是 MemberLayout，裡面依網址換子頁面；必須登入才能使用。 */}
+                            <Route path="/member" element={<RequireLogin><MemberLayout/></RequireLogin>}>
+                                <Route index element={<MemberProfile/>}/>
+                                <Route path="recommendation-settings" element={<RecommendationSettings/>}/>
+                            </Route>
+                            {/* 推薦設定搬進會員中心，舊網址導過去 */}
+                            <Route path="/recommendation-settings" element={<Navigate to="/member/recommendation-settings" replace/>}/>
                             <Route path="/login" element={<Login/>}/>
                             <Route path="/complete-profile" element={<CompleteProfile/>}/>
                         </Routes>

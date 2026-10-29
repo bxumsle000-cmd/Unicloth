@@ -1,13 +1,10 @@
 import { useState, useEffect, useContext } from 'react'
 import { Link, useNavigate } from "react-router-dom";
-import {
-    getToken,
-    clearToken
-} from "../../../js/kinu.js";
-import { signOutFirebase } from "../../../js/firebase.js";
+import { getToken } from "../../../js/kinu.js";
 import { useLanguage } from "../../../js/i18n.js";
 import { CountContext } from "../../../js/CountProvider.jsx";
 import LanguageMenu from "./LanguageMenu.jsx";
+import MemberMenu from "./MemberMenu.jsx";
 
 /** Header 右邊：搜尋、天氣、各功能 */
 function HeaderActions() {
@@ -52,14 +49,7 @@ function HeaderActions() {
         );
     }
 
-    // JWT 後端不記狀態：前端把 token 刪掉就等於登出；整頁重新載入讓各處的數量歸零
     const loggedIn = Boolean(getToken());
-
-    async function logout() {
-        clearToken();
-        await signOutFirebase().catch(() => {});
-        window.location.href = '/';
-    }
 
     /*
      * 所有右側功能連結共用樣式：
@@ -121,25 +111,9 @@ function HeaderActions() {
                 </Link>
             )}
 
-            {/* 推薦設定只有登入會員能使用，手機版縮短為「推薦」。 */}
-            {loggedIn && (
-                <Link
-                    to="/recommendation-settings"
-                    className={actionClass}
-                >
-                    <span className="max-[760px]:hidden">
-                        推薦設定
-                    </span>
-                    <span className="hidden max-[760px]:inline">
-                        推薦
-                    </span>
-                </Link>
-            )}
-
+            {/* 登入後顯示會員中心選單（會員資料、推薦設定、登出），沒登入顯示登入。 */}
             {loggedIn ? (
-                <button onClick={logout} className={actionClass}>
-                    {t('logout')}
-                </button>
+                <MemberMenu className={actionClass} />
             ) : (
                 <Link to="/login" className={actionClass}>
                     {t('login')}

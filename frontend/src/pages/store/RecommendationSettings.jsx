@@ -35,15 +35,11 @@ function RecommendationSettings() {
     }
 
     return (
-        <div className="px-[5.5%] pt-[38px] pb-[90px]
-                        max-[760px]:px-[4%] max-[760px]:pt-[26px]">
-            <div className="mb-2 text-[10px] tracking-[.22em] text-[#76716c]">
-                RECOMMENDATION SETTINGS
-            </div>
-
-            <h1 className="mb-3 text-[clamp(24px,3vw,34px)] font-medium tracking-[.08em]">
+        // 放在會員中心裡，外框和大標題由 MemberLayout 負責
+        <div>
+            <h2 className="mb-3 text-[15px] font-medium tracking-[.08em]">
                 推薦設定
-            </h1>
+            </h2>
 
             <p className="mb-8 text-[11px] tracking-[.06em] text-[#76716c]">
                 系統會依照商品瀏覽紀錄分析你偏好的風格。
