@@ -127,15 +127,6 @@ function Checkout() {
       .catch((e) => toast(e.message, true));
   }, []);
 
-  // 會員資料
-  const [member, setMember] = useState(null);
-
-  useEffect(() => {
-    api("/api/member/me")
-      .then(setMember)
-      .catch(() => {});
-  }, []);
-
   // 上架中的商品
   const buyList = (cartItemList || []).filter((item) => item.onSale);
 
@@ -163,6 +154,33 @@ function Checkout() {
     setForm((previous) => ({
       ...previous,
       [name]: value,
+    }));
+  }
+
+  // 會員資料
+  const [member, setMember] = useState(null);
+
+  useEffect(() => {
+    api("/api/member/me")
+      .then((data) => {
+        setMember(data);
+
+        // 預設是宅配：一進來就帶入會員資料的地址（使用者還沒自己填的話）
+        setForm((previous) =>
+          previous.shippingMethod === "HOME" && !previous.shippingAddress
+            ? { ...previous, shippingAddress: data.address ?? "" }
+            : previous,
+        );
+      })
+      .catch(() => {});
+  }, []);
+
+  // 切換配送方式：宅配帶入會員地址，超商取貨清空讓使用者填門市名稱
+  function changeShippingMethod(method) {
+    setForm((previous) => ({
+      ...previous,
+      shippingMethod: method,
+      shippingAddress: method === "HOME" ? (member?.address ?? "") : "",
     }));
   }
 
@@ -479,7 +497,7 @@ function Checkout() {
                 name="shippingMethod"
                 options={SHIPPING_OPTIONS}
                 value={form.shippingMethod}
-                onChange={(v) => changeField("shippingMethod", v)}
+                onChange={changeShippingMethod}
               />
             </div>
 
