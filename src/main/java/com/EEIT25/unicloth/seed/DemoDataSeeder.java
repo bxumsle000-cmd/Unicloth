@@ -276,7 +276,7 @@ public class DemoDataSeeder implements CommandLineRunner {
         Long productStaffId = findStaffId("PRODUCT");
         Long mktStaffId = findStaffId("MKT");
         if (productStaffId == null || mktStaffId == null) {
-            log.warn("[seed] 找不到商品部或行銷部的員工（V8 migration 會建），無法產生示範假資料");
+            log.warn("[seed] 找不到商品部或行銷部的員工（V1 migration 會建），無法產生示範假資料");
             return;
         }
         couponMap = seedCoupons();
@@ -374,7 +374,7 @@ public class DemoDataSeeder implements CommandLineRunner {
         return result;
     }
 
-    /** 找某個部門 id 最小的員工（V8 建的測試員），沒有回傳 null */
+    /** 找某個部門 id 最小的員工（V1 migration 建的測試員），沒有回傳 null */
     private Long findStaffId(String department) {
         List<Long> idList = jdbcTemplate.queryForList(
                 "SELECT TOP 1 id FROM staff WHERE department = ? ORDER BY id", Long.class, department);
