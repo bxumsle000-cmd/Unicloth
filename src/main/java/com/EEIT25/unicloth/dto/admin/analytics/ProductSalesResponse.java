@@ -1,4 +1,4 @@
-package com.EEIT25.unicloth.dto.analytics;
+package com.EEIT25.unicloth.dto.admin.analytics;
 
 /**
  * 指定期間內的商品銷售統計。

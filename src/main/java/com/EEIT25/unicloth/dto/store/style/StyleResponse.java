@@ -1,4 +1,4 @@
-package com.EEIT25.unicloth.dto.style;
+package com.EEIT25.unicloth.dto.store.style;
 
 import com.EEIT25.unicloth.entity.Style;
 

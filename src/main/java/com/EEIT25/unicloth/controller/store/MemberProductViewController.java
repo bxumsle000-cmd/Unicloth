@@ -1,8 +1,8 @@
-package com.EEIT25.unicloth.controller;
+package com.EEIT25.unicloth.controller.store;
 
 import com.EEIT25.unicloth.dto.store.member.ClearProductViewHistoryResponse;
 import com.EEIT25.unicloth.security.CurrentMember;
-import com.EEIT25.unicloth.service.MemberProductViewService;
+import com.EEIT25.unicloth.service.shop.MemberProductViewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

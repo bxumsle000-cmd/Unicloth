@@ -1,8 +1,8 @@
-package com.EEIT25.unicloth.controller;
+package com.EEIT25.unicloth.controller.admin;
 
-import com.EEIT25.unicloth.dto.analytics.ProductSalesResponse;
-import com.EEIT25.unicloth.dto.analytics.ProductSalesTrendResponse;
-import com.EEIT25.unicloth.service.ProductSalesAnalyticsService;
+import com.EEIT25.unicloth.dto.admin.analytics.ProductSalesResponse;
+import com.EEIT25.unicloth.dto.admin.analytics.ProductSalesTrendResponse;
+import com.EEIT25.unicloth.service.admin.ProductSalesAnalyticsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

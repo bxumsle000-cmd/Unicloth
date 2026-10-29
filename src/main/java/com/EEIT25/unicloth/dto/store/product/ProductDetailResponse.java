@@ -1,6 +1,6 @@
 package com.EEIT25.unicloth.dto.store.product;
 
-import com.EEIT25.unicloth.dto.style.StyleResponse;
+import com.EEIT25.unicloth.dto.store.style.StyleResponse;
 import com.EEIT25.unicloth.entity.Product;
 import com.EEIT25.unicloth.entity.ProductVariant;
 

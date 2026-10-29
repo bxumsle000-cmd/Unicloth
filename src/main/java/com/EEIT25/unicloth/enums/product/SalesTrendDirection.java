@@ -1,4 +1,4 @@
-package com.EEIT25.unicloth.enums;
+package com.EEIT25.unicloth.enums.product;
 
 /**
  * 商品銷量相較上一期的變化方向。

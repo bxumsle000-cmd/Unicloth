@@ -1,6 +1,6 @@
-package com.EEIT25.unicloth.dto.analytics;
+package com.EEIT25.unicloth.dto.admin.analytics;
 
-import com.EEIT25.unicloth.enums.SalesTrendDirection;
+import com.EEIT25.unicloth.enums.product.SalesTrendDirection;
 
 /**
  * 商品本期與上一期的銷售趨勢。

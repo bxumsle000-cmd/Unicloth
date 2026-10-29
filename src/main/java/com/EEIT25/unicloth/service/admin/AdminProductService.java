@@ -1,6 +1,6 @@
 package com.EEIT25.unicloth.service.admin;
 
-import com.EEIT25.unicloth.service.ProductStyleService;
+import com.EEIT25.unicloth.service.shop.ProductStyleService;
 import com.EEIT25.unicloth.dto.admin.product.AdminCategoryOptionResponse;
 import com.EEIT25.unicloth.dto.admin.product.AdminProductDetailResponse;
 import com.EEIT25.unicloth.dto.admin.product.AdminProductListResponse;
@@ -9,7 +9,7 @@ import com.EEIT25.unicloth.dto.admin.product.CreateProductVariantsRequest;
 import com.EEIT25.unicloth.dto.admin.product.UpdateProductRequest;
 import com.EEIT25.unicloth.dto.admin.product.UpdateProductStatusRequest;
 import com.EEIT25.unicloth.dto.admin.product.UpdateProductStockRequest;
-import com.EEIT25.unicloth.dto.style.StyleResponse;
+import com.EEIT25.unicloth.dto.store.style.StyleResponse;
 import com.EEIT25.unicloth.entity.Category;
 import com.EEIT25.unicloth.entity.Product;
 import com.EEIT25.unicloth.entity.ProductVariant;

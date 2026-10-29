@@ -1,6 +1,5 @@
 package com.EEIT25.unicloth.service.shop;
 
-import com.EEIT25.unicloth.service.MemberProductViewService;
 import com.EEIT25.unicloth.dto.store.category.ProductCardResponse;
 import com.EEIT25.unicloth.dto.store.product.ProductDetailResponse;
 import com.EEIT25.unicloth.entity.Product;

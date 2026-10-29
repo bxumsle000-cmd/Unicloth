@@ -1,9 +1,9 @@
-package com.EEIT25.unicloth.service;
+package com.EEIT25.unicloth.service.admin;
 
-import com.EEIT25.unicloth.dto.analytics.ProductSalesResponse;
-import com.EEIT25.unicloth.dto.analytics.ProductSalesTrendResponse;
+import com.EEIT25.unicloth.dto.admin.analytics.ProductSalesResponse;
+import com.EEIT25.unicloth.dto.admin.analytics.ProductSalesTrendResponse;
 import com.EEIT25.unicloth.enums.order.OrderStatus;
-import com.EEIT25.unicloth.enums.SalesTrendDirection;
+import com.EEIT25.unicloth.enums.product.SalesTrendDirection;
 import com.EEIT25.unicloth.repository.OrderItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;

@@ -1,6 +1,6 @@
 package com.EEIT25.unicloth.repository;
 
-import com.EEIT25.unicloth.dto.analytics.ProductSalesResponse;
+import com.EEIT25.unicloth.dto.admin.analytics.ProductSalesResponse;
 import com.EEIT25.unicloth.entity.Order;
 import com.EEIT25.unicloth.entity.OrderItem;
 import com.EEIT25.unicloth.enums.order.OrderStatus;
@@ -24,7 +24,7 @@ public interface OrderItemRepository
      * 先依售出件數排序，同件數時依銷售金額排序。
      */
     @Query("""
-            SELECT new com.EEIT25.unicloth.dto.analytics.ProductSalesResponse(
+            SELECT new com.EEIT25.unicloth.dto.admin.analytics.ProductSalesResponse(
                 product.id,
                 product.slug,
                 product.name,

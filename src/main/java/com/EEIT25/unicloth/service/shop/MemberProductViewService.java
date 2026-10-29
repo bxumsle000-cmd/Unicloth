@@ -1,4 +1,4 @@
-package com.EEIT25.unicloth.service;
+package com.EEIT25.unicloth.service.shop;
 
 import com.EEIT25.unicloth.entity.Member;
 import com.EEIT25.unicloth.entity.MemberProductView;
