@@ -1,11 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import ProductCard from "../../component/store/product/ProductCard.jsx";
 import { api, getToken, toast } from "../../js/kinu.js";
+import { CountContext } from "../../js/CountProvider.jsx";
 
 function Recommendations() {
     const navigate = useNavigate();
     const loggedIn = Boolean(getToken());
+    // 按愛心成功後通知 Header 更新數字。
+    const { refreshWishlist } = useContext(CountContext);
 
     // null 代表推薦商品仍在載入。
     const [products, setProducts] = useState(null);
@@ -80,6 +83,7 @@ function Recommendations() {
                     ? "已取消收藏"
                     : "已加入收藏"
             );
+            refreshWishlist();
         } catch (error) {
             toast(error.message, true);
         }

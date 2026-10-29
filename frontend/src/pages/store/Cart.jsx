@@ -1,10 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { HiArrowLongRight } from "react-icons/hi2";
 import { api, toast, money, fmtDate, FREE_SHIPPING_THRESHOLD, SHIPPING_FEE } from "../../js/kinu.js";
+import { CountContext } from "../../js/CountProvider.jsx";
 import CartItem from "../../component/store/CartItem.jsx";
 
 function Cart() {
+    // 改數量、移除成功後通知 Header 更新數字
+    const { refreshCart } = useContext(CountContext);
+
     const [cartItemList, setCartItemList] = useState(null);
     useEffect(() => {
         api(`/api/cart`)
@@ -48,6 +52,7 @@ function Cart() {
         try {
             await api(`/api/cart`, { method: "PATCH", body: { cartItemId: item.id, qty: qty } });
             setCartItemList(cartItemList.map((c) => (c.id === item.id ? { ...c, qty: qty } : c)));
+            refreshCart();
         } catch (e) {
             toast(e.message, true);
         }
@@ -58,6 +63,7 @@ function Cart() {
             await api(`/api/cart/${item.id}`, { method: "DELETE" });
             setCartItemList(cartItemList.filter((c) => c.id !== item.id));
             toast("已移除");
+            refreshCart();
         } catch (e) {
             toast(e.message, true);
         }

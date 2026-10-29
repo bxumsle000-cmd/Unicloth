@@ -1,10 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
 import { CiHeart } from "react-icons/ci";
 import {api, toast} from "../../js/kinu.js";
+import { CountContext } from "../../js/CountProvider.jsx";
 import WishListCard from "../../component/store/WishListCard.jsx";
 
 function Wishlist(){
+    // 取消收藏成功後通知 Header 更新數字
+    const { refreshWishlist } = useContext(CountContext);
+
     const  [wishlist,setWishlist] = useState([])
     useEffect(()=>{
         api(`/api/wishlist`).then(setWishlist);
@@ -16,6 +20,7 @@ function Wishlist(){
             await api(`/api/wishlist/${slug}`, { method: 'DELETE' });
             setWishlist(wishlist.filter((item) => item.slug !== slug));
             toast('已取消收藏');
+            refreshWishlist();
         } catch (e) {
             toast(e.message, true);
         }

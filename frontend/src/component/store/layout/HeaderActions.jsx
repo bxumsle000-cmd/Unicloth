@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import { Link, useNavigate } from "react-router-dom";
 import {
-    api,
     getToken,
     clearToken
 } from "../../../js/kinu.js";
 import { signOutFirebase } from "../../../js/firebase.js";
 import { useLanguage } from "../../../js/i18n.js";
+import { CountContext } from "../../../js/CountProvider.jsx";
 import LanguageMenu from "./LanguageMenu.jsx";
 
 /** Header 右邊：搜尋、天氣、各功能 */
@@ -29,28 +29,8 @@ function HeaderActions() {
             );
     }, []);
 
-    const [wishCount, setWishCount] = useState(0);
-
-    useEffect(() => {
-        api('/api/wishlist')
-            .then(list => setWishCount(list.length))
-            .catch(() => {});
-    }, []);
-
-    const [cartCount, setCartCount] = useState(0);
-
-    useEffect(() => {
-        api('/api/cart')
-            .then(cartItemList =>
-                setCartCount(
-                    cartItemList.reduce(
-                        (sum, item) => sum + item.qty,
-                        0
-                    )
-                )
-            )
-            .catch(() => {});
-    }, []);
+    // 收藏、購物車數量放在 CountProvider，別的頁面改了會通知這裡更新
+    const { wishCount, cartCount } = useContext(CountContext);
 
     // 搜尋：按 Enter 送出表單，關鍵字放在網址上（重新整理、上一頁都還在）
     const [keyword, setKeyword] = useState("");

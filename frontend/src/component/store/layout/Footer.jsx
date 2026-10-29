@@ -12,8 +12,8 @@ function Footer() {
                     <div className="mt-2.5 text-[9px] tracking-[.08em] text-[#a5a09a]">EVERYDAY, BEAUTIFULLY.</div>
                 </div>
                 <div className="flex gap-[38px] text-[9px] tracking-[.1em] max-[760px]:mt-[30px] max-[760px]:flex-wrap max-[760px]:gap-[18px]">
-                    <a href="#">{t('shippingReturns')}</a>
-                    <a href="#">{t('faq')}</a>
+                    <a href="/shipping-returns">{t('shippingReturns')}</a>
+                    <a href="/faq">{t('faq')}</a>
                     <a href="/support">{t('contactUs')}</a>
                     <a href="#">Instagram ↗</a>
                 </div>

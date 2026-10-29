@@ -12,7 +12,7 @@ export const LANGUAGES = [
 export const DICTIONARY = {
     zh: {
         // Header
-        topBanner: '全館滿 NT$2,500，享免運服務 · 新會員首購 95 折',
+        topBanner: '全館滿 NT$2,500，享免運服務',
         newArrivals: '新品',
         women: '女裝',
         men: '男裝',
@@ -51,7 +51,7 @@ export const DICTIONARY = {
     },
     en: {
         // Header
-        topBanner: 'FREE SHIPPING ON ORDERS OVER NT$2,500 · NEW MEMBERS 5% OFF FIRST ORDER',
+        topBanner: 'FREE SHIPPING ON ORDERS OVER NT$2,500',
         newArrivals: 'NEW',
         women: 'WOMEN',
         men: 'MEN',
@@ -90,7 +90,7 @@ export const DICTIONARY = {
     },
     ja: {
         // Header
-        topBanner: 'NT$2,500以上のご購入で送料無料 · 新規会員様は初回5%OFF',
+        topBanner: 'NT$2,500以上のご購入で送料無料',
         newArrivals: '新着',
         women: 'ウィメンズ',
         men: 'メンズ',
@@ -129,7 +129,7 @@ export const DICTIONARY = {
     },
     ko: {
         // Header
-        topBanner: 'NT$2,500 이상 구매 시 무료 배송 · 신규 회원 첫 구매 5% 할인',
+        topBanner: 'NT$2,500 이상 구매 시 무료 배송',
         newArrivals: '신상품',
         women: '여성',
         men: '남성',

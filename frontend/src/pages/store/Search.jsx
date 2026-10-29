@@ -1,5 +1,6 @@
 import { api, toast } from "../../js/kinu.js";
-import { useState, useEffect } from "react";
+import { CountContext } from "../../js/CountProvider.jsx";
+import { useState, useEffect, useContext } from "react";
 import { useSearchParams } from "react-router-dom";
 import ProductCard from "../../component/store/product/ProductCard.jsx";
 import SortSelect from "../../component/store/product/SortSelect.jsx";
@@ -9,6 +10,9 @@ function Search() {
     // 關鍵字從網址讀：/search?keyword=外套
     const [searchParams] = useSearchParams();
     const keyword = (searchParams.get("keyword") || "").trim();
+
+    // 按愛心成功後通知 Header 更新數字
+    const { refreshWishlist } = useContext(CountContext);
 
     // 已收藏的商品 slug；進頁面抓一次就好，換頁、換排序都不會變
     const [likedSet, setLikedSet] = useState(new Set());
@@ -29,6 +33,7 @@ function Search() {
             {next.add(slug);}
             setLikedSet(next);
             toast(liked ? '已取消收藏' : '已加入收藏');
+            refreshWishlist();
         } catch (e) {
             toast(e.message, true);
         }

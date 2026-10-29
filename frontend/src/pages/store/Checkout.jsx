@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 
 import {
@@ -11,6 +11,7 @@ import {
   SHIPPING_OPTIONS,
   PAYMENT_OPTIONS,
 } from "../../js/kinu.js";
+import { CountContext } from "../../js/CountProvider.jsx";
 
 const inputClass =
   "w-full border-b border-[#d6d0c7] bg-transparent py-2 text-[14px] tracking-[.04em] outline-none focus:border-black";
@@ -111,6 +112,7 @@ function RadioGroup({ name, options, value, onChange }) {
 function Checkout() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { refreshCart } = useContext(CountContext);
 
   // 購物車頁帶過來的折價券
   const coupon = location.state?.coupon ?? null;
@@ -247,6 +249,9 @@ function Checkout() {
 
       // 記住已建立的訂單，避免之後重複下單
       setCreatedOrder(order);
+
+      // 結帳的商品已從購物車移除，通知 Header 更新數字
+      refreshCart();
 
       // 貨到付款：維持原本訂單完成流程
       if (form.paymentMethod === "COD") {
