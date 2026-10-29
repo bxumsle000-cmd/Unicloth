@@ -1,5 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
+import { clearToken } from './kinu.js';
 
 /**
  * Firebase 設定：值來自 frontend/.env（全組共用，有進 git）；想換成自己的專案可以用 .env.local 覆蓋。
@@ -45,4 +46,14 @@ export async function getGoogleName() {
  */
 export async function signOutFirebase() {
     if (auth) await signOut(auth);
+}
+
+/**
+ * 會員登出：JWT 後端不記狀態，前端把 token 刪掉就等於登出；
+ * 整頁重新載入讓各處的數量（收藏、購物車）歸零。
+ */
+export async function logoutMember() {
+    clearToken();
+    await signOutFirebase().catch(() => {});
+    window.location.href = '/';
 }

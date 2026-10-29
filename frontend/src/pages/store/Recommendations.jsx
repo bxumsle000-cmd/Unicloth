@@ -113,7 +113,7 @@ function Recommendations() {
                 <Link
                     to={
                         loggedIn
-                            ? "/recommendation-settings"
+                            ? "/member/recommendation-settings"
                             : "/login"
                     }
                     className="shrink-0 border-b border-[#76716c] pb-1 text-[10px] tracking-[.08em] text-[#76716c]"
