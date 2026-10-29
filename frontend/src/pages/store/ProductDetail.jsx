@@ -1,14 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { CiHeart } from "react-icons/ci";
 import { IoHeart } from "react-icons/io5";
 import { HiArrowLongRight } from "react-icons/hi2";
 import { api, getToken, toast, money, imgSrc, FREE_SHIPPING_THRESHOLD, SHIPPING_FEE } from "../../js/kinu.js";
+import { CountContext } from "../../js/CountProvider.jsx";
 import Accordion from "../../component/store/product/Accordion.jsx";
 
 function ProductDetail() {
     const slug = useParams().slug;
     const navigate = useNavigate();
+    // 加入購物車、按愛心成功後通知 Header 更新數字
+    const { refreshCart, refreshWishlist } = useContext(CountContext);
 
     const [product, setProduct] = useState(null);
     const [notFound, setNotFound] = useState(false);
@@ -80,6 +83,7 @@ function ProductDetail() {
         try {
             await api('/api/cart', { method: 'POST', body: { variantId: sizeOption.variantId, qty: qty } });
             toast('已加入購物車');
+            refreshCart();
         } catch (e) {
             toast(e.message, true);
         }
@@ -91,6 +95,7 @@ function ProductDetail() {
             await api(`/api/wishlist/${slug}`, { method: liked ? 'DELETE' : 'POST' });
             setLiked(!liked);
             toast(liked ? '已取消收藏' : '已加入收藏');
+            refreshWishlist();
         } catch (e) {
             toast(e.message, true);
         }

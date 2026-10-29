@@ -12,6 +12,8 @@ import OrderComplete from "./pages/store/OrderComplete.jsx";
 import Search from "./pages/store/Search.jsx";
 import Orders from "./pages/store/Orders.jsx";
 import Support from "./pages/store/Support.jsx";
+import ShippingReturns from "./pages/store/ShippingReturns.jsx";
+import Faq from "./pages/store/Faq.jsx";
 import Login from "./pages/store/Login.jsx";
 import CompleteProfile from "./pages/store/CompleteProfile.jsx";
 import ProfileGuard from "./component/guard/ProfileGuard.jsx";
@@ -20,6 +22,7 @@ import NewArrivals from "./pages/store/NewArrivals.jsx";
 import Recommendations from "./pages/store/Recommendations.jsx";
 import RecommendationSettings from "./pages/store/RecommendationSettings.jsx";
 import { LanguageProvider } from "./js/LanguageProvider.jsx";
+import { CountProvider } from "./js/CountProvider.jsx";
 import AdminLogin from "./pages/admin/AdminLogin.jsx";
 import ProductDepartmentHome from "./pages/admin/ProductDepartmentHome.jsx";
 import OrderHome from "./pages/admin/OrderHome.jsx";
@@ -28,38 +31,44 @@ import MktHome from "./pages/admin/MktHome.jsx";
 import AdminHome from "./pages/admin/AdminHome.jsx";
 
 // 前台：上面 Header、下面 Footer，中間依網址換頁
+// CountProvider 只包前台：Header 的收藏、購物車數字要讓各頁面都能通知更新
 function StoreLayout(){
     return (
-        <div className="flex min-h-screen flex-col">
-            <Header/>
-            <main className="flex-1">
-                <ProfileGuard>
-                    <Routes>
-                        <Route path="/" element={<Home/>}/>
-                        {/* 新品頁只顯示目前上架且勾選新品標籤的商品。 */}
-                        <Route path="/new-arrivals" element={<NewArrivals/>}/>
-                        <Route path="/category/:code" element={<Category/>}/>
-                        <Route path="/wishlist/" element={<RequireLogin><Wishlist/></RequireLogin>}/>
-                        <Route path="/product/:slug" element={<ProductDetail/>}/>
-                        <Route path="/coupons" element={<RequireLogin><Coupons/></RequireLogin>}/>
-                        <Route path="/cart" element={<RequireLogin><Cart/></RequireLogin>}/>
-                        <Route path="/checkout" element={<RequireLogin><Checkout/></RequireLogin>}/>
-                        <Route path="/order-complete" element={<OrderComplete/>}/>
-                        <Route path="/search" element={<Search/>}/>
-                        <Route path="/orders" element={<RequireLogin><Orders/></RequireLogin>}/>
-                        {/* 客服單目前必須登入才能建立，規則與後端 SecurityConfig 一致。 */}
-                        <Route path="/support" element={<RequireLogin><Support/></RequireLogin>}/>
-                        {/* 訪客看熱門商品，登入會員則取得個人化推薦。 */}
-                        <Route path="/recommendations" element={<Recommendations/>}/>
-                        {/* 推薦設定包含會員瀏覽紀錄管理，必須登入才能使用。 */}
-                        <Route path="/recommendation-settings" element={<RequireLogin><RecommendationSettings/></RequireLogin>}/>
-                        <Route path="/login" element={<Login/>}/>
-                        <Route path="/complete-profile" element={<CompleteProfile/>}/>
-                    </Routes>
-                </ProfileGuard>
-            </main>
-            <Footer/>
-        </div>
+        <CountProvider>
+            <div className="flex min-h-screen flex-col">
+                <Header/>
+                <main className="flex-1">
+                    <ProfileGuard>
+                        <Routes>
+                            <Route path="/" element={<Home/>}/>
+                            {/* 新品頁只顯示目前上架且勾選新品標籤的商品。 */}
+                            <Route path="/new-arrivals" element={<NewArrivals/>}/>
+                            <Route path="/category/:code" element={<Category/>}/>
+                            <Route path="/wishlist/" element={<RequireLogin><Wishlist/></RequireLogin>}/>
+                            <Route path="/product/:slug" element={<ProductDetail/>}/>
+                            <Route path="/coupons" element={<RequireLogin><Coupons/></RequireLogin>}/>
+                            <Route path="/cart" element={<RequireLogin><Cart/></RequireLogin>}/>
+                            <Route path="/checkout" element={<RequireLogin><Checkout/></RequireLogin>}/>
+                            <Route path="/order-complete" element={<OrderComplete/>}/>
+                            <Route path="/search" element={<Search/>}/>
+                            <Route path="/orders" element={<RequireLogin><Orders/></RequireLogin>}/>
+                            {/* 客服單目前必須登入才能建立，規則與後端 SecurityConfig 一致。 */}
+                            <Route path="/support" element={<RequireLogin><Support/></RequireLogin>}/>
+                            {/* 配送與退貨、常見問題是純說明頁，訪客也能看。 */}
+                            <Route path="/shipping-returns" element={<ShippingReturns/>}/>
+                            <Route path="/faq" element={<Faq/>}/>
+                            {/* 訪客看熱門商品，登入會員則取得個人化推薦。 */}
+                            <Route path="/recommendations" element={<Recommendations/>}/>
+                            {/* 推薦設定包含會員瀏覽紀錄管理，必須登入才能使用。 */}
+                            <Route path="/recommendation-settings" element={<RequireLogin><RecommendationSettings/></RequireLogin>}/>
+                            <Route path="/login" element={<Login/>}/>
+                            <Route path="/complete-profile" element={<CompleteProfile/>}/>
+                        </Routes>
+                    </ProfileGuard>
+                </main>
+                <Footer/>
+            </div>
+        </CountProvider>
     )
 }
 

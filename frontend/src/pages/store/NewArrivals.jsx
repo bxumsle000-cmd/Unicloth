@@ -1,13 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import ProductCard from "../../component/store/product/ProductCard.jsx";
 import SortSelect from "../../component/store/product/SortSelect.jsx";
 import Pagination from "../../component/common/Pagination.jsx";
 import { api, getToken, toast } from "../../js/kinu.js";
+import { CountContext } from "../../js/CountProvider.jsx";
 
 function NewArrivals() {
     const navigate = useNavigate();
     const loggedIn = Boolean(getToken());
+    // 按愛心成功後通知 Header 更新數字。
+    const { refreshWishlist } = useContext(CountContext);
 
     // 已收藏的商品 slug；訪客不呼叫會員收藏 API。
     const [likedSet, setLikedSet] = useState(new Set());
@@ -59,6 +62,7 @@ function NewArrivals() {
                     ? "已取消收藏"
                     : "已加入收藏"
             );
+            refreshWishlist();
         } catch (error) {
             toast(error.message, true);
         }
