@@ -51,13 +51,10 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 // CSRF 是防「瀏覽器自動帶 Cookie」的攻擊；JWT 放在 Authorization header，瀏覽器不會自動帶，所以關掉
-                .csrf(csrf -> csrf.disable())
                 // STATELESS：不建立 HttpSession，每個請求只靠自己帶的 JWT 證明身分
+                .csrf(csrf -> csrf.disable())
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                // 登入走自己的 /api/auth/firebase，不需要 Security 內建的登入頁與 Basic 認證視窗
-                .formLogin(form -> form.disable())
-                .httpBasic(basic -> basic.disable())
 
                 // 沒登入 → 401；登入了但授權規則不通過（會員沒補填資料、身分不對）→ 403
                 .exceptionHandling(ex -> ex
