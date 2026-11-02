@@ -63,8 +63,7 @@ public class SecurityConfig {
 
                 // 授權規則：由上往下比對，第一條符合的生效，所以「放行」要寫在「要登入」前面
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST,
-                                "/api/auth/firebase", "/api/auth/logout").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/firebase", "/api/auth/logout").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/admin/auth/login").permitAll()
                         // 商品、分類、風格與推薦允許訪客查詢
                         .requestMatchers(
@@ -93,7 +92,7 @@ public class SecurityConfig {
                         // 用 hasRole("MEMBER") 而不是 authenticated()：員工 token 也算「已登入」，但不能用會員功能
                         .requestMatchers(HttpMethod.GET, "/api/member/me").hasRole("MEMBER")
                         .requestMatchers(HttpMethod.PUT, "/api/member/me/complete-profile").hasRole("MEMBER")
-                        // 新增的 API 只要放在 /api 底下，預設就是要登入「而且」補填過資料（員工 token 在這裡也會被擋）
+                        // 剩下的 API 只要放在 /api 底下，預設就是要登入「而且」補填過資料（員工 token 在這裡也會被擋）
                         .requestMatchers("/api/**").access(profileCompleted())
                         // 圖片、影片、Swagger、/error 等
                         .anyRequest().permitAll()
