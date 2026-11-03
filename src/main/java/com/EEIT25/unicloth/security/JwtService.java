@@ -67,20 +67,6 @@ public class JwtService {
     }
 
     /**
-     * 驗證 token（簽章、是否過期）並取出會員 id；員工的 token 不能當會員用，一樣丟例外。
-     *
-     * @param token 前端帶來的 token（不含 "Bearer " 前綴）
-     * @throws JwtException 簽章錯誤、格式錯誤、已過期、是員工 token 等任何驗證失敗的情況
-     */
-    public Long parseMemberId(String token) throws JwtException {
-        ParsedToken parsed = parse(token);
-        if (parsed.staff()) {
-            throw new MalformedJwtException("這是員工的 token，不是會員的");
-        }
-        return parsed.id();
-    }
-
-    /**
      * 驗證 token（簽章、是否過期），並分辨是會員還是員工的 token。
      * 沒有 dept 的就是會員 token（加上員工功能之前發出去的 token 也都沒有 dept，所以不受影響）。
      *
@@ -114,6 +100,20 @@ public class JwtService {
             // 不認識的部門名稱（例如 enum 改名了）當成無效 token
             throw new MalformedJwtException("員工 token 裡有不認識的部門：" + departmentName, e);
         }
+    }
+
+    /**
+     * 驗證 token（簽章、是否過期）並取出會員 id；員工的 token 不能當會員用，一樣丟例外。
+     *
+     * @param token 前端帶來的 token（不含 "Bearer " 前綴）
+     * @throws JwtException 簽章錯誤、格式錯誤、已過期、是員工 token 等任何驗證失敗的情況
+     */
+    public Long parseMemberId(String token) throws JwtException {
+        ParsedToken parsed = parse(token);
+        if (parsed.staff()) {
+            throw new MalformedJwtException("這是員工的 token，不是會員的");
+        }
+        return parsed.id();
     }
 
     /**
