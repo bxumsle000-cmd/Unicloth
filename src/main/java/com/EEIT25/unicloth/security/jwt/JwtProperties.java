@@ -1,4 +1,4 @@
-package com.EEIT25.unicloth.security;
+package com.EEIT25.unicloth.security.jwt;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

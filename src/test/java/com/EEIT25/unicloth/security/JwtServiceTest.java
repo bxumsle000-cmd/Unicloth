@@ -1,6 +1,8 @@
 package com.EEIT25.unicloth.security;
 
 import com.EEIT25.unicloth.enums.staff.Department;
+import com.EEIT25.unicloth.security.jwt.JwtProperties;
+import com.EEIT25.unicloth.security.jwt.JwtService;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;

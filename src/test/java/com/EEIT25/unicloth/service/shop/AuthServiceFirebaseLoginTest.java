@@ -8,7 +8,7 @@ import com.EEIT25.unicloth.exception.ApiException;
 import com.EEIT25.unicloth.repository.MemberRepository;
 import com.EEIT25.unicloth.security.FirebaseTokenVerifier;
 import com.EEIT25.unicloth.security.FirebaseTokenVerifier.FirebaseUser;
-import com.EEIT25.unicloth.security.JwtService;
+import com.EEIT25.unicloth.security.jwt.JwtService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

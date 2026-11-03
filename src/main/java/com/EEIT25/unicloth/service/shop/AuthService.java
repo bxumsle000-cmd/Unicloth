@@ -9,7 +9,7 @@ import com.EEIT25.unicloth.repository.MemberProfileRepository;
 import com.EEIT25.unicloth.repository.MemberRepository;
 import com.EEIT25.unicloth.security.FirebaseTokenVerifier;
 import com.EEIT25.unicloth.security.FirebaseTokenVerifier.FirebaseUser;
-import com.EEIT25.unicloth.security.JwtService;
+import com.EEIT25.unicloth.security.jwt.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

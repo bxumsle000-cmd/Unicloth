@@ -3,6 +3,7 @@ package com.EEIT25.unicloth.security;
 import com.EEIT25.unicloth.exception.ApiException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -39,9 +40,12 @@ public class FirebaseTokenVerifier {
     // 沒設定 projectId 時是 null
     private final NimbusJwtDecoder decoder;
 
+    /**
+     * @param projectId 讀 application.yml 的 firebase.project-id；沒設定時是空字串，Google 登入會回 503，其他功能不受影響
+     */
     @Autowired
-    public FirebaseTokenVerifier(FirebaseProperties props) {
-        this(props.projectId(), NimbusJwtDecoder.withJwkSetUri(JWK_SET_URI).build());
+    public FirebaseTokenVerifier(@Value("${firebase.project-id:}") String projectId) {
+        this(projectId, NimbusJwtDecoder.withJwkSetUri(JWK_SET_URI).build());
     }
 
     /** 測試用：換成用自己產生的公鑰驗簽章的 decoder */

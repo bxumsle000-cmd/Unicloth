@@ -72,7 +72,7 @@ jwt:
   expiration-ms: 86400000
 
 # ============================== Firebase 登入 ==============================
-# 以下是專案自訂的設定，由 FirebaseProperties 讀取
+# 以下是專案自訂的設定，由 FirebaseTokenVerifier 用 @Value 讀取
 firebase:
   # Firebase 專案 ID（Firebase Console → 專案設定 → 一般 → 專案 ID），用來驗證前端送來的 ID token。
   # 不是機密，全組共用 kinu-62cd9；想換成自己的專案測試，用環境變數 FIREBASE_PROJECT_ID 覆蓋。

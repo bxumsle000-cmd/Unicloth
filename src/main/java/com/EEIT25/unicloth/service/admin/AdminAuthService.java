@@ -9,7 +9,7 @@ import com.EEIT25.unicloth.enums.staff.StaffStatus;
 import com.EEIT25.unicloth.exception.ApiException;
 import com.EEIT25.unicloth.repository.StaffRepository;
 import com.EEIT25.unicloth.security.CurrentStaff;
-import com.EEIT25.unicloth.security.JwtService;
+import com.EEIT25.unicloth.security.jwt.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
