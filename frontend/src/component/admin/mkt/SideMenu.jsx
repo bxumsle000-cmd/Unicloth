@@ -2,7 +2,7 @@ import { useState } from "react";
 
 // 側邊選單的大類和底下的子頁面；page.key 要跟 MktHome 切換頁面用的值一樣
 const MENU_GROUPS = [
-    { key: 'coupon', name: 'Coupon', pages: [
+    { key: 'coupon', name: '折價券', pages: [
         { key: 'coupon',  name: '折價券' },
         { key: 'issue',   name: '發券給會員' },
         { key: 'records', name: '發券紀錄' },
