@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ADMIN_ACCOUNT_KEY, ADMIN_DEPT_KEY, ADMIN_NAME_KEY, ADMIN_TOKEN_KEY, DEPARTMENTS } from "../../js/admin.js";
-import { api, toast } from "../../js/kinu.js";
+import { api } from "../../js/api.js";
+import { toast } from "../../js/toast.js";
 
 // 測試用員工帳號（資料來自 db/migration 的 V5、V8），密碼都是 Test1234；只在開發模式（npm run dev）顯示在畫面上
 const TEST_ACCOUNTS = { PRODUCT: 'product01', ORDER: 'order01', CS: 'cs01', MKT: 'mkt01', ADMIN: 'sys01' };

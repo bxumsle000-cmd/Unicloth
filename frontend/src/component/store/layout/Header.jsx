@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { MdClose, MdMenu } from "react-icons/md";
-import { api } from "../../../js/kinu.js";
+import { api } from "../../../js/api.js";
 import MegaMenu from "./MegaMenu.jsx";
 import MobileMenu from "./MobileMenu.jsx";
 import HeaderActions from "./HeaderActions.jsx";

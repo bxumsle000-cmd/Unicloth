@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { api, getToken, clearToken } from "../../js/kinu.js";
+import { api } from "../../js/api.js";
+import { getToken, clearToken } from "../../js/auth.js";
 import { signOutFirebase } from "../../js/firebase.js";
 
 /**

@@ -41,14 +41,14 @@ public class AuthService {
 
         Member member = memberRepository.findByFirebaseUid(firebaseUser.uid()).orElse(null);
         if (member == null) {
-            if (!StringUtils.hasText(firebaseUser.email())) {
+            if (firebaseUser.email() == null || firebaseUser.email().isBlank()) {
                 throw ApiException.badRequest("這個 Google 帳號沒有提供 email，無法登入");
             }
 
             member = memberRepository.findByEmail(firebaseUser.email()).orElse(null);
             if (member != null) {
                 // email 沒驗證過，或這個帳號已經綁了別的 Google 帳號，都不能綁，避免被別人冒用
-                if (!firebaseUser.emailVerified() || member.getFirebaseUid() != null) {
+                    if (!firebaseUser.emailVerified() || member.getFirebaseUid() != null) {
                     throw ApiException.conflict("此email已經註冊過");
                 }
                 member.setFirebaseUid(firebaseUser.uid());

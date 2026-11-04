@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { adminApi } from "../../../js/admin.js";
-import { toast } from "../../../js/kinu.js";
+import { toast } from "../../../js/toast.js";
 
 /**
  * 選會員：搜尋會員、複選，顯示已選幾位（選「指定會員」才顯示）

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MdAdd } from "react-icons/md";
 import { ADMIN_ACCOUNT_KEY, ADMIN_TOKEN_KEY, DEPARTMENTS, adminApi } from "../../js/admin.js";
-import { toast } from "../../js/kinu.js";
+import { toast } from "../../js/toast.js";
 import Pagination from "../../component/common/Pagination.jsx";
 import AdminHeader from "../../component/admin/shared/AdminHeader.jsx";
 import StaffTable from "../../component/admin/staff/StaffTable.jsx";

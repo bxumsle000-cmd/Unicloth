@@ -3,7 +3,11 @@ import { useParams, useNavigate } from "react-router-dom";
 import { CiHeart } from "react-icons/ci";
 import { IoHeart } from "react-icons/io5";
 import { HiArrowLongRight } from "react-icons/hi2";
-import { api, getToken, toast, money, imgSrc, FREE_SHIPPING_THRESHOLD, SHIPPING_FEE } from "../../js/kinu.js";
+import { api } from "../../js/api.js";
+import { getToken } from "../../js/auth.js";
+import { toast } from "../../js/toast.js";
+import { money, imgSrc } from "../../js/format.js";
+import { FREE_SHIPPING_THRESHOLD, SHIPPING_FEE } from "../../js/checkout.js";
 import { CountContext } from "../../js/CountProvider.jsx";
 import Accordion from "../../component/store/product/Accordion.jsx";
 

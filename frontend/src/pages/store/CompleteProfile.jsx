@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
-import { api, getToken, toast } from "../../js/kinu.js";
+import { api } from "../../js/api.js";
+import { getToken } from "../../js/auth.js";
+import { toast } from "../../js/toast.js";
 import { getGoogleName } from "../../js/firebase.js";
 
 const inputClass = "w-full border-b border-[#d6d0c7] bg-transparent py-2 text-[14px] tracking-[.04em] outline-none focus:border-black";

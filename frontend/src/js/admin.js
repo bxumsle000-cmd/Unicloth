@@ -1,9 +1,9 @@
 /**
  * 後台共用的東西。
- * 員工的 token 跟會員的 token（kinu.js 的 'token'）分開存：
+ * 員工的 token 跟會員的 token（auth.js 的 'token'）分開存：
  * 員工 token 不能打會員 API，混在一起的話前台 Header 會以為會員登入了。
  */
-import { api } from "./kinu.js";
+import { api } from "./api.js";
 
 // 五個部門：key 要跟後端 enum Department 一樣（登入時直接送給後端），name 是畫面上顯示的名字
 export const DEPARTMENTS = [
@@ -77,7 +77,7 @@ export function fmtDate(s) {
     return String(s).replace(/-/g, '/');
 }
 
-/** 呼叫後台 API：跟 kinu.js 的 api() 一樣，只是帶的是員工 token */
+/** 呼叫後台 API：跟 api.js 的 api() 一樣，只是帶的是員工 token */
 export function adminApi(path, options = {}) {
     return api(path, { ...options, token: getAdminToken() });
 }

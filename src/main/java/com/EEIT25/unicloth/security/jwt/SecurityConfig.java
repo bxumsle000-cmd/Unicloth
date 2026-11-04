@@ -42,7 +42,7 @@ public class SecurityConfig {
     private final JwtService jwtService;
     private final MemberProfileRepository memberProfileRepository;
 
-    /** 跟 GlobalExceptionHandler 回的格式一樣，前端 kinu.js 會讀 message 顯示 */
+    /** 跟 GlobalExceptionHandler 回的格式一樣，前端 api.js 會讀 message 顯示 */
     private static final String UNAUTHORIZED_BODY = "{\"code\":401,\"message\":\"尚未登入或登入已失效\"}";
     private static final String PROFILE_REQUIRED_BODY = "{\"code\":403,\"message\":\"請先填寫會員資料\"}";
     private static final String FORBIDDEN_BODY = "{\"code\":403,\"message\":\"沒有權限使用這個功能\"}";

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { imgSrc } from "../../../js/kinu.js";
+import { imgSrc } from "../../../js/format.js";
 import { useLanguage } from "../../../js/i18n.js";
 
 /**

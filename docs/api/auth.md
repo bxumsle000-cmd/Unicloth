@@ -89,5 +89,5 @@
 
 **後端什麼都沒做**，方法是空的，呼叫一定回 204。
 JWT 是「無狀態」的：後端不記錄發過哪些 token，所以也沒辦法讓某一張 token 失效。
-登出就是前端把 localStorage 裡的 token 刪掉（`kinu.js` 的 `clearToken()`），沒有 token 就等於沒登入。
+登出就是前端把 localStorage 裡的 token 刪掉（`auth.js` 的 `clearToken()`），沒有 token 就等於沒登入。
 被複製走的 token 在過期前（1 天）還是能用，這是 JWT 的取捨。

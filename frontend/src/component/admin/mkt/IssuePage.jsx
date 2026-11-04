@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { adminApi, fmtDateTime } from "../../../js/admin.js";
-import { toast } from "../../../js/kinu.js";
+import { toast } from "../../../js/toast.js";
 import IssueForm from "./IssueForm.jsx";
 import ScheduleTable from "./ScheduleTable.jsx";
 

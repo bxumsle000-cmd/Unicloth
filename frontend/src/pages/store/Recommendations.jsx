@@ -1,7 +1,9 @@
 import { useEffect, useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import ProductCard from "../../component/store/product/ProductCard.jsx";
-import { api, getToken, toast } from "../../js/kinu.js";
+import { api } from "../../js/api.js";
+import { getToken } from "../../js/auth.js";
+import { toast } from "../../js/toast.js";
 import { CountContext } from "../../js/CountProvider.jsx";
 
 function Recommendations() {

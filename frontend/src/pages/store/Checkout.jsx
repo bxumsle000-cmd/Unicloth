@@ -1,16 +1,15 @@
 import { useState, useEffect, useRef, useContext } from "react";
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 
+import { api } from "../../js/api.js";
+import { toast } from "../../js/toast.js";
+import { money, imgSrc } from "../../js/format.js";
 import {
-  api,
-  toast,
-  money,
-  imgSrc,
   FREE_SHIPPING_THRESHOLD,
   SHIPPING_FEE,
   SHIPPING_OPTIONS,
   PAYMENT_OPTIONS,
-} from "../../js/kinu.js";
+} from "../../js/checkout.js";
 import { CountContext } from "../../js/CountProvider.jsx";
 
 const inputClass =

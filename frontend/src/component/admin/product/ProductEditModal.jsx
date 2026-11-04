@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { getAdminToken } from "../../../js/admin.js";
-import { money, toast } from "../../../js/kinu.js";
+import { money } from "../../../js/format.js";
+import { toast } from "../../../js/toast.js";
 import ProductStyleSelector from "./ProductStyleSelector.jsx";
 
 const EMPTY_FORM = {

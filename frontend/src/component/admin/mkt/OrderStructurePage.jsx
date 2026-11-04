@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { SALES_RANGE_OPTIONS, adminApi, fmtDate } from "../../../js/admin.js";
-import { toast } from "../../../js/kinu.js";
+import { toast } from "../../../js/toast.js";
 import ToggleButtons from "./ToggleButtons.jsx";
 import SalesFilterBar from "./SalesFilterBar.jsx";
 import SalesStatCards from "./SalesStatCards.jsx";

@@ -6,7 +6,8 @@ import ProductBatchActionBar from "../../component/admin/product/ProductBatchAct
 import ProductCreateModal from "../../component/admin/product/ProductCreateModal.jsx";
 import ProductEditModal from "../../component/admin/product/ProductEditModal.jsx";
 import { getAdminToken } from "../../js/admin.js";
-import { imgSrc, money, toast } from "../../js/kinu.js";
+import { imgSrc, money } from "../../js/format.js";
+import { toast } from "../../js/toast.js";
 
 const PAGE_SIZE = 20;
 

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { adminApi } from "../../../js/admin.js";
-import { imgSrc, toast } from "../../../js/kinu.js";
+import { imgSrc } from "../../../js/format.js";
+import { toast } from "../../../js/toast.js";
 import Pagination from "../../common/Pagination.jsx";
 import ToggleButtons from "./ToggleButtons.jsx";
 

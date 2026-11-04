@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { adminApi } from "../../../js/admin.js";
-import { toast } from "../../../js/kinu.js";
+import { toast } from "../../../js/toast.js";
 import Modal from "../shared/Modal.jsx";
 
 const lineButtonClass = "border border-line px-4 py-2.5 text-[12px] tracking-[.12em] hover:border-black";

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { adminApi, discountText } from "../../../js/admin.js";
-import { toast } from "../../../js/kinu.js";
+import { toast } from "../../../js/toast.js";
 import MemberPicker from "./MemberPicker.jsx";
 
 const inputClass = "border border-line bg-paper px-3 py-2.5 text-[14px] outline-none focus:border-black";

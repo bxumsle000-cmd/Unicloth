@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { api, toast } from "../../js/kinu.js";
+import { api } from "../../js/api.js";
+import { toast } from "../../js/toast.js";
 
 const inputClass = "w-full border-b border-[#d6d0c7] bg-transparent py-2 text-[14px] tracking-[.04em] outline-none focus:border-black";
 

@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from 'react'
 import { Link, useNavigate } from "react-router-dom";
-import { getToken } from "../../../js/kinu.js";
+import { getToken } from "../../../js/auth.js";
 import { useLanguage } from "../../../js/i18n.js";
 import { CountContext } from "../../../js/CountProvider.jsx";
 import LanguageMenu from "./LanguageMenu.jsx";

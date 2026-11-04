@@ -3,7 +3,9 @@ import { useNavigate } from "react-router-dom";
 import ProductCard from "../../component/store/product/ProductCard.jsx";
 import SortSelect from "../../component/store/product/SortSelect.jsx";
 import Pagination from "../../component/common/Pagination.jsx";
-import { api, getToken, toast } from "../../js/kinu.js";
+import { api } from "../../js/api.js";
+import { getToken } from "../../js/auth.js";
+import { toast } from "../../js/toast.js";
 import { CountContext } from "../../js/CountProvider.jsx";
 
 function NewArrivals() {

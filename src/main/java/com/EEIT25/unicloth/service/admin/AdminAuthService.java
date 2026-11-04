@@ -50,7 +50,6 @@ public class AdminAuthService {
             throw ApiException.forbidden("此帳號不屬於「" + request.department().getLabel() + "」，請改選其他部門");
         }
 
-        // @Transactional 裡改 Entity 的欄位，交易結束時會自動 UPDATE，不用再呼叫 save
         staff.setLastLoginAt(LocalDateTime.now());
 
         return new StaffLoginResponse(

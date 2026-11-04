@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { api, toast } from "../../js/kinu.js";
+import { api } from "../../js/api.js";
+import { toast } from "../../js/toast.js";
 
 function RecommendationSettings() {
     const [clearing, setClearing] = useState(false);

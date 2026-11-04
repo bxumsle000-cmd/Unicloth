@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { COUPON_TRIGGERS, adminApi } from "../../../js/admin.js";
-import { toast } from "../../../js/kinu.js";
+import { toast } from "../../../js/toast.js";
 import Modal from "../shared/Modal.jsx";
 
 const inputClass = "border border-line bg-paper px-3 py-2.5 text-[14px] outline-none focus:border-black";

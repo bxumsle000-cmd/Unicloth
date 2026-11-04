@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { adminApi } from "../../../js/admin.js";
-import { toast } from "../../../js/kinu.js";
+import { toast } from "../../../js/toast.js";
 import CouponTable from "./CouponTable.jsx";
 import CouponCreateModal from "./CouponCreateModal.jsx";
 import CouponEditModal from "./CouponEditModal.jsx";

@@ -1,4 +1,5 @@
-import { api, toast } from "../../js/kinu.js";
+import { api } from "../../js/api.js";
+import { toast } from "../../js/toast.js";
 import { CountContext } from "../../js/CountProvider.jsx";
 import { useState, useEffect, useContext } from "react";
 import { useSearchParams } from "react-router-dom";

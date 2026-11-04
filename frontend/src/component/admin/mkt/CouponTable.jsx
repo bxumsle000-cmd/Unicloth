@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { COUPON_TRIGGERS, discountText } from "../../../js/admin.js";
-import { money } from "../../../js/kinu.js";
+import { money } from "../../../js/format.js";
 
 const smallButtonClass = "ml-2 border border-line px-2.5 py-1 text-[12px] hover:border-black";
 const filterClass = "border border-line bg-white px-3 py-2 text-[13px] outline-none focus:border-black";

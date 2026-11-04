@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { COUPON_SOURCES, MEMBER_COUPON_STATUSES, adminApi } from "../../../js/admin.js";
-import { toast } from "../../../js/kinu.js";
+import { toast } from "../../../js/toast.js";
 import RecordTable from "./RecordTable.jsx";
 
 const filterClass = "border border-line bg-white px-3 py-2 text-[13px] outline-none focus:border-black";

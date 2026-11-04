@@ -1,5 +1,5 @@
 import { COUPON_SOURCES, MEMBER_COUPON_STATUSES, fmtDateTime } from "../../../js/admin.js";
-import { money } from "../../../js/kinu.js";
+import { money } from "../../../js/format.js";
 import Pagination from "../../common/Pagination.jsx";
 
 /**

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ADMIN_TOKEN_KEY, adminApi, fmtDateTime } from "../../js/admin.js";
-import { toast } from "../../js/kinu.js";
+import { toast } from "../../js/toast.js";
 import Pagination from "../../component/common/Pagination.jsx";
 import AdminHeader from "../../component/admin/shared/AdminHeader.jsx";
 import CsTicketDetailModal from "../../component/admin/cs/CsTicketDetailModal.jsx";

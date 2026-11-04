@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getAdminToken } from "../../../js/admin.js";
-import { toast } from "../../../js/kinu.js";
+import { toast } from "../../../js/toast.js";
 
 const HISTORY_PAGE_SIZE = 10;
 

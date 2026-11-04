@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
-import { clearToken } from './kinu.js';
+import { clearToken } from './auth.js';
 
 /**
  * Firebase 設定：值來自 frontend/.env（全組共用，有進 git）；想換成自己的專案可以用 .env.local 覆蓋。

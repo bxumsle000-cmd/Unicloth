@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { adminDownload } from "../../../js/admin.js";
-import { toast } from "../../../js/kinu.js";
+import { toast } from "../../../js/toast.js";
 
 const inputClass = "border border-line px-3 py-2 text-[13px] text-[#111] focus:border-black focus:outline-none";
 

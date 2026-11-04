@@ -1,7 +1,8 @@
 import { useState, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
 import { CiHeart } from "react-icons/ci";
-import {api, toast} from "../../js/kinu.js";
+import { api } from "../../js/api.js";
+import { toast } from "../../js/toast.js";
 import { CountContext } from "../../js/CountProvider.jsx";
 import WishListCard from "../../component/store/WishListCard.jsx";
 

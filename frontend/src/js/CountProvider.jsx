@@ -1,5 +1,5 @@
 import { createContext, useEffect, useState } from 'react'
-import { api } from './kinu.js';
+import { api } from './api.js';
 
 /** 在元件裡用：const { cartCount, refreshCart } = useContext(CountContext); */
 // eslint-disable-next-line react-refresh/only-export-components

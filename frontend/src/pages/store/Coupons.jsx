@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { api, toast } from "../../js/kinu.js";
+import { api } from "../../js/api.js";
+import { toast } from "../../js/toast.js";
 import CouponCard from "../../component/store/CouponCard.jsx";
 
 // 分頁籤：value 對應後端回來的 status

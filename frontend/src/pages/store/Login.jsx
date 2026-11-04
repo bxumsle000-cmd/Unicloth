@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { api, setToken, toast } from "../../js/kinu.js";
+import { api } from "../../js/api.js";
+import { setToken } from "../../js/auth.js";
+import { toast } from "../../js/toast.js";
 import { firebaseReady, signInWithGoogle } from "../../js/firebase.js";
 
 function Login() {

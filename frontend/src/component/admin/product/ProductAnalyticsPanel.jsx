@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { adminApi } from "../../../js/admin.js";
-import { imgSrc, money } from "../../../js/kinu.js";
+import { imgSrc, money } from "../../../js/format.js";
 
 const PERIOD_OPTIONS = [
     { days: 7, label: "最近 7 天" },

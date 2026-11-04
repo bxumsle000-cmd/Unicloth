@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { api, toast } from "../../js/kinu.js";
+import { api } from "../../js/api.js";
+import { toast } from "../../js/toast.js";
 
 const TOPICS = [
     "訂單與物流",

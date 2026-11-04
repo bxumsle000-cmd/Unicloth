@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { getAdminToken } from "../../../js/admin.js";
-import { toast } from "../../../js/kinu.js";
+import { toast } from "../../../js/toast.js";
 
 async function adminRequest(path, options = {}) {
     const response = await fetch(path, {

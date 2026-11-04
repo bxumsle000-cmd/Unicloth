@@ -40,7 +40,7 @@ sequenceDiagram
     S->>J: generateToken(會員 id)
     J-->>S: 會員 JWT（sub = 會員 id，無 dept）
     S-->>FE: { token, profileCompleted }
-    FE->>FE: setToken(token)（kinu.js）→ 存進 localStorage
+    FE->>FE: setToken(token)（auth.js）→ 存進 localStorage
     FE->>U: profileCompleted ? 回首頁 : 去 /complete-profile
 ```
 
@@ -73,7 +73,7 @@ sequenceDiagram
 ## 3. 之後每個請求：驗證 token、檢查權限
 
 前端每次呼叫 API 時自動帶上 `Authorization: Bearer <token>`：
-- 前台用 `kinu.js` 的 `api()`，帶會員 token
+- 前台用 `api.js` 的 `api()`，帶會員 token
 - 後台用 `admin.js` 的 `adminApi()`，帶員工 token
 
 後端收到請求後，會依序經過 Spring Security 的過濾鏈。以下是跟 JWT 有關的幾關：
@@ -154,7 +154,7 @@ AuthorizationFilter            ← 照 SecurityConfig 規則檢查
 
 ```mermaid
 flowchart LR
-    A[按登出] --> B["前端刪掉 localStorage 的 token<br/>kinu.js clearToken() / admin.js clearAdminSession()"]
+    A[按登出] --> B["前端刪掉 localStorage 的 token<br/>auth.js clearToken() / admin.js clearAdminSession()"]
     B --> C[之後的請求不再帶 token]
 
     D[token 超過 1 天] --> E[JwtService.parse 驗證失敗]
@@ -193,7 +193,8 @@ flowchart LR
 |---|---|
 | `frontend/src/js/firebase.js` | `signInWithGoogle()`：跳出 Google 視窗，拿 Firebase ID token |
 | `frontend/src/pages/store/Login.jsx` | 會員登入頁：拿 Firebase token 換會員 JWT |
-| `frontend/src/js/kinu.js` | `api()` 自動帶 `Authorization: Bearer`；`getToken` / `setToken` / `clearToken` 管理會員 token |
+| `frontend/src/js/api.js` | `api()` 自動帶 `Authorization: Bearer` |
+| `frontend/src/js/auth.js` | `getToken` / `setToken` / `clearToken` 管理會員 token |
 | `frontend/src/pages/admin/AdminLogin.jsx` | 員工登入頁：把員工 JWT 存進 `localStorage` |
 | `frontend/src/js/admin.js` | `adminApi()` 帶員工 token；`getAdminToken()`、`clearAdminSession()` |
 | `frontend/src/component/guard/RequireLogin.jsx` | 沒有會員 token 就不顯示頁面，改顯示「請先登入」 |
