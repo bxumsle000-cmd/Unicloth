@@ -1,7 +1,7 @@
 # Checkout API（結帳）
 
-- Controller：`controller/CheckoutController.java`
-- Service：`service/CheckoutService.java`
+- Controller：`controller/store/CheckoutController.java`
+- Service：`service/shop/CheckoutService.java`
 - 共同前綴：`/api/checkout`
 
 | 功能 | Method | 路徑 | 成功狀態碼 | 成功時回什麼 |
@@ -10,7 +10,23 @@
 
 **結帳只買「勾選」的購物車項目**：前端把要買的購物車項目 id 放在 `cartItemIdList` 傳上來，沒勾的會留在購物車。
 
-> 🔒 **需要登入**：請求要帶 `Authorization: Bearer <token>`（token 從 `/api/auth/firebase` 取得），操作的是 token 裡的那個會員。沒帶 token 或 token 無效、過期回 401。登入了但還沒補填會員資料回 403「請先填寫會員資料」。
+**結帳後的訂單狀態看付款方式：**
+
+| `paymentMethod` | 訂單狀態 | 下一步 |
+|---|---|---|
+| `COD`（貨到付款） | `PENDING`（訂單確認中） | 等後台出貨 |
+| `CREDIT`（信用卡）、`ATM`（ATM 轉帳） | `UNPAID`（未付款） | 前端呼叫 `POST /api/payments/ecpay/create` 去綠界付款（見 [ecpay.md](ecpay.md)） |
+
+> `UNPAID` 的訂單逾時沒付款會被排程自動取消，並還原庫存和折價券：信用卡 30 分鐘、ATM 4 天。
+
+> 🔒 **需要登入**：請求要帶 `Authorization: Bearer <token>`（token 從 `/api/auth/firebase` 取得），操作的是 token 裡的那個會員。
+>
+> | 情況 | 狀態碼 | `message` |
+> |---|---|---|
+> | 沒帶 token、token 無效或過期 | 401 | `尚未登入或登入已失效` |
+> | 還沒補填會員資料 | 403 | `請先填寫會員資料` |
+> | 帶的是員工 token | 403 | `沒有權限使用這個功能` |
+> | 帳號被停用 | 403 | `此帳號已被停用` |
 
 ---
 
@@ -45,14 +61,14 @@
 | `cartItemIdList` | number[] | ✅ | 至少一個；值是「我的購物車」回應裡的 `id` |
 
 > `shippingMethod` 傳小寫 `"home"` 或不存在的值，JSON 會轉不過去，回 400 `請求內容格式錯誤，請確認欄位值是否正確`。
-> `cartItemIdList` 裡**不要放重複的 id**：例如 `[12, 12]` 會被當成「有勾選的商品不在你的購物車裡」，回 400（原因見下面「過程中做了什麼」的步驟 ③）。
+> `cartItemIdList` 裡**不要放重複的 id**：例如 `[12, 12]` 會被當成「有勾選的商品不在你的購物車裡」，回 400（原因見下面「過程中做了什麼」的補充）。
 
 ### Response — 成功 `201 Created`
 
 ```json
 {
   "orderNo": "UC20261003-0427",
-  "createdAt": "2026-10-03T14:30:12.123456",
+  "createdAt": "2026-10-03T14:30:12",
   "receiverName": "王小美",
   "receiverPhone": "0912345678",
   "shippingMethod": "HOME",
@@ -73,8 +89,7 @@
 | `shippingAddress` | string | 宅配地址或超商門市名 |
 | `total` | number | 實付金額 = 商品小計 − 折抵 + 運費 |
 
-> 回應**沒有**商品小計、折抵、運費、商品明細，只有最後的 `total`。要看完整內容請呼叫「我的訂單」`GET /api/orders`。
-> `createdAt` 小數秒的位數我**沒有實際確認**，這是推測；前端顯示日期時建議只取前面的 `yyyy-MM-dd`。
+> 回應**沒有**商品小計、折抵、運費、商品明細，只有最後的 `total`。要看訂單內容請呼叫「我的訂單」`GET /api/orders`。
 
 ### 金額怎麼算
 
@@ -104,11 +119,10 @@
 
 | 狀態碼 | 情況 | `message` |
 |---|---|---|
-| 400 | 欄位驗證沒過 | 例：`receiverName: 不得是空白; cartItemIdList: 請至少勾選一件商品` |
+| 400 | 欄位驗證沒過 | 例：`receiverName: 不得空白; cartItemIdList: 請至少勾選一件商品` |
 | 400 | 其他欄位格式錯誤（例如 `shippingMethod` 傳小寫） | `請求內容格式錯誤，請確認欄位值是否正確` |
 | 400 | `cartItemIdList` 裡有 id 不是自己購物車的、已經被刪掉了，或有重複的 id | `有勾選的商品不在你的購物車裡，請重新整理購物車` |
 | 400 | 小計沒達到折價券的最低消費 | `未達這張折價券的最低消費` |
-| 401 | 資料庫找不到目前登入的會員 | `登入過期或失效` |
 | 404 | `memberCouponId` 不存在，**或不是自己的券** | `沒有找到這張折價券` |
 | 409 | 勾選的商品有已下架的 | `「商品名稱」已下架，請先從購物車移除` |
 | 409 | 折價券已經用過（包含兩個請求同時用同一張券，搶輸的那一個） | `這張折價券已經使用過` |
@@ -133,7 +147,7 @@
    ▼
 ③ CheckoutService.checkout()   ← 整段包在 @Transactional 裡
    ├─ CurrentMember.require()：查出目前登入的會員
-   │    └─ 查不到 → 401「登入過期或失效」
+   │    └─ 帳號被停用 → 403「此帳號已被停用」
    ├─ 用「目前會員 + cartItemIdList」查購物車項目，SKU、商品一起撈（join fetch）
    │    └─ 撈到的筆數 ≠ 傳上來的 id 數量 → 400「有勾選的商品不在你的購物車裡…」
    ├─ 逐項檢查商品是不是 ON_SALE，同時加總小計
@@ -149,7 +163,7 @@
    ├─ 逐項扣庫存（一條 UPDATE 同時檢查 + 扣）
    │    └─ 更新 0 筆 → 409「「商品名稱」庫存不足」
    ├─ 產生訂單編號，撞號就重抽
-   ├─ 存訂單主檔（orders），status 預設 PENDING
+   ├─ 存訂單主檔（orders）：貨到付款 status = PENDING；信用卡、ATM status = UNPAID
    ├─ 存訂單明細（order_items），商品資料複製一份當快照
    ├─ 有用券 → 標記這張券已使用、記錄用在哪張訂單（一條 UPDATE 同時檢查「還沒用過」+ 標記）
    │    └─ 更新 0 筆（被同時結帳的另一個請求搶先用掉）→ 409「這張折價券已經使用過」
@@ -203,11 +217,11 @@ WHERE id = :id AND used_at IS NULL
 | `id` | 資料庫自動遞增（IDENTITY） |
 | `order_no` | 程式產生，例：`UC20261003-0427` |
 | `member_id` | 目前登入的會員 |
-| `status` | 固定 `PENDING`（訂單確認中） |
+| `status` | 貨到付款是 `PENDING`（訂單確認中）；信用卡、ATM 是 `UNPAID`（未付款） |
 | `receiver_name`、`receiver_phone`、`receiver_email`、`shipping_method`、`shipping_address`、`payment_method`、`note` | Request 原封不動 |
 | `subtotal`、`discount`、`shipping_fee`、`total` | 依上面「金額怎麼算」 |
 | `member_coupon_id` | 有用券就是 `memberCouponId`，沒用是 `null` |
-| `paid_at`、`shipped_at`、`completed_at` | `null`（目前沒有地方會填） |
+| `paid_at`、`shipped_at`、`delivered_at`、`completed_at`、`shipping_carrier`、`tracking_number` | `null`（付款、出貨、送達、取貨時才填） |
 | `created_at` | 寫入當下的時間 |
 
 `order_items` 每一筆：

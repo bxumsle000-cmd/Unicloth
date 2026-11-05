@@ -1,7 +1,7 @@
 # Admin Auth API（員工登入 / 改自己的密碼）
 
-- Controller：`controller/AdminAuthController.java`
-- Service：`service/AdminAuthService.java`
+- Controller：`controller/admin/AdminAuthController.java`
+- Service：`service/admin/AdminAuthService.java`
 - 共同前綴：`/api/admin/auth`
 
 | 功能 | Method | 路徑 | 成功狀態碼 | 成功時回什麼 |
@@ -79,7 +79,7 @@
 | 401 | 查不到這個帳號 | `帳號或密碼錯誤` |
 | 401 | 帳號存在但密碼錯 | `帳號或密碼錯誤` |
 | 403 | 帳號密碼都對，但帳號被停用 | `此帳號已被停用` |
-| 403 | 帳號密碼都對，但不屬於選的部門（ADMIN 不會有這個錯） | `此帳號不屬於「{部門中文}」，請改選其他部門`，例：`此帳號不屬於「客服」，請改選其他部門` |
+| 403 | 帳號密碼都對，但不屬於選的部門（ADMIN 不會有這個錯） | `此帳號不屬於「{部門中文}」，請改選其他部門`，例：`此帳號不屬於「商品部」，請改選其他部門` |
 
 > 為什麼「部門不對」要等密碼對了才說？
 > 如果密碼錯也說「部門不對」，員工會以為是部門選錯，一直換部門試，其實是密碼打錯。

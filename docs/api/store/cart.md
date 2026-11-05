@@ -1,7 +1,7 @@
 # Cart API（購物車）
 
-- Controller：`controller/CartController.java`
-- Service：`service/CartItemService.java`
+- Controller：`controller/store/CartController.java`
+- Service：`service/shop/CartItemService.java`
 - 共同前綴：`/api/cart`
 
 | 功能 | Method | 路徑 | 成功狀態碼 | 成功時回什麼 |
@@ -20,7 +20,16 @@
 | `variantId` | SKU 的 id | 加入購物車時傳 |
 | `cartItemId`（回應裡的 `id`） | 購物車裡「這一筆」的 id | 修改數量、移除時傳 |
 
-> 🔒 **需要登入**：請求要帶 `Authorization: Bearer <token>`（token 從 `/api/auth/firebase` 取得），操作的是 token 裡的那個會員。沒帶 token 或 token 無效、過期回 401。登入了但還沒補填會員資料回 403「請先填寫會員資料」。
+> 🔒 **需要登入**：請求要帶 `Authorization: Bearer <token>`（token 從 `/api/auth/firebase` 取得），操作的是 token 裡的那個會員。
+>
+> | 情況 | 狀態碼 | `message` |
+> |---|---|---|
+> | 沒帶 token、token 無效或過期 | 401 | `尚未登入或登入已失效` |
+> | 還沒補填會員資料 | 403 | `請先填寫會員資料` |
+> | 帶的是員工 token | 403 | `沒有權限使用這個功能` |
+> | 帳號被停用 | 403 | `此帳號已被停用` |
+>
+> 下面各支 API 的「失敗」表格就不再重複列這幾種。
 
 ---
 
@@ -69,9 +78,7 @@
 
 ### Response — 失敗
 
-| 狀態碼 | 情況 | `message` |
-|---|---|---|
-| 401 | 資料庫找不到目前登入的會員 | `登入過期或失效` |
+只有最上面列的共通錯誤。
 
 ### 過程中做了什麼
 
@@ -81,7 +88,7 @@
    ▼
 ① CartItemService.getCartItems()
    ├─ CurrentMember.require()：查出目前登入的會員
-   │    └─ 查不到 → 401「登入過期或失效」
+   │    └─ 帳號被停用 → 403「此帳號已被停用」
    ├─ 用目前登入的會員 id 查 cart_items，
    │    同時把 SKU 和商品一起撈出來（join fetch），照加入時間，舊的在前
    └─ 每一筆轉成 CartItemResponse
@@ -113,8 +120,6 @@
 | `variantId` | number | ✅ | 不可為 `null`；要加入的 SKU id |
 | `qty` | number | ✅ | 必須 > 0；這次要**加上去**的數量 |
 
-> `qty` 沒傳時會被當成 `0`，所以一樣會因為「必須 > 0」回 400。
-
 ### Response — 成功 `204 No Content`
 
 沒有 body。
@@ -125,9 +130,8 @@
 
 | 狀態碼 | 情況 | `message` |
 |---|---|---|
-| 400 | 欄位驗證沒過 | 例：`qty: 必須是正數` |
-| 400 | 其他欄位格式錯誤 | `請求內容格式錯誤，請確認欄位值是否正確` |
-| 401 | 資料庫找不到目前登入的會員 | `登入過期或失效` |
+| 400 | `qty` 是 0 或負數、`variantId` 是 `null` | 例：`qty: 必須大於 0; variantId: 不得是空值` |
+| 400 | `qty` 沒傳或傳 `null`、JSON 語法錯誤 | `請求內容格式錯誤，請確認欄位值是否正確` |
 | 404 | `variantId` 找不到 SKU | `沒有找到商品` |
 | 409 | 商品已下架 | `商品已下架` |
 | 409 | 購物車原本的數量 + 這次的數量 > 庫存 | `不能超過庫存數量` |
@@ -147,7 +151,7 @@
    │
    ▼
 ① Spring 把 JSON 轉成 AddCartItemRequest
-   └─ 轉不過去（JSON 語法錯）→ 400
+   └─ 轉不過去（JSON 語法錯、qty 沒傳）→ 400
    │
    ▼
 ② @Valid 檢查欄位規則
@@ -156,7 +160,7 @@
    ▼
 ③ CartItemService.add()   ← 整段包在 @Transactional 裡
    ├─ CurrentMember.require()：查出目前登入的會員
-   │    └─ 查不到 → 401「登入過期或失效」
+   │    └─ 帳號被停用 → 403「此帳號已被停用」
    ├─ 用 variantId 查 SKU
    │    └─ 查不到 → 404「沒有找到商品」
    ├─ 檢查 SKU 所屬的商品是不是 ON_SALE
@@ -211,7 +215,6 @@
 
 > **是「直接設定」不是「加減」**：原本 2，傳 `qty: 3`，結果是 3（不是 5）。
 > 想把數量改成 0？不行，會回 400。要移除請用「移除一筆」。
-> `cartItemId`、`qty` 沒傳時會被當成 `0`，一樣會回 400。
 
 ### Response — 成功 `204 No Content`
 
@@ -221,9 +224,8 @@
 
 | 狀態碼 | 情況 | `message` |
 |---|---|---|
-| 400 | 欄位驗證沒過 | 例：`qty: 必須是正數` |
-| 400 | 其他欄位格式錯誤 | `請求內容格式錯誤，請確認欄位值是否正確` |
-| 401 | 資料庫找不到目前登入的會員 | `登入過期或失效` |
+| 400 | `cartItemId`、`qty` 是 0 或負數 | 例：`qty: 必須大於 0; cartItemId: 必須大於 0` |
+| 400 | `cartItemId`、`qty` 沒傳或傳 `null`、JSON 語法錯誤 | `請求內容格式錯誤，請確認欄位值是否正確` |
 | 404 | `cartItemId` 不存在，**或不是自己的購物車** | `找不到購物車編號` |
 | 409 | 新數量 > 庫存 | `不能超過庫存數量` |
 
@@ -234,7 +236,7 @@
    │
    ▼
 ① Spring 把 JSON 轉成 ChangeCartItemQtyRequest
-   └─ 轉不過去（JSON 語法錯）→ 400
+   └─ 轉不過去（JSON 語法錯、欄位沒傳）→ 400
    │
    ▼
 ② @Valid 檢查欄位規則
@@ -243,7 +245,7 @@
    ▼
 ③ CartItemService.changeQty()   ← 整段包在 @Transactional 裡
    ├─ CurrentMember.require()：查出目前登入的會員
-   │    └─ 查不到 → 401「登入過期或失效」
+   │    └─ 帳號被停用 → 403「此帳號已被停用」
    ├─ 用 cartItemId + 目前會員 查購物車那一筆
    │    └─ 查不到（不存在或是別人的）→ 404「找不到購物車編號」
    ├─ 檢查 qty 是否超過 SKU 的庫存
@@ -261,7 +263,7 @@
 
 > 為什麼查詢時要加「目前會員」？這樣別人就算猜到你的 `cartItemId`，也改不到你的購物車，只會拿到 404。
 
-> ⚠️ 觀察到的小地方（不影響目前功能，供參考）：「加入購物車」會檢查商品是否下架，「修改數量」**沒有**檢查。所以已下架商品在購物車裡仍然可以改數量；結帳時 `CheckoutService` 會擋下，回 409「「商品名稱」已下架，請先從購物車移除」。
+> ⚠️ 「加入購物車」會檢查商品是否下架，「修改數量」**沒有**檢查，所以已下架商品在購物車裡仍然可以改數量；結帳時 `CheckoutService` 會擋下，回 409「「商品名稱」已下架，請先從購物車移除」。
 
 ---
 
@@ -285,9 +287,7 @@
 
 | 狀態碼 | 情況 | `message` |
 |---|---|---|
-| 401 | 資料庫找不到目前登入的會員 | `登入過期或失效` |
-
-> `cartItemId` 不是數字（例如 `/api/cart/abc`）時，我**推測**會回 500 `系統發生錯誤，請稍後再試`：Spring 轉型失敗丟出的例外，`GlobalExceptionHandler` 沒有專門處理，會掉到最後的兜底 handler。沒有實際測過。
+| 500 | `cartItemId` 不是數字（例如 `/api/cart/abc`） | `系統發生錯誤，請稍後再試` |
 
 ### 過程中做了什麼
 
@@ -297,7 +297,7 @@
    ▼
 ① CartItemService.remove()   ← 整段包在 @Transactional 裡
    ├─ CurrentMember.require()：查出目前登入的會員
-   │    └─ 查不到 → 401「登入過期或失效」
+   │    └─ 帳號被停用 → 403「此帳號已被停用」
    └─ 刪掉 cart_items 裡「這個 id + 目前會員」那一筆
         沒有符合的就什麼都不做
    │

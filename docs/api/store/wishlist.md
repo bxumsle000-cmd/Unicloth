@@ -1,7 +1,7 @@
 # Wishlist API（追蹤清單 / 愛心）
 
-- Controller：`controller/WishlistController.java`
-- Service：`service/WishlistService.java`
+- Controller：`controller/store/WishlistController.java`
+- Service：`service/shop/WishlistService.java`
 - 共同前綴：`/api/wishlist`
 
 | 功能 | Method | 路徑 | 成功狀態碼 | 成功時回什麼 |
@@ -17,7 +17,16 @@
 
 **追蹤的是「商品」不是 SKU**：同一件 T 恤不管哪個顏色、尺寸，都只算追蹤一次。
 
-> 🔒 **需要登入**：請求要帶 `Authorization: Bearer <token>`（token 從 `/api/auth/firebase` 取得），操作的是 token 裡的那個會員。沒帶 token 或 token 無效、過期回 401。登入了但還沒補填會員資料回 403「請先填寫會員資料」。
+> 🔒 **需要登入**：請求要帶 `Authorization: Bearer <token>`（token 從 `/api/auth/firebase` 取得），操作的是 token 裡的那個會員。
+>
+> | 情況 | 狀態碼 | `message` |
+> |---|---|---|
+> | 沒帶 token、token 無效或過期 | 401 | `尚未登入或登入已失效` |
+> | 還沒補填會員資料 | 403 | `請先填寫會員資料` |
+> | 帶的是員工 token | 403 | `沒有權限使用這個功能` |
+> | 帳號被停用 | 403 | `此帳號已被停用` |
+>
+> 下面各支 API 的「失敗」表格就不再重複列這幾種。
 
 ---
 
@@ -62,9 +71,7 @@
 
 ### Response — 失敗
 
-| 狀態碼 | 情況 | `message` |
-|---|---|---|
-| 401 | 資料庫找不到目前登入的會員 | `登入過期或失效` |
+只有最上面列的共通錯誤。
 
 ### 過程中做了什麼
 
@@ -74,7 +81,7 @@
    ▼
 ① WishlistService.getWishlist()
    ├─ CurrentMember.require()：查出目前登入的會員
-   │    └─ 查不到 → 401「登入過期或失效」
+   │    └─ 帳號被停用 → 403「此帳號已被停用」
    ├─ 用目前登入的會員 id 查 wishlist_items，同時把商品一起撈出來（join fetch）
    │    照加入追蹤的時間，新的在前
    └─ 每一筆轉成 WishlistItemResponse
@@ -121,9 +128,7 @@ true
 
 ### Response — 失敗
 
-| 狀態碼 | 情況 | `message` |
-|---|---|---|
-| 401 | 資料庫找不到目前登入的會員 | `登入過期或失效` |
+只有最上面列的共通錯誤。
 
 ### 過程中做了什麼
 
@@ -133,7 +138,7 @@ true
    ▼
 ① WishlistService.isInWishlist()
    ├─ CurrentMember.require()：查出目前登入的會員
-   │    └─ 查不到 → 401「登入過期或失效」
+   │    └─ 帳號被停用 → 403「此帳號已被停用」
    └─ 查 wishlist_items 裡有沒有「目前會員 + 這個 slug 的商品」這一筆
    │
    ▼
@@ -164,7 +169,6 @@ true
 
 | 狀態碼 | 情況 | `message` |
 |---|---|---|
-| 401 | 資料庫找不到目前登入的會員 | `登入過期或失效` |
 | 404 | `slug` 找不到商品，**或商品已下架** | `找不到商品:{slug}`，例：`找不到商品:men-487511` |
 
 > 已下架的商品不能**新增**追蹤，但原本就追蹤的下架商品會留在清單裡。
@@ -177,7 +181,7 @@ true
    ▼
 ① WishlistService.add()   ← 整段包在 @Transactional 裡
    ├─ CurrentMember.require()：查出目前登入的會員
-   │    └─ 查不到 → 401「登入過期或失效」
+   │    └─ 帳號被停用 → 403「此帳號已被停用」
    ├─ 用 slug 查「上架中」的商品（findOnSaleBySlug）
    │    └─ 查不到或已下架 → 404「找不到商品:{slug}」
    ├─ 檢查是否已經追蹤過
@@ -221,9 +225,7 @@ true
 
 ### Response — 失敗
 
-| 狀態碼 | 情況 | `message` |
-|---|---|---|
-| 401 | 資料庫找不到目前登入的會員 | `登入過期或失效` |
+只有最上面列的共通錯誤。
 
 ### 過程中做了什麼
 
@@ -233,7 +235,7 @@ true
    ▼
 ① WishlistService.remove()   ← 整段包在 @Transactional 裡
    ├─ CurrentMember.require()：查出目前登入的會員
-   │    └─ 查不到 → 401「登入過期或失效」
+   │    └─ 帳號被停用 → 403「此帳號已被停用」
    └─ 刪掉 wishlist_items 裡「目前會員 + 這個 slug 的商品」那一筆
         沒有符合的就什麼都不做
    │

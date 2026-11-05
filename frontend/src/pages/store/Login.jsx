@@ -40,11 +40,6 @@ function Login() {
                 {loading ? "登入中…" : "使用 Google 登入"}
             </button>
 
-            {!firebaseReady && (
-                <p className="mt-4 text-[11px] tracking-[.04em] text-[#b0413e]">
-                    尚未設定 Firebase：請確認 frontend/.env 有 Firebase 設定值，並重新啟動 npm run dev
-                </p>
-            )}
         </div>
     )
 }

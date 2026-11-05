@@ -1,15 +1,20 @@
 # Member API（會員資料 / 補填資料 / 修改資料）
 
-- Controller：`controller/MemberController.java`
-- Service：`service/MemberService.java`
+- Controller：`controller/store/MemberController.java`
+- Service：`service/shop/MemberService.java`
 - 共同前綴：`/api/member`
 
 | 功能 | Method | 路徑 | 成功狀態碼 | 成功時回什麼 |
 |---|---|---|---|---|
 | 取得我的會員資料 | GET | `/api/member/me` | 200 | 會員資料 |
+| 補填會員資料 | PUT | `/api/member/me/complete-profile` | 200 | 補填後的會員資料 |
 | 修改我的會員資料 | PUT | `/api/member/me/profile` | 200 | 修改後的會員資料 |
 
-> 🔒 **需要登入**：請求要帶 `Authorization: Bearer <token>`（token 從 `/api/auth/firebase` 取得），操作的是 token 裡的那個會員。沒帶 token 或 token 無效、過期回 401。登入了但還沒補填會員資料回 403「請先填寫會員資料」。
+清除瀏覽紀錄在另一份文件：[member-product-view.md](member-product-view.md)。
+
+> 🔒 **需要登入**：請求要帶 `Authorization: Bearer <token>`（token 從 `/api/auth/firebase` 取得），操作的是 token 裡的那個會員。沒帶 token 或 token 無效、過期回 401 `尚未登入或登入已失效`；帶員工 token 回 403 `沒有權限使用這個功能`。
+
+**帳號和個人資料分兩張表：** `members` 存 email、狀態；`member_profiles` 存姓名、手機、性別、生日、地址。第一次用 Google 登入時只有 `members`，補填後才有 `member_profiles`。
 
 ---
 
@@ -42,13 +47,13 @@
 |---|---|---|
 | `memberId` | number | 會員 id |
 | `email` | string | Email |
-| `name` | string | 姓名 |
-| `phone` | string | 手機 |
-| `gender` | string | 性別 |
-| `birthday` | string | 生日，格式 `yyyy-MM-dd` |
+| `name` | string \| null | 姓名 |
+| `phone` | string \| null | 手機 |
+| `gender` | string \| null | 性別：`male` / `female` |
+| `birthday` | string \| null | 生日，格式 `yyyy-MM-dd` |
 | `address` | string \| null | 地址，沒填過就是 `null` |
 | `status` | string | 帳號狀態：`ACTIVE`（正常）/ `DISABLED`（停用） |
-| `createdAt` | string | 註冊時間，格式 `yyyy-MM-ddTHH:mm:ss`（可能帶小數秒，例如 `2026-10-03T14:30:00.123`） |
+| `createdAt` | string | 註冊時間，格式 `yyyy-MM-ddTHH:mm:ss`（可能帶小數秒） |
 | `profileCompleted` | boolean | 會員資料填了沒；前端的路由守衛靠它決定要不要導去補填頁 |
 
 ### Response — 失敗
@@ -68,7 +73,8 @@
    ▼
 ① MemberService.getMe()
    ├─ CurrentMember.require()：用目前登入的會員 id 去 members 表查
-   │    └─ 查不到 → 401「登入過期或失效」
+   │    ├─ 查不到 → 401「登入過期或失效」
+   │    └─ 帳號被停用 → 403「此帳號已被停用」
    ├─ 用會員 id 去 member_profiles 表查個人資料（查不到 = 還沒補填）
    └─ 把 Member、MemberProfile 轉成 MemberResponse
    │
@@ -80,7 +86,7 @@
 
 ---
 
-## 1-1. 補填會員資料 `PUT /api/member/me/complete-profile`
+## 2. 補填會員資料 `PUT /api/member/me/complete-profile`
 
 第一次用 Google 登入的會員只有帳號，沒有個人資料。補填完才能用購物車、結帳等其他要登入的功能。
 
@@ -112,16 +118,38 @@
 
 | 狀態碼 | 情況 | `message` |
 |---|---|---|
-| 400 | 欄位驗證沒過 | 例：`gender: 只能是 male 或 female` |
-| 401 | 沒登入、token 無效 | `尚未登入或登入已失效` |
+| 400 | 欄位驗證沒過 | 例：`gender: 只能是 male 或 female; birthday: 必須是過去的日期; name: 不得空白` |
+| 400 | `birthday` 不是日期格式、JSON 語法錯誤 | `請求內容格式錯誤，請確認欄位值是否正確` |
+| 401 | 資料庫找不到目前登入的會員 | `登入過期或失效` |
 | 403 | 帳號被停用 | `此帳號已被停用` |
 | 409 | 已經補填過（之後要改資料請用 `PUT /api/member/me/profile`） | `已經填過會員資料` |
+
+### 過程中做了什麼
+
+```
+前端 PUT /api/member/me/complete-profile
+   │
+   ▼
+① Spring 把 JSON 轉成 CompleteProfileRequest，@Valid 檢查欄位
+   └─ 沒過 → 400
+   │
+   ▼
+② MemberService.completeProfile()   ← 整段包在 @Transactional 裡
+   ├─ CurrentMember.require()：查出目前登入的會員
+   │    ├─ 查不到 → 401「登入過期或失效」
+   │    └─ 帳號被停用 → 403「此帳號已被停用」
+   ├─ member_profiles 已經有這個會員 → 409「已經填過會員資料」
+   └─ 新增一筆 MemberProfile
+   │
+   ▼
+③ 回 200 + JSON
+```
 
 **資料庫影響：** `member_profiles` 新增一筆，`member_id` 就是目前登入的會員 id。
 
 ---
 
-## 2. 修改我的會員資料 `PUT /api/member/me/profile`
+## 3. 修改我的會員資料 `PUT /api/member/me/profile`
 
 ### Request
 
@@ -157,7 +185,8 @@
   "birthday": "1998-05-20",
   "address": "台中市西屯區台灣大道三段99號",
   "status": "ACTIVE",
-  "createdAt": "2026-10-03T14:30:00"
+  "createdAt": "2026-10-03T14:30:00",
+  "profileCompleted": true
 }
 ```
 
@@ -165,9 +194,8 @@
 
 | 狀態碼 | 情況 | `message` |
 |---|---|---|
-| 400 | 欄位驗證沒過 | 例：`name: 不得是空白; phone: 不得是空白` |
-| 400 | 其他欄位格式錯誤 | `請求內容格式錯誤，請確認欄位值是否正確` |
-| 401 | 資料庫找不到目前登入的會員 | `登入過期或失效` |
+| 400 | 欄位驗證沒過 | 例：`name: 不得空白; phone: 不得空白` |
+| 400 | JSON 語法錯誤 | `請求內容格式錯誤，請確認欄位值是否正確` |
 | 403 | 帳號被停用 | `此帳號已被停用` |
 | 403 | 還沒補填會員資料（要先呼叫 `PUT /api/member/me/complete-profile`） | `請先填寫會員資料` |
 
@@ -177,28 +205,33 @@
 前端 PUT /api/member/me/profile
    │
    ▼
-① Spring 把 JSON 轉成 UpdateMemberRequest
+① SecurityConfig：要登入，而且 member_profiles 有這個會員
+   └─ 沒有 → 403「請先填寫會員資料」
+   │
+   ▼
+② Spring 把 JSON 轉成 UpdateMemberRequest
    └─ 轉不過去（JSON 語法錯）→ 400
    │
    ▼
-② @Valid 檢查欄位規則
+③ @Valid 檢查欄位規則
    └─ 沒過 → 400（一次列出所有錯的欄位）
    │
    ▼
-③ MemberService.updateProfile()   ← 整段包在 @Transactional 裡
+④ MemberService.updateProfile()   ← 整段包在 @Transactional 裡
    ├─ CurrentMember.require()：查出目前登入的會員
-   │    └─ 查不到 → 401「登入過期或失效」
+   │    └─ 帳號被停用 → 403「此帳號已被停用」
+   ├─ 查出這個會員的 MemberProfile
    ├─ 把 name、phone、address 設成 Request 的值
-   └─ 把 Member 轉成 MemberResponse
+   └─ 轉成 MemberResponse
    │
    ▼
-④ 交易結束，Hibernate 發現 Member 被改過 → 自動 UPDATE 回資料庫
+⑤ 交易結束，Hibernate 發現 MemberProfile 被改過 → 自動 UPDATE 回資料庫
    │
    ▼
-⑤ 回 200 + JSON
+⑥ 回 200 + JSON
 ```
 
-**資料庫影響：** `members` 表更新一筆（目前登入的會員）。
+**資料庫影響：** `member_profiles` 表更新一筆（目前登入的會員）。
 
 | 欄位 | 值從哪來 |
 |---|---|
@@ -207,7 +240,3 @@
 
 **補充：為什麼程式裡沒有呼叫 `save()` 也會存進資料庫？**
 在 `@Transactional` 裡從資料庫查出來的 Entity，Hibernate 會一直「盯著」它。交易結束時，Hibernate 比對發現欄位被 `setXxx()` 改過，就會自動送出 UPDATE。這個機制叫 dirty checking。
-
----
-
-> ⚠️ 觀察到的小地方（不影響目前功能，供參考）：這幾支 API 都**沒有**檢查會員 `status`，所以被停用（`DISABLED`）的會員，目前仍然可以查詢、修改資料。實際上停用的會員登不進來，所以現階段影響不大。

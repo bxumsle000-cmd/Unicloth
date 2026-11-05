@@ -1,7 +1,7 @@
 # Staff API（後台員工帳號管理）
 
-- Controller：`controller/StaffController.java`
-- Service：`service/StaffService.java`
+- Controller：`controller/admin/StaffController.java`
+- Service：`service/admin/StaffService.java`
 - 共同前綴：`/api/admin/admin/staff`
 
 | 功能 | Method | 路徑 | 成功狀態碼 | 成功時回什麼 |
@@ -19,10 +19,10 @@
 
 | 欄位 | 可能的值 |
 |---|---|
-| `department` | `PRODUCT`（商品部）、`ORDER`（訂單物流）、`CS`（客服）、`MKT`（行銷）、`ADMIN`（管理者） |
+| `department` | `PRODUCT`（商品部）、`ORDER`（訂單物流）、`CS`（客服）、`MKT`（行銷）、`ADMIN`（系統管理） |
 | `status` | `ACTIVE`（正常）、`DISABLED`（停用） |
 
-> 🔒 **只有 ADMIN（管理者）能用**：請求要帶 `Authorization: Bearer <員工 token>`（從 `/api/admin/auth/login` 取得，見 `admin-auth.md`），而且 token 裡的部門要是 `ADMIN`。
+> 🔒 **只有 ADMIN（管理者）能用**：請求要帶 `Authorization: Bearer <員工 token>`（從 `/api/admin/auth/login` 取得，見 [admin-auth.md](admin-auth.md)），而且 token 裡的部門要是 `ADMIN`。
 >
 > | 情況 | 狀態碼 | `message` |
 > |---|---|---|
@@ -35,7 +35,7 @@
 > 管理者被停用後，舊 token 在過期前（1 天）還是能用這些 API。只有「停用」會用到目前登入者的 id（擋停用自己），也只查 id、不查狀態。
 > 改自己的密碼（`/api/admin/auth/password`）有查，被停用會回 403。
 
-**員工自己改密碼不在這裡**，在 `PATCH /api/admin/auth/password`（見 `admin-auth.md`）。
+**員工自己改密碼不在這裡**，在 `PATCH /api/admin/auth/password`（見 [admin-auth.md](admin-auth.md)）。
 
 ---
 
@@ -111,7 +111,8 @@
 
 | 狀態碼 | 情況 | `message` |
 |---|---|---|
-| 400 | `department` 或 `status` 不是上面列的值 | Spring 的轉換錯誤訊息，例：`department: Failed to convert value of type 'java.lang.String' to required type '...Department'; ...` |
+| 400 | `department` 或 `status` 不是上面列的值 | Spring 的轉換訊息，例：`department: Failed to convert value of type 'java.lang.String' to required type 'com.EEIT25.unicloth.enums.staff.Department'; ...` |
+| 500 | `sort` 用了不存在的欄位 | `系統發生錯誤，請稍後再試` |
 
 > 這個 400 的訊息是英文、還帶 Java 類別名稱，不適合直接給使用者看。前端用下拉選單送固定值就不會遇到。
 
@@ -163,7 +164,7 @@ Hibernate 第一次遇到 `null` 參數時會猜它的型別並快取起來，�
 | `department` | string | ✅ | 不可空（訊息：`請選擇部門`）；**一個員工只能有一個部門** |
 
 > **不用傳密碼**：密碼由系統產生，見下面的 `tempPassword`。
-> `account`、`name` 資料庫欄位上限是 50 字，但**後端目前沒有先檢查長度**；超過的話會在寫進資料庫時出錯，實際回什麼我沒有測過。
+> `account`、`name` 資料庫欄位上限是 50 字，但**後端目前沒有先檢查長度**；超過的話會在寫進資料庫時出錯。
 > `account` 的前後空白**不會**去掉，`" cs02"` 和 `"cs02"` 會被當成不同帳號。
 
 ### Response — 成功 `201 Created`
@@ -252,7 +253,7 @@ Hibernate 第一次遇到 `null` 參數時會猜它的型別並快取起來，�
 
 沒有 body。
 
-> 可以改自己的姓名，後端沒擋（後台畫面上自己那一列沒有放編輯按鈕）。
+> 可以改自己的姓名，後端沒擋。
 
 ### Response — 失敗
 
@@ -359,8 +360,8 @@ Hibernate 第一次遇到 `null` 參數時會猜它的型別並快取起來，�
 > 本來就是停用的帳號再停用一次，一樣回 204。
 > 停用後：
 > - 不能登入（帳號密碼對時回 403「此帳號已被停用」）
-> - 還沒過期的舊 token 打 `PATCH /api/admin/auth/password` 會回 403
-> - 但打其他後台 API **目前不會被擋**，見最上面的「目前的限制」
+> - 還沒過期的舊 token 打有用 `CurrentStaff.require()` 的 API（改密碼、進貨入庫、手動改庫存、預約發券）會回 403
+> - 打其他後台 API **目前不會被擋**，見最上面的「目前的限制」
 
 ### Response — 失敗
 

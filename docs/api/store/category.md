@@ -1,7 +1,7 @@
 # Category API（導覽選單 / 分類頁 / 分類商品）
 
-- Controller：`controller/CategoryController.java`
-- Service：`service/CategoryService.java`
+- Controller：`controller/store/CategoryController.java`
+- Service：`service/shop/CategoryService.java`
 - 共同前綴：`/api/categories`
 
 | 功能 | Method | 路徑 | 成功狀態碼 | 成功時回什麼 |
@@ -48,12 +48,6 @@
         "children": []
       }
     ]
-  },
-  {
-    "code": "all_women",
-    "name": "女裝",
-    "iconUrl": null,
-    "children": [ ... ]
   }
 ]
 ```
@@ -236,10 +230,10 @@
 範例：
 
 ```
-GET /api/categories/all_men-tops/products?page=0&size=20&colors=黑色&colors=白色&sizes=M&minPrice=500&maxPrice=1500&sort=price,asc
+GET /api/categories/all_men-tops/products?page=0&size=24&colors=黑色&colors=白色&sizes=M&minPrice=500&maxPrice=1500&sort=price,asc
 ```
 
-**篩選條件**（`dto/category/ProductFilterRequest.java`）
+**篩選條件**（`dto/store/category/ProductFilterRequest.java`）
 
 | 參數 | 型別 | 必填 | 規則 / 說明 |
 |---|---|---|---|
@@ -256,10 +250,10 @@ GET /api/categories/all_men-tops/products?page=0&size=20&colors=黑色&colors=�
 | 參數 | 型別 | 預設 | 說明 |
 |---|---|---|---|
 | `page` | number | `0` | 第幾頁，**從 0 開始** |
-| `size` | number | `25` | 一頁幾筆 |
+| `size` | number | `24` | 一頁幾筆 |
 | `sort` | string | `id,desc` | 排序，格式 `欄位,方向`，例：`sort=price,asc` |
 
-> `sort` 能用的欄位是 `Product` 的欄位名稱（例如 `id`、`price`、`name`）。傳不存在的欄位會出錯，我**推測**會回 500，沒有實際測過。
+> `sort` 能用的欄位是 `Product` 的欄位名稱（例如 `id`、`price`、`name`）。傳不存在的欄位回 500 `系統發生錯誤，請稍後再試`。
 
 ### 篩選規則
 
@@ -277,17 +271,21 @@ GET /api/categories/all_men-tops/products?page=0&size=20&colors=黑色&colors=�
 {
   "content": [
     {
-      "slug": "men-487511",
-      "name": "DRY-EX防曬連帽外套",
-      "price": 390,
-      "origPrice": 590,
-      "newArrival": true,
+      "slug": "men-481569",
+      "name": "棉質舒適九分褲(牛仔)",
+      "price": 590,
+      "origPrice": 790,
+      "newArrival": false,
       "hot": false,
-      "imageUrl": "img/products/men-487511/col66.jpg"
+      "imageUrl": "img/products/men-481569/col62.jpg",
+      "styles": [
+        { "id": 1, "code": "japanese", "name": "日系" },
+        { "id": 2, "code": "natural", "name": "自然風" }
+      ]
     }
   ],
   "page": {
-    "size": 20,
+    "size": 24,
     "number": 0,
     "totalElements": 57,
     "totalPages": 3
@@ -306,6 +304,7 @@ GET /api/categories/all_men-tops/products?page=0&size=20&colors=黑色&colors=�
 | `newArrival` | boolean | 是否顯示「新品」標籤 |
 | `hot` | boolean | 是否顯示「熱門」標籤 |
 | `imageUrl` | string \| null | 縮圖，沒有時是 `null` |
+| `styles` | array | 商品的風格標籤，每一筆是 `{ id, code, name }`，沒有標籤是 `[]` |
 
 `page` 分頁資訊：
 
@@ -316,7 +315,7 @@ GET /api/categories/all_men-tops/products?page=0&size=20&colors=黑色&colors=�
 | `totalElements` | number | 符合條件的商品總數 |
 | `totalPages` | number | 總頁數 |
 
-> 分頁的格式是 `content` + `page`，這是因為 `application.properties` 設了 `spring.data.web.pageable.serialization-mode=via_dto`。
+> 分頁的格式是 `content` + `page`，這是因為 `application.yml` 設了 `spring.data.web.pageable.serialization-mode: via_dto`。
 > 查不到商品時：`content` 是 `[]`、`totalElements` 是 `0`，不會報錯。
 
 ### Response — 失敗
@@ -324,9 +323,8 @@ GET /api/categories/all_men-tops/products?page=0&size=20&colors=黑色&colors=�
 | 狀態碼 | 情況 | `message` |
 |---|---|---|
 | 400 | `minPrice` 或 `maxPrice` 是負數 | 例：`minPrice: 必須大於或等於 0` |
+| 400 | `minPrice`、`maxPrice` 不是數字 | Spring 的轉換訊息，例：`minPrice: Failed to convert value of type 'java.lang.String' to required type 'java.lang.Integer'; For input string: "abc"` |
 | 404 | `code` 找不到對應的分類 | `找不到分類：{code}` |
-
-> `minPrice=abc` 這種「不是數字」的情況，我**推測**也會回 400，但 `message` 可能是一段 Spring 產生的英文轉型錯誤訊息，沒有實際測過，以實際回應為準。
 
 ### 過程中做了什麼
 
@@ -335,7 +333,7 @@ GET /api/categories/all_men-tops/products?page=0&size=20&colors=黑色&colors=�
    │
    ▼
 ① Spring 把網址參數轉成 ProductFilterRequest 和 Pageable
-   ├─ 沒帶 page / size / sort → 用預設值（0 / 25 / id,desc）
+   ├─ 沒帶 page / size / sort → 用預設值（0 / 24 / id,desc）
    └─ @Valid 檢查 minPrice、maxPrice ≥ 0
         └─ 沒過 → 400
    │
@@ -356,7 +354,7 @@ GET /api/categories/all_men-tops/products?page=0&size=20&colors=黑色&colors=�
 ④ 回 200 + JSON（content + page）
 ```
 
-**資料庫影響：** 只有「讀」`categories`、`products`、`product_variants` 表，不會寫入任何資料。
+**資料庫影響：** 只有「讀」`categories`、`products`、`product_variants`、`product_styles`、`styles` 表，不會寫入任何資料。
 
 **補充：為什麼要一次撈出全部分類？**
 分類只有幾百筆，一次全部撈進記憶體再往下找，只需要查一次資料庫。如果每往下一層就查一次，4 層就要查好幾次。
@@ -365,7 +363,7 @@ GET /api/categories/all_men-tops/products?page=0&size=20&colors=黑色&colors=�
 
 ## 5. 篩選選項 `GET /api/categories/{code}/filters`
 
-分類頁左側（或上方）的顏色、尺寸篩選清單。
+分類頁的顏色、尺寸篩選清單。
 
 ### Request
 
@@ -379,7 +377,7 @@ GET /api/categories/all_men-tops/products?page=0&size=20&colors=黑色&colors=�
 
 ```json
 {
-  "colors": ["黑色", "白色", "海軍藍"],
+  "colors": ["黑色", "白色", "藍色"],
   "sizes": ["S", "M", "L", "XL"]
 }
 ```
@@ -393,7 +391,7 @@ GET /api/categories/all_men-tops/products?page=0&size=20&colors=黑色&colors=�
 > 值是資料庫原樣，前端呼叫「分類底下的商品」時要原封不動帶回去。
 > 這個分類沒有商品時，兩個都是空陣列 `[]`。
 
-> 後端回傳的順序不固定，前端 `products.html` 的 `sortSizes()` 會自己排成 S → M → L。
+> 後端回傳的順序不固定，前端 `format.js` 的 `sortSizes()` 會自己排尺寸。
 
 ### Response — 失敗
 

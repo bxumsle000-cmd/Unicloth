@@ -1,7 +1,7 @@
 # Support Ticket API（客服單）
 
-- Controller：`controller/SupportTicketController.java`
-- Service：`service/SupportTicketService.java`
+- Controller：`controller/store/SupportTicketController.java`
+- Service：`service/shop/SupportTicketService.java`
 - 共同前綴：`/api/support-tickets`
 
 | 功能 | Method | 路徑 | 成功狀態碼 | 成功時回什麼 |
@@ -9,7 +9,7 @@
 | 送出客服單 | POST | `/api/support-tickets` | 201 | 剛建立的客服單（含單號） |
 | 我送出的客服單 | GET | `/api/support-tickets` | 200 | 我送出的所有客服單 |
 
-「送出客服單」要帶 JSON body；「我送出的客服單」不需要參數。
+「送出客服單」要帶 JSON body；「我送出的客服單」不需要參數。客服人員回覆在後台（見 [admin-support-ticket.md](../admin/admin-support-ticket.md)）。
 
 **兩支回的客服單長得一樣**（都是 `SupportTicketResponse`），欄位說明見「送出客服單」。
 
@@ -17,14 +17,21 @@
 
 | `status` | 畫面顯示 | 意思 |
 |---|---|---|
-| `IN_PROGRESS` | 處理中 | 剛送出時的預設狀態 |
-| `RESOLVED` | 已解決 | 客服處理完畢 |
+| `IN_PROGRESS` | 處理中 | 剛送出時的預設狀態；客服回覆但還沒結案也是這個 |
+| `RESOLVED` | 已解決 | 客服回覆時選擇結案 |
 
-> 目前**沒有任何 API 會改狀態**，所以透過這兩支 API 看到的一定是 `IN_PROGRESS`。
-
-> 🔒 **需要登入**：請求要帶 `Authorization: Bearer <token>`（token 從 `/api/auth/firebase` 取得），操作的是 token 裡的那個會員。沒帶 token 或 token 無效、過期回 401。登入了但還沒補填會員資料回 403「請先填寫會員資料」。
+> 🔒 **需要登入**：請求要帶 `Authorization: Bearer <token>`（token 從 `/api/auth/firebase` 取得），操作的是 token 裡的那個會員。
 >
-> 資料表 `support_tickets.member_id` 允許 `NULL`，原本設計是「**未登入也能送客服單**」，但目前分不出有沒有登入，所以先一律綁定目前的會員（見 `SupportTicketService` 的 TODO）。
+> | 情況 | 狀態碼 | `message` |
+> |---|---|---|
+> | 沒帶 token、token 無效或過期 | 401 | `尚未登入或登入已失效` |
+> | 還沒補填會員資料 | 403 | `請先填寫會員資料` |
+> | 帶的是員工 token | 403 | `沒有權限使用這個功能` |
+> | 帳號被停用 | 403 | `此帳號已被停用` |
+>
+> 下面各支 API 的「失敗」表格就不再重複列這幾種。
+>
+> 資料表 `support_tickets.member_id` 允許 `NULL`，原本設計是「**未登入也能送客服單**」，但目前一律綁定目前的會員（見 `SupportTicketService` 的 TODO）。
 
 ---
 
@@ -44,7 +51,7 @@
 |---|---|---|---|
 | `email` | string | ✅ | 不可空白；要是 Email 格式；最多 255 字；客服回覆用 |
 | `topic` | string | ✅ | 不可空白；只能是下表其中一個（**中文字要完全一樣**） |
-| `message` | string | ✅ | 不可空白；最多 2000 字（資料表欄位也是 `NVARCHAR(2000)`） |
+| `message` | string | ✅ | 不可空白；最多 2000 字 |
 
 `topic` 可選的值：
 
@@ -68,8 +75,11 @@
   "email": "test@example.com",
   "topic": "退換貨",
   "message": "我收到的衣服尺寸不對，想換成 M 號。",
+  "reply": null,
   "status": "IN_PROGRESS",
-  "createdAt": "2026-10-03T14:30:00"
+  "createdAt": "2026-10-03T14:30:00",
+  "repliedAt": null,
+  "resolvedAt": null
 }
 ```
 
@@ -79,11 +89,13 @@
 | `email` | string | 聯絡 Email |
 | `topic` | string | 問題類型 |
 | `message` | string | 問題內容 |
+| `reply` | string \| null | 客服回覆；還沒回覆是 `null` |
 | `status` | string | 狀態，剛送出一定是 `IN_PROGRESS` |
 | `createdAt` | string | 送出時間，格式 `yyyy-MM-ddTHH:mm:ss`（可能帶小數秒） |
+| `repliedAt` | string \| null | 最後回覆時間；還沒回覆是 `null` |
+| `resolvedAt` | string \| null | 結案時間；還沒結案是 `null` |
 
 > 回應裡**沒有客服單的 `id`**，前端用 `ticketNo` 辨識就好。
-> `createdAt` 小數秒的位數我**沒有實際確認**，這是推測；前端顯示日期時建議只取前面的 `yyyy-MM-dd`。
 
 ### Response — 失敗
 
@@ -91,7 +103,6 @@
 |---|---|---|
 | 400 | 欄位驗證沒過 | 見下表 |
 | 400 | JSON 語法錯誤 | `請求內容格式錯誤，請確認欄位值是否正確` |
-| 401 | 資料庫找不到目前登入的會員 | `登入過期或失效` |
 
 欄位驗證沒過時的 `message` 例子：
 
@@ -102,12 +113,9 @@
 | `email` 超過 255 字 | `email: 大小必須在 0 和 255 之間` |
 | `topic` 沒帶 | `topic: 不得空白` |
 | `topic` 是 `退貨`（不在清單裡） | `topic: 不是可選的問題類型` |
+| `topic` 是空字串 `""` | `topic: 不得空白; topic: 不是可選的問題類型` |
 | `message` 沒帶或空白 | `message: 不得空白` |
 | `message` 超過 2000 字 | `message: 大小必須在 0 和 2000 之間` |
-
-> 多個欄位都錯時，會用 `; ` 接成一句，例如 `email: 不得空白; message: 不得空白`（順序不固定）。
-> `topic` 送空字串 `""` 時，`@NotBlank` 和 `@Pattern` 都會不過，我**推測**會同時出現兩句：`topic: 不得空白; topic: 不是可選的問題類型`。沒有實際測過。
-> 以上預設訊息是 Hibernate Validator 的繁中版本（`ValidationMessages_zh_TW`），伺服器語系不同時文字可能不一樣。
 
 ### 過程中做了什麼
 
@@ -125,7 +133,7 @@
    ▼
 ③ SupportTicketService.create()   ← 整段包在 @Transactional 裡
    ├─ CurrentMember.require()：查出目前登入的會員
-   │    └─ 查不到 → 401「登入過期或失效」
+   │    └─ 帳號被停用 → 403「此帳號已被停用」
    ├─ 產生客服單號：CS + 隨機 8 位數字
    │    └─ 資料庫已經有這個單號 → 重抽，直到不重複
    ├─ 新增一筆 SupportTicket 存進資料庫
@@ -145,6 +153,7 @@
 | `email` | Request 的 `email` |
 | `topic` | Request 的 `topic` |
 | `message` | Request 的 `message` |
+| `reply`、`replied_at`、`resolved_at` | `null` |
 | `status` | `IN_PROGRESS`（預設值） |
 | `created_at` | 寫入當下的時間 |
 
@@ -177,16 +186,22 @@
     "email": "test@example.com",
     "topic": "退換貨",
     "message": "我收到的衣服尺寸不對，想換成 M 號。",
+    "reply": null,
     "status": "IN_PROGRESS",
-    "createdAt": "2026-10-03T14:30:00"
+    "createdAt": "2026-10-03T14:30:00",
+    "repliedAt": null,
+    "resolvedAt": null
   },
   {
     "ticketNo": "CS91827364",
     "email": "test@example.com",
     "topic": "訂單與物流",
     "message": "請問訂單什麼時候會出貨？",
+    "reply": "您好，訂單預計明天出貨。",
     "status": "RESOLVED",
-    "createdAt": "2026-09-28T10:05:12"
+    "createdAt": "2026-09-28T10:05:12",
+    "repliedAt": "2026-09-28T15:20:00",
+    "resolvedAt": "2026-09-28T15:20:00"
   }
 ]
 ```
@@ -198,9 +213,7 @@
 
 ### Response — 失敗
 
-| 狀態碼 | 情況 | `message` |
-|---|---|---|
-| 401 | 資料庫找不到目前登入的會員 | `登入過期或失效` |
+只有最上面列的共通錯誤。
 
 ### 過程中做了什麼
 
@@ -210,7 +223,7 @@
    ▼
 ① SupportTicketService.getMyTickets()
    ├─ CurrentMember.require()：查出目前登入的會員
-   │    └─ 查不到 → 401「登入過期或失效」
+   │    └─ 帳號被停用 → 403「此帳號已被停用」
    ├─ 查 support_tickets 裡這個會員的所有客服單，照送出時間，新的在前
    └─ 每一筆轉成 SupportTicketResponse
    │

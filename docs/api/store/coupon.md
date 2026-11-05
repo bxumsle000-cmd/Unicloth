@@ -1,16 +1,15 @@
-# Coupon API（折價券）
+# Coupon API（我的折價券）
 
-- Controller：`controller/CouponController.java`
-- Service：`service/CouponService.java`
+- Controller：`controller/store/CouponController.java`
+- Service：`service/shop/CouponService.java`
 - 共同前綴：`/api/coupon`
 
 | 功能 | Method | 路徑 | 成功狀態碼 | 成功時回什麼 |
 |---|---|---|---|---|
 | 我的折價券 | GET | `/api/coupon` | 200 | 我持有的所有券 |
 | 結帳可選的券 | GET | `/api/coupon/usable?subtotal=...` | 200 | 未使用、未過期的券 + 這次能折多少 |
-| 發券給會員 | POST | `/api/coupon` | 204 | 沒有 body |
 
-前兩支不需要 body，參數放在網址上；「發券給會員」要帶 JSON body。
+這兩支都不需要 body，參數放在網址上。發券在行銷後台（見 [admin-coupon.md](../admin/admin-coupon.md)）。
 
 **兩種「券」不要搞混：**
 
@@ -30,7 +29,16 @@
 | `AMOUNT` | 折固定金額 | 折多少元 | `value = 100` → 折 100 元 |
 | `PERCENT` | 打折 | 折幾 % | `value = 10` → 折 10%，也就是打 9 折 |
 
-> 🔒 **需要登入**：請求要帶 `Authorization: Bearer <token>`（token 從 `/api/auth/firebase` 取得），操作的是 token 裡的那個會員。沒帶 token 或 token 無效、過期回 401。登入了但還沒補填會員資料回 403「請先填寫會員資料」。
+> 🔒 **需要登入**：請求要帶 `Authorization: Bearer <token>`（token 從 `/api/auth/firebase` 取得），操作的是 token 裡的那個會員。
+>
+> | 情況 | 狀態碼 | `message` |
+> |---|---|---|
+> | 沒帶 token、token 無效或過期 | 401 | `尚未登入或登入已失效` |
+> | 還沒補填會員資料 | 403 | `請先填寫會員資料` |
+> | 帶的是員工 token | 403 | `沒有權限使用這個功能` |
+> | 帳號被停用 | 403 | `此帳號已被停用` |
+>
+> 下面各支 API 的「失敗」表格就不再重複列這幾種。
 
 ---
 
@@ -94,9 +102,7 @@
 
 ### Response — 失敗
 
-| 狀態碼 | 情況 | `message` |
-|---|---|---|
-| 401 | 資料庫找不到目前登入的會員 | `登入過期或失效` |
+只有最上面列的共通錯誤。
 
 ### 過程中做了什麼
 
@@ -106,7 +112,7 @@
    ▼
 ① CouponService.getMyCoupons()
    ├─ CurrentMember.require()：查出目前登入的會員
-   │    └─ 查不到 → 401「登入過期或失效」
+   │    └─ 帳號被停用 → 403「此帳號已被停用」
    ├─ 查這個會員持有的所有券，照到期時間由早到晚
    └─ 每一張轉成 CouponResponse
         └─ 依「用過沒 → 過期沒」算出 status
@@ -130,8 +136,6 @@
 | `subtotal` | 網址 | number | ✅ | 購物車的商品小計（**不含運費**） |
 
 範例：`GET /api/coupon/usable?subtotal=1200`
-
-> `subtotal` 沒帶、或不是數字（例如 `subtotal=abc`）時，我**推測**會回 500 `系統發生錯誤，請稍後再試`：參數型別是 `int`，Spring 沒辦法把「沒有值」或文字轉成 `int`，丟出的例外 `GlobalExceptionHandler` 沒有專門處理。沒有實際測過。
 
 ### Response — 成功 `200 OK`
 
@@ -195,7 +199,7 @@
 
 | 狀態碼 | 情況 | `message` |
 |---|---|---|
-| 401 | 資料庫找不到目前登入的會員 | `登入過期或失效` |
+| 500 | `subtotal` 沒帶、或不是數字（例如 `subtotal=abc`） | `系統發生錯誤，請稍後再試` |
 
 ### 過程中做了什麼
 
@@ -205,7 +209,7 @@
    ▼
 ① CouponService.getUsableCoupons()
    ├─ CurrentMember.require()：查出目前登入的會員
-   │    └─ 查不到 → 401「登入過期或失效」
+   │    └─ 帳號被停用 → 403「此帳號已被停用」
    ├─ 查這個會員持有的所有券，照到期時間由早到晚
    ├─ 只留下「沒用過」且「到期時間在現在之後」的
    └─ 每一張轉成 UsableCouponResponse
@@ -217,85 +221,3 @@
 ```
 
 **資料庫影響：** 只有「讀」`member_coupons`、`coupons` 表，不會寫入任何資料。
-
----
-
-## 3. 發券給會員 `POST /api/coupon`
-
-把某張折價券發給某個會員。
-
-### Request
-
-```json
-{
-  "memberId": 1,
-  "couponId": 2
-}
-```
-
-| 欄位 | 型別 | 必填 | 規則 |
-|---|---|---|---|
-| `memberId` | number | ✅ | 不可為 `null`；要發給哪個會員 |
-| `couponId` | number | ✅ | 不可為 `null`；折價券**範本**的 id（`coupons.id`，不是 `member_coupons.id`） |
-
-### Response — 成功 `204 No Content`
-
-沒有 body。
-
-> **重複發同一張券不會報錯**：每發一次就多一張，各自有到期時間。
-
-### Response — 失敗
-
-| 狀態碼 | 情況 | `message` |
-|---|---|---|
-| 400 | 欄位驗證沒過 | 例：`memberId: 不得是空值` |
-| 400 | 其他欄位格式錯誤 | `請求內容格式錯誤，請確認欄位值是否正確` |
-| 401 | `memberId` 找不到會員 | `登入過期或失效` |
-| 404 | `couponId` 找不到折價券 | `沒有找到這張折價券` |
-| 400 | 這張折價券已停止發放（`is_active = 0`） | `這張折價券已停止發放` |
-
-### 過程中做了什麼
-
-```
-前端 POST /api/coupon
-   │
-   ▼
-① Spring 把 JSON 轉成 GrantCouponRequest
-   └─ 轉不過去（JSON 語法錯）→ 400
-   │
-   ▼
-② @Valid 檢查欄位規則
-   └─ 沒過 → 400（一次列出所有錯的欄位）
-   │
-   ▼
-③ CouponService.grantTo()   ← 整段包在 @Transactional 裡
-   ├─ 用 memberId 查會員
-   │    └─ 查不到 → 401「登入過期或失效」
-   ├─ 用 couponId 查折價券範本
-   │    └─ 查不到 → 404「沒有找到這張折價券」
-   ├─ 檢查範本是不是還在發放中（active）
-   │    └─ 不是 → 400「這張折價券已停止發放」
-   └─ 新增一筆 MemberCoupon
-        └─ 到期時間 = 現在 + 範本的 valid_days 天
-   │
-   ▼
-④ 回 204（沒有 body）
-```
-
-**資料庫影響：** `member_coupons` 表新增一筆。
-
-| 欄位 | 值從哪來 |
-|---|---|
-| `id` | 資料庫自動遞增（IDENTITY） |
-| `member_id` | Request 的 `memberId` |
-| `coupon_id` | Request 的 `couponId` |
-| `expire_at` | 現在時間 + 範本的 `valid_days` 天 |
-| `used_at` | `null`（未使用） |
-| `order_id` | `null`（還沒用在任何訂單） |
-| `received_at` | 寫入當下的時間 |
-
-**到期時間的手動推演**：10/03 14:30 領「新會員 100 元折價券」（`valid_days = 30`）→ `expire_at` = 11/02 14:30。
-
-> ⚠️ 觀察到的小地方（供參考）：
-> - **任何人都能呼叫這支，發任何券給任何會員**，沒有檢查呼叫的人是不是管理員。如果這支只是開發測試用，上線前要加權限或拿掉。
-> - `memberId` 找不到會員時，回的是 401「登入過期或失效」，但這裡的 `memberId` 是 Request 傳進來的，不是登入的人，用 404「找不到會員」比較貼切。
