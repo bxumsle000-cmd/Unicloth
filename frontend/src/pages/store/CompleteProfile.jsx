@@ -45,7 +45,7 @@ function CompleteProfile() {
             await api("/api/member/me/complete-profile", {
                 method: "PUT",
                 // 地址沒填就送 null；欄位格式由後端檢查，錯了會回訊息
-                body: { ...form, address: form.address.trim() || null },
+                body: { ...form }
             });
             // 整頁重新載入：路由守衛才會重新確認「已補填」
             window.location.href = "/";
@@ -63,7 +63,7 @@ function CompleteProfile() {
             <form onSubmit={submit} className="w-full max-w-[460px]">
                 <div className="mb-2 text-[10px] tracking-[.22em] text-[#76716c]">PROFILE</div>
                 <h1 className="mb-3 text-[clamp(24px,3vw,34px)] font-medium tracking-[.08em]">填寫會員資料</h1>
-                <p className="mb-8 text-[11px] tracking-[.06em] text-[#76716c]">第一次登入請先填寫資料，結帳時會用到</p>
+                <p className="mb-8 text-[11px] tracking-[.06em] text-[#76716c]">第一次登入請先填寫資料</p>
 
                 <div className="space-y-6">
                     <Field label="姓名">

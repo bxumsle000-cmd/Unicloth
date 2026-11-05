@@ -40,38 +40,37 @@ function StoreLayout(){
             <div className="flex min-h-screen flex-col">
                 <Header/>
                 <main className="flex-1">
-                    <ProfileGuard>
-                        <Routes>
-                            <Route path="/" element={<Home/>}/>
-                            {/* 新品頁只顯示目前上架且勾選新品標籤的商品。 */}
-                            <Route path="/new-arrivals" element={<NewArrivals/>}/>
-                            <Route path="/category/:code" element={<Category/>}/>
-                            <Route path="/wishlist/" element={<RequireLogin><Wishlist/></RequireLogin>}/>
-                            <Route path="/product/:slug" element={<ProductDetail/>}/>
-                            <Route path="/coupons" element={<RequireLogin><Coupons/></RequireLogin>}/>
-                            <Route path="/cart" element={<RequireLogin><Cart/></RequireLogin>}/>
-                            <Route path="/checkout" element={<RequireLogin><Checkout/></RequireLogin>}/>
-                            <Route path="/order-complete" element={<OrderComplete/>}/>
-                            <Route path="/search" element={<Search/>}/>
-                            <Route path="/orders" element={<RequireLogin><Orders/></RequireLogin>}/>
-                            {/* 客服單目前必須登入才能建立，規則與後端 SecurityConfig 一致。 */}
-                            <Route path="/support" element={<RequireLogin><Support/></RequireLogin>}/>
-                            {/* 配送與退貨、常見問題是純說明頁，訪客也能看。 */}
-                            <Route path="/shipping-returns" element={<ShippingReturns/>}/>
-                            <Route path="/faq" element={<Faq/>}/>
-                            {/* 訪客看熱門商品，登入會員則取得個人化推薦。 */}
-                            <Route path="/recommendations" element={<Recommendations/>}/>
-                            {/* 會員中心：外框是 MemberLayout，裡面依網址換子頁面；必須登入才能使用。 */}
-                            <Route path="/member" element={<RequireLogin><MemberLayout/></RequireLogin>}>
-                                <Route index element={<MemberProfile/>}/>
-                                <Route path="recommendation-settings" element={<RecommendationSettings/>}/>
-                            </Route>
-                            {/* 推薦設定搬進會員中心，舊網址導過去 */}
-                            <Route path="/recommendation-settings" element={<Navigate to="/member/recommendation-settings" replace/>}/>
-                            <Route path="/login" element={<Login/>}/>
-                            <Route path="/complete-profile" element={<CompleteProfile/>}/>
-                        </Routes>
-                    </ProfileGuard>
+                    <ProfileGuard/>
+                    <Routes>
+                        <Route path="/" element={<Home/>}/>
+                        {/* 新品頁只顯示目前上架且勾選新品標籤的商品。 */}
+                        <Route path="/new-arrivals" element={<NewArrivals/>}/>
+                        <Route path="/category/:code" element={<Category/>}/>
+                        <Route path="/wishlist/" element={<RequireLogin><Wishlist/></RequireLogin>}/>
+                        <Route path="/product/:slug" element={<ProductDetail/>}/>
+                        <Route path="/coupons" element={<RequireLogin><Coupons/></RequireLogin>}/>
+                        <Route path="/cart" element={<RequireLogin><Cart/></RequireLogin>}/>
+                        <Route path="/checkout" element={<RequireLogin><Checkout/></RequireLogin>}/>
+                        <Route path="/order-complete" element={<OrderComplete/>}/>
+                        <Route path="/search" element={<Search/>}/>
+                        <Route path="/orders" element={<RequireLogin><Orders/></RequireLogin>}/>
+                        {/* 客服單目前必須登入才能建立，規則與後端 SecurityConfig 一致。 */}
+                        <Route path="/support" element={<RequireLogin><Support/></RequireLogin>}/>
+                        {/* 配送與退貨、常見問題是純說明頁，訪客也能看。 */}
+                        <Route path="/shipping-returns" element={<ShippingReturns/>}/>
+                        <Route path="/faq" element={<Faq/>}/>
+                        {/* 訪客看熱門商品，登入會員則取得個人化推薦。 */}
+                        <Route path="/recommendations" element={<Recommendations/>}/>
+                        {/* 會員中心：外框是 MemberLayout，裡面依網址換子頁面；必須登入才能使用。 */}
+                        <Route path="/member" element={<RequireLogin><MemberLayout/></RequireLogin>}>
+                            <Route index element={<MemberProfile/>}/>
+                            <Route path="recommendation-settings" element={<RecommendationSettings/>}/>
+                        </Route>
+                        {/* 推薦設定搬進會員中心，舊網址導過去 */}
+                        <Route path="/recommendation-settings" element={<Navigate to="/member/recommendation-settings" replace/>}/>
+                        <Route path="/login" element={<Login/>}/>
+                        <Route path="/complete-profile" element={<CompleteProfile/>}/>
+                    </Routes>
                 </main>
                 <Footer/>
             </div>
