@@ -215,7 +215,7 @@ function Checkout() {
    * 3. 信用卡/ATM 建立綠界付款
    * 4. 表單 POST 跳轉綠界
    *
-   * 貨到付款維持原本流程。
+   * 貨到付款不經過綠界，建立訂單後直接到訂單完成頁。
    */
   async function submitOrder() {
     if (submitLockedRef.current || createdOrder) {
@@ -270,7 +270,7 @@ function Checkout() {
       // 結帳的商品已從購物車移除，通知 Header 更新數字
       refreshCart();
 
-      // 貨到付款：維持原本訂單完成流程
+      // 貨到付款：直接到訂單完成頁
       if (form.paymentMethod === "COD") {
         navigate("/order-complete", {
           state: { order },

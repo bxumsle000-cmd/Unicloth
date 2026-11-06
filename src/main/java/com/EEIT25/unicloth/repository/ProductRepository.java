@@ -24,15 +24,6 @@ public interface ProductRepository
     boolean existsBySlugEndingWith(String suffix);
 
     /**
-     * 分類 id 在清單內、且狀態符合的商品（分頁）。
-     */
-    Page<Product> findByCategoryIdInAndStatus(
-            Collection<Long> categoryIds,
-            ProductStatus status,
-            Pageable pageable
-    );
-
-    /**
      * 分類商品 + 篩選（分頁）。每個條件都是「沒帶就不篩」：<br>
      * - 價格：minPrice / maxPrice 是 null → (NULL IS NULL OR …) 永遠成立，等於沒這個條件<br>
      * - 顏色 / 尺寸：清單不能寫 :colors IS NULL（Hibernate 會把清單展開），所以另外傳布林旗標：
@@ -94,29 +85,6 @@ public interface ProductRepository
      */
     Page<Product> findByStatusAndNewArrivalTrue(
             ProductStatus status,
-            Pageable pageable
-    );
-
-    /**
-     * 使用商品名稱、風格名稱或風格代碼搜尋。
-     */
-    @Query("""
-            SELECT DISTINCT p
-            FROM Product p
-            LEFT JOIN p.styles style
-            WHERE p.status = :status
-              AND (
-                  LOWER(p.name)
-                      LIKE LOWER(CONCAT('%', :keyword, '%'))
-                  OR LOWER(style.name)
-                      LIKE LOWER(CONCAT('%', :keyword, '%'))
-                  OR LOWER(style.code)
-                      LIKE LOWER(CONCAT('%', :keyword, '%'))
-              )
-            """)
-    Page<Product> findByKeywordOrStyle(
-            @Param("status") ProductStatus status,
-            @Param("keyword") String keyword,
             Pageable pageable
     );
 

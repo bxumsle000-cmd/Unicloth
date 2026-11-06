@@ -5,7 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import java.nio.charset.StandardCharsets;
 
 /**
- * JWT 相關設定值，對應 application.properties 裡 {@code jwt.*} 的項目。
+ * JWT 相關設定值，對應 application.yml 裡 {@code jwt.*} 的項目。
  * <p>
  * Spring Boot 啟動時會把設定檔的值綁進這個 record（{@code expiration-ms} 會自動對應到 {@code expirationMs}），
  * 要用的地方直接注入 {@code JwtProperties} 即可。

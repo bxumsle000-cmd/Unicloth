@@ -1,4 +1,4 @@
-# Admin Product Analytics API（商品部後台：熱銷 / 銷售趨勢）
+# Admin Product Analytics API（商品部後台：銷售趨勢）
 
 - Controller：`controller/admin/AdminProductAnalyticsController.java`
 - Service：`service/admin/ProductSalesAnalyticsService.java`
@@ -6,10 +6,9 @@
 
 | 功能 | Method | 路徑 | 成功狀態碼 | 成功時回什麼 |
 |---|---|---|---|---|
-| 熱銷排行 | GET | `/api/admin/product/analytics/best-sellers` | 200 | 商品銷售清單 |
 | 銷售趨勢 | GET | `/api/admin/product/analytics/trends` | 200 | 商品趨勢清單 |
 
-**兩支共同的參數：**
+**參數：**
 
 | 參數 | 位置 | 型別 | 必填 | 說明 |
 |---|---|---|---|---|
@@ -25,7 +24,7 @@
 
 > 🔒 **只有 PRODUCT、ADMIN 能用**：請求要帶 `Authorization: Bearer <員工 token>`（從 `/api/admin/auth/login` 取得，見 [admin-auth.md](admin-auth.md)）。
 
-**兩支共同的失敗回應：**
+**失敗回應：**
 
 | 狀態碼 | 情況 | `message` |
 |---|---|---|
@@ -35,60 +34,7 @@
 
 ---
 
-## 1. 熱銷排行 `GET /api/admin/product/analytics/best-sellers`
-
-### Request
-
-範例：`GET /api/admin/product/analytics/best-sellers?days=30&limit=10`
-
-### Response — 成功 `200 OK`
-
-```json
-[
-  {
-    "productId": 1100,
-    "slug": "men-486087",
-    "name": "小羊毛圓領毛衣(長袖)(圖紋)",
-    "imageUrl": "img/products/men-486087/col09.jpg",
-    "unitsSold": 3,
-    "orderCount": 1,
-    "revenue": 3870
-  }
-]
-```
-
-| 欄位 | 型別 | 說明 |
-|---|---|---|
-| `productId` | number | 商品 id |
-| `slug` | string | 商品字串 id |
-| `name` | string | 商品名稱 |
-| `imageUrl` | string \| null | 商品主圖 |
-| `unitsSold` | number | 售出件數 |
-| `orderCount` | number | 幾張訂單買過 |
-| `revenue` | number | 銷售金額 |
-
-> 順序是**件數多的在前**，一樣時金額高的在前，再一樣時商品 id 大的在前。
-> 這段期間沒有銷售時，回空陣列 `[]`。
-
-### 過程中做了什麼
-
-```
-前端 GET /api/admin/product/analytics/best-sellers?...
-   │
-   ▼
-① ProductSalesAnalyticsService.getBestSellers()   ← @Transactional(readOnly = true)
-   ├─ 把 days 限制在 1 ~ 365、limit 限制在 1 ~ 100
-   └─ 查有效訂單的明細，依商品加總，排序後取前 limit 筆
-   │
-   ▼
-② 回 200 + JSON 陣列
-```
-
-**資料庫影響：** 只有「讀」`order_items`、`orders`、`product_variants`、`products` 表，不會寫入任何資料。
-
----
-
-## 2. 銷售趨勢 `GET /api/admin/product/analytics/trends`
+## 銷售趨勢 `GET /api/admin/product/analytics/trends`
 
 比較「本期」和「上一個相同長度的期間」。
 

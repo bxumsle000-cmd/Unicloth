@@ -1,4 +1,4 @@
-/** 排序下拉選單：sort 是目前的排序值（例如 price,asc），選了新的就呼叫 onSortChange */
+/** 排序下拉選單：sort 是目前的排序值（例如 price,asc），選了新的就呼叫 setSort */
 function SortSelect({ sort, setSort }) {
     return (
         <div className="mb-5 flex justify-end">

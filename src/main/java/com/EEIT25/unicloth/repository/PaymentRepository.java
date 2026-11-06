@@ -36,13 +36,6 @@ public interface PaymentRepository
     );
 
     /**
-     * 查詢某張訂單的所有付款紀錄。
-     */
-    List<Payment> findByOrderIdOrderByCreatedAtDesc(
-            Long orderId
-    );
-
-    /**
      * 查詢某張訂單指定狀態的付款紀錄。
      */
     List<Payment> findByOrderIdAndStatus(

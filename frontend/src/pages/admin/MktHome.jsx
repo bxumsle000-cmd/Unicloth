@@ -1,4 +1,4 @@
-// 行銷首頁（/admin/mkt），內容之後再做
+// 行銷首頁（/admin/mkt）：折價券管理、發券、銷售數據
 import { lazy, Suspense, useState } from "react";
 import AdminHeader from "../../component/admin/shared/AdminHeader.jsx";
 import SideMenu from "../../component/admin/mkt/SideMenu.jsx";

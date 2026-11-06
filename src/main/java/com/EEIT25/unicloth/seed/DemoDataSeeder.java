@@ -39,7 +39,7 @@ import java.util.Set;
  *   <li>商品部的入庫紀錄</li>
  * </ul>
  *
- * 只有 application.properties 設 app.seed.demo-data=true 時這個 class 才會被建立。
+ * 只有 application.yml 設 app.seed.demo-data=true 時這個 class 才會被建立。
  * 假會員的 email 都是 demoXX@demo.unicloth.com；資料庫裡已經有這種會員就整個跳過，所以只會塞一次。
  *
  * - 日期以「第一次塞資料的那天」往前算 15 個月；想用今天重新產生，先跑 data/demo_data_delete.sql，再重開 Spring Boot。
@@ -141,14 +141,13 @@ public class DemoDataSeeder implements CommandLineRunner {
     /** 會員的消費類型：平均幾天買一次、每張訂單幾件、偏好的價位（1 = 偏貴、0 = 不挑、-1 = 偏便宜）、想用折價券的機率 */
     @RequiredArgsConstructor
     private enum Segment {
-        VIP("高消費常客", 9, 2, 5, 1, 0.25),
-        REGULAR("穩定回購", 22, 1, 3, 0, 0.3),
-        BARGAIN("愛用折價券", 35, 1, 3, -1, 0.85),
-        OCCASIONAL("偶爾購買", 70, 1, 2, 0, 0.2),
-        CHURNED("流失會員", 25, 1, 3, 0, 0.3),
-        NEW("新會員", 20, 1, 3, 0, 0.5);
+        VIP(9, 2, 5, 1, 0.25),          // 高消費常客
+        REGULAR(22, 1, 3, 0, 0.3),      // 穩定回購
+        BARGAIN(35, 1, 3, -1, 0.85),    // 愛用折價券
+        OCCASIONAL(70, 1, 2, 0, 0.2),   // 偶爾購買
+        CHURNED(25, 1, 3, 0, 0.3),      // 流失會員
+        NEW(20, 1, 3, 0, 0.5);          // 新會員
 
-        private final String label;
         private final int avgDays;
         private final int minItems;
         private final int maxItems;

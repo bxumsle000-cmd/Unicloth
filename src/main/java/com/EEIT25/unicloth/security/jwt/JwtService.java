@@ -68,7 +68,7 @@ public class JwtService {
 
     /**
      * 驗證 token（簽章、是否過期），並分辨是會員還是員工的 token。
-     * 沒有 dept 的就是會員 token（加上員工功能之前發出去的 token 也都沒有 dept，所以不受影響）。
+     * 沒有 dept 的就是會員 token。
      *
      * @param token 前端帶來的 token（不含 "Bearer " 前綴）
      * @throws JwtException 簽章錯誤、格式錯誤、已過期等任何驗證失敗的情況

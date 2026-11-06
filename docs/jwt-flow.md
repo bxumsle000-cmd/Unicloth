@@ -119,7 +119,7 @@ flowchart TD
 
 | 路徑 | 規則 |
 |---|---|
-| `POST /api/auth/firebase`、`/api/auth/logout`、`/api/admin/auth/login` | 不用登入 |
+| `POST /api/auth/firebase`、`/api/admin/auth/login` | 不用登入 |
 | `GET /api/products/**`、`/api/categories/**`、`/api/styles/**`、`/api/recommendations/**` | 不用登入 |
 | `POST /api/payments/ecpay/notify` | 不用登入（綠界通知） |
 | `/api/admin/部門/**` | 該部門或 ADMIN 的員工 token |
@@ -162,7 +162,7 @@ flowchart LR
     F --> G[要登入的 API 回 401]
 ```
 
-- JWT 是無狀態（STATELESS）的，後端不記錄誰登入過。登出就是前端把 token 丟掉，後端的 `POST /api/auth/logout` 什麼都不做。
+- JWT 是無狀態（STATELESS）的，後端不記錄誰登入過。登出就是前端把 token 丟掉，不用呼叫後端。
 - 有效時間由 `application.yml` 的 `jwt.expiration-ms` 設定，目前是 86400000 毫秒（1 天）。
 
 ---
@@ -177,7 +177,7 @@ flowchart LR
 | `src/main/java/com/EEIT25/unicloth/security/JwtProperties.java` | 讀上面兩個設定值；金鑰不到 32 bytes 會在啟動時直接報錯 |
 | `src/main/java/com/EEIT25/unicloth/security/JwtService.java` | 產生 token（`generateToken`、`generateStaffToken`）、解析 token（`parse`、`parseMemberId`），`ParsedToken.staff()` 判斷是不是員工 |
 | `src/main/java/com/EEIT25/unicloth/security/FirebaseTokenVerifier.java` | 驗證 Google 登入的 Firebase ID token |
-| `src/main/java/com/EEIT25/unicloth/controller/store/AuthController.java` | `POST /api/auth/firebase`（會員登入）、`POST /api/auth/logout` |
+| `src/main/java/com/EEIT25/unicloth/controller/store/AuthController.java` | `POST /api/auth/firebase`（會員登入） |
 | `src/main/java/com/EEIT25/unicloth/service/shop/AuthService.java` | 會員登入：驗 Firebase token → 找到或建立會員 → 發會員 JWT |
 | `src/main/java/com/EEIT25/unicloth/controller/admin/AdminAuthController.java` | `POST /api/admin/auth/login`（員工登入） |
 | `src/main/java/com/EEIT25/unicloth/service/admin/AdminAuthService.java` | 員工登入：比對帳密、檢查部門 → 發員工 JWT |

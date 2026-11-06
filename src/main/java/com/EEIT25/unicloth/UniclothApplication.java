@@ -7,7 +7,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @ConfigurationPropertiesScan   // 讓 security/ 裡的 JwtProperties（@ConfigurationProperties）被註冊成 Bean
-@EnableScheduling              // 開啟 @Scheduled 排程（OrderTimeoutScheduler：逾時未付款自動取消）
+@EnableScheduling              // 開啟 @Scheduled 排程（service/scheduler 底下的排程）
 public class UniclothApplication {
 
     public static void main(String[] args) {

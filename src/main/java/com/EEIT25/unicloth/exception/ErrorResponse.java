@@ -5,7 +5,7 @@ package com.EEIT25.unicloth.exception;
  * <pre>
  * {
  *   "code": 404,
- *   "message": "找不到工單：T001"
+ *   "message": "找不到訂單：UC20260901-8842"
  * }
  * </pre>
  *

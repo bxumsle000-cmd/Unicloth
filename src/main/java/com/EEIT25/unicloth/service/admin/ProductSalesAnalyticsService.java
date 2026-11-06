@@ -6,7 +6,6 @@ import com.EEIT25.unicloth.enums.order.OrderStatus;
 import com.EEIT25.unicloth.enums.product.SalesTrendDirection;
 import com.EEIT25.unicloth.repository.OrderItemRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +18,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * 計算商品熱銷排行與銷售表現。
+ * 計算商品銷售趨勢。
  */
 @Service
 @RequiredArgsConstructor
@@ -36,28 +35,6 @@ public class ProductSalesAnalyticsService {
             );
 
     private final OrderItemRepository orderItemRepository;
-
-    /**
-     * 依指定天數取得熱銷商品排行。
-     */
-    @Transactional(readOnly = true)
-    public List<ProductSalesResponse> getBestSellers(
-            Integer requestedDays,
-            Integer requestedLimit
-    ) {
-        int days = normalizeDays(requestedDays);
-        int limit = normalizeLimit(requestedLimit);
-        LocalDateTime endAt = LocalDateTime.now();
-        LocalDateTime startAt = endAt.minusDays(days);
-
-        return orderItemRepository
-                .findProductSales(
-                        EXCLUDED_STATUSES,
-                        startAt,
-                        endAt,
-                        PageRequest.of(0, limit)
-                );
-    }
 
     /**
      * 比較本期與相同長度的上一期，取得商品銷售趨勢。

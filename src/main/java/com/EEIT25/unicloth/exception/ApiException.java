@@ -11,8 +11,8 @@ import org.springframework.http.HttpStatus;
  * <p>
  * 用法範例：
  * <pre>
- *   throw new ApiException(HttpStatus.NOT_FOUND, "找不到工單：" + ticketId);
- *   throw ApiException.notFound("找不到客服");
+ *   throw new ApiException(HttpStatus.NOT_FOUND, "找不到訂單：" + orderNo);
+ *   throw ApiException.notFound("找不到客服單");
  * </pre>
  */
 @Getter

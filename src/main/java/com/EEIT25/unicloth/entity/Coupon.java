@@ -57,7 +57,7 @@ public class Coupon {
     @Column(name = "auto_trigger", length = 20)
     private CouponAutoTrigger autoTrigger;
 
-    // 可否領取
+    // 是否啟用；停用後不能再發，已發出的券會員還是能用
     @Column(name = "is_active", nullable = false)
     @Builder.Default
     private boolean active = true;

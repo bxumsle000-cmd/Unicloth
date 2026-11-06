@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 /**
- * 商品部門按下「確認出貨」時送來的物流資料。
+ * 訂單物流部門按下「確認出貨」時送來的物流資料。
  * 訂單狀態不由前端傳入，後端會在確認資料正確後自行改為 SHIPPED。
  */
 public record ShipOrderRequest(

@@ -37,7 +37,7 @@ import java.util.Map;
  * 6. 信用卡付款失敗時取消訂單（OrderService.cancelOrder）
  *
  * 注意：
- * ATM 逾時未付款和退款需要另外完成。
+ * 退款需要另外完成。
  */
 @Slf4j
 @Service

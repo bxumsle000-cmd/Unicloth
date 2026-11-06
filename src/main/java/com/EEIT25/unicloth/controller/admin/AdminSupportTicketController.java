@@ -57,7 +57,7 @@ public class AdminSupportTicketController {
     }
 
     /**
-     * 取得單筆客服單完整內容與既有客服回覆。
+     * 取得單筆客服單完整內容與客服回覆。
      */
     @GetMapping("/{ticketId}")
     public AdminSupportTicketDetailResponse getTicket(

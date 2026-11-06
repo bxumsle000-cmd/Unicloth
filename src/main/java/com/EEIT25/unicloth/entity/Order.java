@@ -11,8 +11,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 訂單主檔
@@ -49,7 +47,7 @@ public class Order {
     @Column(name = "receiver_phone", nullable = false)
     private String receiverPhone;
 
-    // 舊訂單沒有這欄，所以 DB 允許 NULL
+    // DB 允許 NULL；結帳時由 CheckoutRequest 的 @NotBlank 擋下空值
     @Column(name = "receiver_email")
     private String receiverEmail;
 

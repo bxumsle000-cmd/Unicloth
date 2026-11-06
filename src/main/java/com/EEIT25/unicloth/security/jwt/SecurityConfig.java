@@ -24,10 +24,10 @@ import java.nio.charset.StandardCharsets;
  * Spring Security 主要設定。
  * <p>
  * Security 預設會把所有端點鎖住，並啟用 Session、CSRF、表單登入，這些是給傳統伺服器渲染網頁用的，
- * 不適合前後端分離 + JWT，所以這裡改成：
+ * 不適合前後端分離 + JWT，所以這裡設定成：
  * <ul>
  *   <li>每個請求先經過 {@link JwtAuthFilter}，有帶有效 token 就標記身分</li>
- *   <li>看商品、分類、風格、推薦、登入（含 Google 登入）、註冊不用登入；其餘 /api/** 一律要登入</li>
+ *   <li>看商品、分類、風格、推薦、登入（含 Google 登入）不用登入；其餘 /api/** 一律要登入</li>
  *   <li>登入了但還沒補填個人資料：只能查自己的資料、補填資料，其他 /api/** 回 403</li>
  *   <li>/api/admin/** 只有員工 token 能用（員工登入除外），/api/admin/部門/** 還要屬於該部門（ADMIN 管理者例外，所有部門都能進）；員工 token 也不能用會員的 API</li>
  *   <li>/api 以外（圖片、影片、Swagger、/error）都放行</li>
@@ -63,7 +63,7 @@ public class SecurityConfig {
 
                 // 授權規則：由上往下比對，第一條符合的生效，所以「放行」要寫在「要登入」前面
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, "/api/auth/firebase", "/api/auth/logout").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/firebase").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/admin/auth/login").permitAll()
                         // 商品、分類、風格與推薦允許訪客查詢
                         .requestMatchers(

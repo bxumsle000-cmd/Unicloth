@@ -3,7 +3,7 @@
 #     docker compose up -d
 #     然後 IDEA 按 Run
 #
-# 整組砍掉重來（會清空所有工單與客服帳號）
+# 整組砍掉重來（會清空資料庫所有資料）
 #     docker compose down -v
 #     docker compose up -d
 #     然後 IDEA 按 Run

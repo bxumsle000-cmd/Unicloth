@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * 分類（主 / 副分類合併，用 parent 分層）
- * parent == null 代表主分類；有值代表副分類，指向所屬主分類。
+ * 分類（所有層級放同一張表，用 parent 分層，共 3 或 4 層）
+ * parent == null 代表第 1 層；有值代表子分類，指向上一層。
  */
 @Entity
 @Table(name = "categories")
@@ -24,7 +24,7 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 自我參照：副分類指向主分類
+    // 自我參照：子分類指向上一層
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private Category parent;

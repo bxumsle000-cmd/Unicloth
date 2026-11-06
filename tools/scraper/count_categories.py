@@ -6,8 +6,7 @@
   python tools/scraper/count_categories.py
 
 查哪些分類：products.json 裡出現過的第 2 層大類，從官網一路往下展開到最細層。
-  - 最細層的名稱後面括號是它原本的中間層，例如「長袖（休閒襯衫）」，
-    因為 regroup_categories.py 會把同一大類底下同名的細類合併。
+  - 最細層的名稱後面括號是它的中間層，例如「長袖（休閒襯衫）」，用來區分同一大類底下同名的細類。
   - 官網件數是列表 API 的 productSum（查詢條件 stockFilter=warehouse，跟爬蟲一樣）。
   - 一件商品可以同時掛在好幾個細類，所以細類加總通常會大於大類的件數。
   - 「收」表示 products.json 裡有這個細類（用大類 + 細類名稱比對）。

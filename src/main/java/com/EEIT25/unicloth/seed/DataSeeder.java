@@ -25,12 +25,12 @@ import java.util.List;
 /**
  * 啟動時把 data/products.json 匯進資料庫。
  *
- * 只有 application.properties 設 app.seed.products=true 時這個 class 才會被建立（預設 false，什麼都不做）。
+ * 只有 application.yml 設 app.seed.products=true 時這個 class 才會被建立（預設 false，什麼都不做）。
  * 匯入是「補上還沒有的」：slug 或 SKU 已存在的商品會跳過，所以重複執行不會塞出重複資料。
  */
 @Slf4j
 @Component
-@Order(1)   // 先匯商品，SalesDemoSeeder（@Order(2)）才有商品可以下單
+@Order(1)   // 先匯商品，DemoDataSeeder（@Order(2)）才有商品可以下單
 @ConditionalOnProperty(name = "app.seed.products", havingValue = "true")
 @RequiredArgsConstructor
 public class DataSeeder implements CommandLineRunner {
@@ -124,7 +124,7 @@ public class DataSeeder implements CommandLineRunner {
 
     /**
      * 分類小圖示放在 static/img/categories/icon-{code}.jpg；有這個檔案才回傳相對路徑，沒有回傳 null。
-     * 目前只有第 2 層（外套類、下身類…）有圖示，跟 V4__category_icon_url.sql 回填的結果一致。
+     * 目前只有第 2 層（外套類、下身類…）有圖示。
      */
     private String findCategoryIcon(String code) {
         String path = "img/categories/icon-" + code + ".jpg";

@@ -54,7 +54,7 @@ public class CategoryController {
         return categoryService.getProducts(code, filter, pageable);
     }
 
-    /** 分類頁的篩選選項：顏色、尺寸、價格範圍 */
+    /** 分類頁的篩選選項：顏色、尺寸 */
     @GetMapping("/{code}/filters")
     public FilterOptionsResponse getFilterOptions(@PathVariable String code) {
         return categoryService.getFilterOptions(code);

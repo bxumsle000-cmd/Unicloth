@@ -62,7 +62,7 @@ function Support() {
     }
 
     /**
-     * 將會員填寫的內容送至既有的 POST /api/support-tickets。
+     * 將會員填寫的內容送至 POST /api/support-tickets。
      * 成功後立即加入「我的客服單」清單，避免需要重新整理網頁。
      */
     async function submitTicket(event) {

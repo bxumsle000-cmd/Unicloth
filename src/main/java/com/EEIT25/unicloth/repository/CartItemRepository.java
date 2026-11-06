@@ -23,16 +23,11 @@ public interface CartItemRepository extends JpaRepository<CartItem, Long> {
             """)
     List<CartItem> findCartWithProducts(@Param("memberId") Long memberId);
 
-    Optional<CartItem> findByVariant(ProductVariant variant);
-
     Optional<CartItem> findByMemberAndVariant(Member member, ProductVariant variant);
 
     Optional<CartItem> findByIdAndMember(long l,Member member);
 
     long deleteByIdAndMember(Long id, Member member);
-
-    // 結帳完成後清空購物車（delete 類方法要在 Service 加 @Transactional）
-    void deleteByMemberId(Long memberId);
 
     // ==================== 以下提供給訂單模組（CheckoutService 結帳）使用 ====================
 

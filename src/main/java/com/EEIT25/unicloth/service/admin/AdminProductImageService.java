@@ -29,7 +29,7 @@ public class AdminProductImageService {
 
     /**
      * 儲存商品顏色圖片，並回傳瀏覽器可讀取的網址。
-     * 圖片會放進原有的 static/img/products 商品圖片目錄。
+     * 圖片會放進 static/img/products 商品圖片目錄。
      */
     public String saveProductImage(
             Long productId,

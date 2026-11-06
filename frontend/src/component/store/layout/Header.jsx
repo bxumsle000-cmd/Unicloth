@@ -152,7 +152,7 @@ function Header() {
                         />
                     </Link>
 
-                    {/* 右：搜尋、天氣、各功能 */}
+                    {/* 右：搜尋、各功能 */}
                     <HeaderActions />
                 </header>
             </div>

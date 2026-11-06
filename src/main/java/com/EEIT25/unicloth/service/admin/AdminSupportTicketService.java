@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 /**
  * 客服後台的客服單處理服務。
  *
- * 會員送出客服單仍由 SupportTicketService 負責；
+ * 會員送出客服單由 SupportTicketService 負責；
  * 這個類別只處理客服人員查看、回覆與結案的功能。
  */
 @Service

@@ -6,7 +6,7 @@ import { CountContext } from "../../../js/CountProvider.jsx";
 import LanguageMenu from "./LanguageMenu.jsx";
 import MemberMenu from "./MemberMenu.jsx";
 
-/** Header 右邊：搜尋、天氣、各功能 */
+/** Header 右邊：搜尋、各功能 */
 function HeaderActions() {
     const { t } = useLanguage();
 

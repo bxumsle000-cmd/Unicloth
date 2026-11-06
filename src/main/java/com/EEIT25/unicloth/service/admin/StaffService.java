@@ -114,7 +114,7 @@ public class StaffService {
                 .orElseThrow(() -> ApiException.notFound("找不到此員工帳號"));
     }
 
-    /** 產生 10 碼亂數臨時密碼；字元表拿掉了容易看錯的 0/O、1/l/I */
+    /** 產生 10 碼亂數臨時密碼；字元表不含容易看錯的 0/O、1/l/I */
     private String randomPassword() {
         String PASSWORD_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
         SecureRandom RANDOM = new SecureRandom();

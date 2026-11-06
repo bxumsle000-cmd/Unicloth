@@ -7,9 +7,8 @@
 | 功能 | Method | 路徑 | 成功狀態碼 | 成功時回什麼 |
 |---|---|---|---|---|
 | Google 登入 | POST | `/api/auth/firebase` | 200 | `{ memberId, token, profileCompleted }` |
-| 登出 | POST | `/api/auth/logout` | 204 | 沒有 body |
 
-這兩支都**不需要登入**。
+這支**不需要登入**。
 
 ---
 
@@ -87,22 +86,3 @@
 
 **資料庫影響：** 第一次登入會在 `members` 新增一筆；綁定既有帳號時會更新那筆的 `firebase_uid`。
 新會員**還沒有** `member_profiles`，要先呼叫 `PUT /api/member/me/complete-profile` 補填（見 [member.md](member.md)），在那之前其他要登入的會員 API 都回 403。
-
----
-
-## 2. 登出 `POST /api/auth/logout`
-
-### Request
-
-不需要 body。
-
-### Response — 成功 `204 No Content`
-
-沒有 body。
-
-### 過程中做了什麼
-
-**後端什麼都沒做**，方法是空的，呼叫一定回 204。
-JWT 是「無狀態」的：後端不記錄發過哪些 token，所以也沒辦法讓某一張 token 失效。
-登出就是前端把 localStorage 裡的 token 刪掉（`auth.js` 的 `clearToken()`），沒有 token 就等於沒登入。
-被複製走的 token 在過期前（1 天）還是能用，這是 JWT 的取捨。

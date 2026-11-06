@@ -31,7 +31,7 @@ public class SupportTicket {
     @Column(name = "ticket_no", nullable = false, unique = true)
     private String ticketNo;
 
-    // 未登入也能送，所以可為 null
+    // 會員送單一定有值；DemoDataSeeder 的訪客客服單是 null
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;

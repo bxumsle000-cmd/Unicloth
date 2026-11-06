@@ -8,7 +8,6 @@ import com.EEIT25.unicloth.dto.admin.product.CreateProductRequest;
 import com.EEIT25.unicloth.dto.admin.product.CreateProductVariantsRequest;
 import com.EEIT25.unicloth.dto.admin.product.UpdateProductRequest;
 import com.EEIT25.unicloth.dto.admin.product.UpdateProductStatusRequest;
-import com.EEIT25.unicloth.dto.admin.product.UpdateProductStockRequest;
 import com.EEIT25.unicloth.dto.store.style.StyleResponse;
 import com.EEIT25.unicloth.entity.Category;
 import com.EEIT25.unicloth.entity.Product;
@@ -388,56 +387,6 @@ public class AdminProductService {
     }
 
     /**
-     * 更新商品各個 SKU 的庫存。
-     */
-    @Transactional
-    public AdminProductDetailResponse updateStock(
-            Long productId,
-            UpdateProductStockRequest request
-    ) {
-        Product product = findProduct(productId);
-
-        List<ProductVariant> variants =
-                productVariantRepository
-                        .findByProductIdOrderByIdAsc(productId);
-
-        Map<Long, ProductVariant> variantsById =
-                variants.stream()
-                        .collect(Collectors.toMap(
-                                ProductVariant::getId,
-                                variant -> variant
-                        ));
-
-        Set<Long> receivedIds = new HashSet<>();
-
-        for (
-                UpdateProductStockRequest.VariantStockRequest
-                        item : request.variants()
-        ) {
-            if (!receivedIds.add(item.variantId())) {
-                throw ApiException.badRequest(
-                        "商品規格重複：" +
-                                item.variantId()
-                );
-            }
-
-            ProductVariant variant =
-                    variantsById.get(item.variantId());
-
-            if (variant == null) {
-                throw ApiException.badRequest(
-                        "商品規格不屬於這件商品：" +
-                                item.variantId()
-                );
-            }
-
-            variant.setStock(item.stock());
-        }
-
-        return toDetailResponse(product, variants);
-    }
-
-    /**
      * 商品上架或下架。
      */
     @Transactional
@@ -632,9 +581,6 @@ public class AdminProductService {
         return String.join("／", names);
     }
 
-    /**
-     * 將 Product 與 SKU 轉成後台詳細資料。
-     */
     /**
      * 將商品與 SKU 轉成後台詳細資料。
      */

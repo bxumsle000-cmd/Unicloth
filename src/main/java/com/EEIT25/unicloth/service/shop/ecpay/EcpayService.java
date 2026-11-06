@@ -70,7 +70,7 @@ public class EcpayService {
     @Value("${ecpay.api-url}")
     private String apiUrl;
 
-    // 新增：綠界付款後返回 KINU 的網址
+    // 綠界付款後返回 KINU 的網址
     @Value("${ecpay.client-back-url}")
     private String clientBackUrl;
 
@@ -202,7 +202,7 @@ public class EcpayService {
         // 網址會自動用 docker-compose 的 tunnel 目前的網址（見 EcpayReturnUrlResolver）
         params.put("ReturnURL", ecpayReturnUrlResolver.resolve());
 
-        // 新增：綠界顯示「返回商店」按鈕
+        // 綠界顯示「返回商店」按鈕
         params.put("ClientBackURL", clientBackUrl);
 
         // 指定付款方式

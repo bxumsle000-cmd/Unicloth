@@ -2,7 +2,7 @@ import Header from "./component/store/layout/Header.jsx";
 import Footer from "./component/store/layout/Footer.jsx";
 import Home from "./pages/store/Home.jsx";
 import Category from "./pages/store/Category.jsx";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Wishlist from "./pages/store/Wishlist.jsx";
 import ProductDetail from "./pages/store/ProductDetail.jsx";
 import Coupons from "./pages/store/Coupons.jsx";
@@ -66,8 +66,6 @@ function StoreLayout(){
                             <Route index element={<MemberProfile/>}/>
                             <Route path="recommendation-settings" element={<RecommendationSettings/>}/>
                         </Route>
-                        {/* 推薦設定搬進會員中心，舊網址導過去 */}
-                        <Route path="/recommendation-settings" element={<Navigate to="/member/recommendation-settings" replace/>}/>
                         <Route path="/login" element={<Login/>}/>
                         <Route path="/complete-profile" element={<CompleteProfile/>}/>
                     </Routes>

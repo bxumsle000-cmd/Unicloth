@@ -5,7 +5,6 @@ import com.EEIT25.unicloth.dto.store.auth.LoginResponse;
 import com.EEIT25.unicloth.service.shop.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,12 +17,6 @@ public class AuthController {
     @PostMapping("/firebase")
     public LoginResponse firebaseLogin(@Valid @RequestBody FirebaseLoginRequest request){
         return authService.firebaseLogin(request);
-    }
-
-    /** 登出 */
-    @PostMapping("/logout")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void logout() {
     }
 
 }

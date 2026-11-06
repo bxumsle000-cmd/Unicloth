@@ -44,7 +44,7 @@ export async function getGoogleName() {
  * 登出 Firebase。只會登出我們的網站，瀏覽器裡的 Google 帳號還是登入狀態；
  * 下次登入會問要用哪個帳號，是因為 signInWithGoogle() 加了 prompt: 'select_account'。
  */
-export async function signOutFirebase() {
+async function signOutFirebase() {
     if (auth) await signOut(auth);
 }
 

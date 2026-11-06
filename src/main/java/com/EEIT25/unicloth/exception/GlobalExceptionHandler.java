@@ -30,8 +30,8 @@ public class GlobalExceptionHandler {
      * 處理方式：狀態碼與訊息都直接取自 ApiException，原樣回給前端。
      * 這類訊息是我們自己寫的、給使用者看的，所以可以放心顯示。
      * <p>
-     * 例：throw ApiException.notFound("找不到工單：T001")
-     *   → HTTP 404 { "code": 404, "message": "找不到工單：T001" }
+     * 例：throw ApiException.notFound("找不到訂單：UC20260901-8842")
+     *   → HTTP 404 { "code": 404, "message": "找不到訂單：UC20260901-8842" }
      */
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<ErrorResponse> handleApiException(ApiException e) {

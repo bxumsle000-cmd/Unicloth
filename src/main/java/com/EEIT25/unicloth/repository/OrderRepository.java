@@ -26,12 +26,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     // 會員的訂單列表，最新的在前
     List<Order> findByMemberIdOrderByCreatedAtDesc(Long memberId);
 
-    // 訂單詳情：同時比對 memberId，避免會員看到別人的訂單
-    Optional<Order> findByIdAndMemberId(Long id, Long memberId);
-
-    // 後台依狀態篩選
-    List<Order> findByStatusOrderByCreatedAtDesc(OrderStatus status);
-
     /**
      * 訂單物流後台列表：關鍵字可查訂單編號、會員 Email、收件人；
      * 狀態與配送方式不帶時就不篩選。

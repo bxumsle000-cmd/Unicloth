@@ -13,7 +13,6 @@ import com.EEIT25.unicloth.security.jwt.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 /**
  * 認證相關服務<br>
@@ -31,7 +30,7 @@ public class AuthService {
      * Google 登入：驗證 Firebase ID token，找到（或建立）對應的會員，回傳我們自己的 JWT。
      * <ol>
      *   <li>用 Firebase uid 找得到 → 就是這個會員</li>
-     *   <li>找不到，但同一個 email 已經用密碼註冊過 → Google 確認過 email 是本人的，才把 uid 綁到原本的帳號</li>
+     *   <li>找不到，但同一個 email 已經有帳號 → Google 確認過 email 是本人的，才把 uid 綁到這個帳號</li>
      *   <li>都找不到 → 建新會員（只有帳號，個人資料之後補填）</li>
      * </ol>
      */

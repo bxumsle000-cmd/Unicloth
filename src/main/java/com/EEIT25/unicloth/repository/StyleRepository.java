@@ -7,23 +7,12 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * 查詢與管理商品風格。
  */
 public interface StyleRepository
         extends JpaRepository<Style, Long> {
-
-    /**
-     * 使用固定代碼查詢，例如 japanese。
-     */
-    Optional<Style> findByCode(String code);
-
-    /**
-     * 使用正式名稱查詢，例如日系。
-     */
-    Optional<Style> findByName(String name);
 
     /**
      * 使用正式名稱、代碼或搜尋別名判斷風格。
