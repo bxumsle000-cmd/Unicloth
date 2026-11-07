@@ -1,5 +1,5 @@
 
-package com.EEIT25.unicloth.repository;
+package com.EEIT25.unicloth.repository.order;
 
 import com.EEIT25.unicloth.entity.Payment;
 import com.EEIT25.unicloth.enums.order.PaymentStatus;

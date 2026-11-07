@@ -1,7 +1,7 @@
 package com.EEIT25.unicloth.service.scheduler;
 
 import com.EEIT25.unicloth.enums.product.ProductStatus;
-import com.EEIT25.unicloth.repository.ProductRepository;
+import com.EEIT25.unicloth.repository.product.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;

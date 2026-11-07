@@ -1,6 +1,6 @@
 package com.EEIT25.unicloth.security.jwt;
 
-import com.EEIT25.unicloth.repository.MemberProfileRepository;
+import com.EEIT25.unicloth.repository.member.MemberProfileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

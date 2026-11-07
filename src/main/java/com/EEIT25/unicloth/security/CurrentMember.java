@@ -3,7 +3,7 @@ package com.EEIT25.unicloth.security;
 import com.EEIT25.unicloth.entity.Member;
 import com.EEIT25.unicloth.enums.member.MemberStatus;
 import com.EEIT25.unicloth.exception.ApiException;
-import com.EEIT25.unicloth.repository.MemberRepository;
+import com.EEIT25.unicloth.repository.member.MemberRepository;
 import com.EEIT25.unicloth.security.jwt.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;

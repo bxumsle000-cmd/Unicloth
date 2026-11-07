@@ -6,8 +6,8 @@ import com.EEIT25.unicloth.entity.Payment;
 import com.EEIT25.unicloth.enums.order.OrderStatus;
 import com.EEIT25.unicloth.enums.order.PaymentMethod;
 import com.EEIT25.unicloth.enums.order.PaymentStatus;
-import com.EEIT25.unicloth.repository.OrderRepository;
-import com.EEIT25.unicloth.repository.PaymentRepository;
+import com.EEIT25.unicloth.repository.order.OrderRepository;
+import com.EEIT25.unicloth.repository.order.PaymentRepository;
 
 import com.EEIT25.unicloth.service.shop.OrderService;
 import jakarta.persistence.EntityManager;

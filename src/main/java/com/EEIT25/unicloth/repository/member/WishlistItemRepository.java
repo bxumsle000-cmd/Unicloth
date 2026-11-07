@@ -1,4 +1,4 @@
-package com.EEIT25.unicloth.repository;
+package com.EEIT25.unicloth.repository.member;
 
 import com.EEIT25.unicloth.entity.WishlistItem;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,4 +1,4 @@
-package com.EEIT25.unicloth.repository;
+package com.EEIT25.unicloth.repository.coupon;
 
 import com.EEIT25.unicloth.entity.Coupon;
 import com.EEIT25.unicloth.enums.coupon.CouponAutoTrigger;

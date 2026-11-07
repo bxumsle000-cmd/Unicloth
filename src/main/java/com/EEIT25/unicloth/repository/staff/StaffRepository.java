@@ -1,4 +1,4 @@
-package com.EEIT25.unicloth.repository;
+package com.EEIT25.unicloth.repository.staff;
 
 import com.EEIT25.unicloth.dto.admin.staff.StaffResponse;
 import com.EEIT25.unicloth.entity.Staff;

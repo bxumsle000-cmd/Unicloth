@@ -5,7 +5,7 @@ import com.EEIT25.unicloth.dto.admin.product.UpdateProductScheduledOffAtRequest;
 import com.EEIT25.unicloth.entity.Product;
 import com.EEIT25.unicloth.enums.product.ProductStatus;
 import com.EEIT25.unicloth.exception.ApiException;
-import com.EEIT25.unicloth.repository.ProductRepository;
+import com.EEIT25.unicloth.repository.product.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

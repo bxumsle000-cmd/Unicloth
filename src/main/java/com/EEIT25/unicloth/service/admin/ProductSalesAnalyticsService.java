@@ -4,7 +4,7 @@ import com.EEIT25.unicloth.dto.admin.analytics.ProductSalesResponse;
 import com.EEIT25.unicloth.dto.admin.analytics.ProductSalesTrendResponse;
 import com.EEIT25.unicloth.enums.order.OrderStatus;
 import com.EEIT25.unicloth.enums.product.SalesTrendDirection;
-import com.EEIT25.unicloth.repository.OrderItemRepository;
+import com.EEIT25.unicloth.repository.order.OrderItemRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
