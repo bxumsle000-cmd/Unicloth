@@ -1,4 +1,4 @@
-package com.EEIT25.unicloth.repository;
+package com.EEIT25.unicloth.repository.inventory;
 
 import com.EEIT25.unicloth.entity.InventoryTransactionItem;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -3,7 +3,7 @@ package com.EEIT25.unicloth.service.shop;
 import com.EEIT25.unicloth.dto.store.coupon.CouponResponse;
 import com.EEIT25.unicloth.dto.store.coupon.UsableCouponResponse;
 import com.EEIT25.unicloth.entity.Member;
-import com.EEIT25.unicloth.repository.MemberCouponRepository;
+import com.EEIT25.unicloth.repository.coupon.MemberCouponRepository;
 import com.EEIT25.unicloth.security.CurrentMember;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

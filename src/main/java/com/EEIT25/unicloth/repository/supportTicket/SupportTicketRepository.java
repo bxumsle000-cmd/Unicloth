@@ -1,4 +1,4 @@
-package com.EEIT25.unicloth.repository;
+package com.EEIT25.unicloth.repository.supportTicket;
 
 import com.EEIT25.unicloth.entity.SupportTicket;
 import com.EEIT25.unicloth.enums.supportTicket.TicketStatus;

@@ -6,7 +6,7 @@ import com.EEIT25.unicloth.dto.store.member.UpdateMemberRequest;
 import com.EEIT25.unicloth.entity.Member;
 import com.EEIT25.unicloth.entity.MemberProfile;
 import com.EEIT25.unicloth.exception.ApiException;
-import com.EEIT25.unicloth.repository.MemberProfileRepository;
+import com.EEIT25.unicloth.repository.member.MemberProfileRepository;
 import com.EEIT25.unicloth.security.CurrentMember;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

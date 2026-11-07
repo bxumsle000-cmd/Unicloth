@@ -8,8 +8,8 @@ import com.EEIT25.unicloth.enums.order.OrderStatus;
 import com.EEIT25.unicloth.enums.order.PaymentMethod;
 import com.EEIT25.unicloth.enums.order.PaymentStatus;
 import com.EEIT25.unicloth.exception.ApiException;
-import com.EEIT25.unicloth.repository.OrderRepository;
-import com.EEIT25.unicloth.repository.PaymentRepository;
+import com.EEIT25.unicloth.repository.order.OrderRepository;
+import com.EEIT25.unicloth.repository.order.PaymentRepository;
 import com.EEIT25.unicloth.security.CurrentMember;
 
 import lombok.RequiredArgsConstructor;

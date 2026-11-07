@@ -2,7 +2,7 @@ package com.EEIT25.unicloth.service.admin;
 
 import com.EEIT25.unicloth.entity.Product;
 import com.EEIT25.unicloth.exception.ApiException;
-import com.EEIT25.unicloth.repository.ProductRepository;
+import com.EEIT25.unicloth.repository.product.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;

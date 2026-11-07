@@ -2,7 +2,7 @@ package com.EEIT25.unicloth.service.scheduler;
 
 import com.EEIT25.unicloth.entity.CouponSchedule;
 import com.EEIT25.unicloth.enums.coupon.CouponScheduleStatus;
-import com.EEIT25.unicloth.repository.CouponScheduleRepository;
+import com.EEIT25.unicloth.repository.coupon.CouponScheduleRepository;
 import com.EEIT25.unicloth.service.admin.AdminCouponService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

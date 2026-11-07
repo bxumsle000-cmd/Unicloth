@@ -1,4 +1,4 @@
-package com.EEIT25.unicloth.repository;
+package com.EEIT25.unicloth.repository.style;
 
 import com.EEIT25.unicloth.entity.Style;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -4,7 +4,7 @@ import com.EEIT25.unicloth.dto.store.supportTicket.CreateSupportTicketRequest;
 import com.EEIT25.unicloth.dto.store.supportTicket.SupportTicketResponse;
 import com.EEIT25.unicloth.entity.Member;
 import com.EEIT25.unicloth.entity.SupportTicket;
-import com.EEIT25.unicloth.repository.SupportTicketRepository;
+import com.EEIT25.unicloth.repository.supportTicket.SupportTicketRepository;
 import com.EEIT25.unicloth.security.CurrentMember;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

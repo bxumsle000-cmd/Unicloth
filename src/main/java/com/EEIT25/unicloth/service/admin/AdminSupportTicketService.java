@@ -6,7 +6,7 @@ import com.EEIT25.unicloth.dto.admin.cs.ReplySupportTicketRequest;
 import com.EEIT25.unicloth.entity.SupportTicket;
 import com.EEIT25.unicloth.enums.supportTicket.TicketStatus;
 import com.EEIT25.unicloth.exception.ApiException;
-import com.EEIT25.unicloth.repository.SupportTicketRepository;
+import com.EEIT25.unicloth.repository.supportTicket.SupportTicketRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

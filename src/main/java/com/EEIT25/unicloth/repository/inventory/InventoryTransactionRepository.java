@@ -1,4 +1,4 @@
-package com.EEIT25.unicloth.repository;
+package com.EEIT25.unicloth.repository.inventory;
 
 import com.EEIT25.unicloth.entity.InventoryTransaction;
 import org.springframework.data.domain.Page;

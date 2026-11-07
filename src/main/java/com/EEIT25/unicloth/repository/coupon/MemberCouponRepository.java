@@ -1,4 +1,4 @@
-package com.EEIT25.unicloth.repository;
+package com.EEIT25.unicloth.repository.coupon;
 
 import com.EEIT25.unicloth.dto.admin.coupon.CouponRecordResponse;
 import com.EEIT25.unicloth.entity.Member;

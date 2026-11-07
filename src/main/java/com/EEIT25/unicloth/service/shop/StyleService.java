@@ -1,7 +1,7 @@
 package com.EEIT25.unicloth.service.shop;
 
 import com.EEIT25.unicloth.dto.store.style.StyleResponse;
-import com.EEIT25.unicloth.repository.StyleRepository;
+import com.EEIT25.unicloth.repository.style.StyleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
