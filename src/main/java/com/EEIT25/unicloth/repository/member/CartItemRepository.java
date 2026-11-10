@@ -1,8 +1,6 @@
 package com.EEIT25.unicloth.repository.member;
 
 import com.EEIT25.unicloth.entity.CartItem;
-import com.EEIT25.unicloth.entity.Member;
-import com.EEIT25.unicloth.entity.ProductVariant;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -23,11 +21,11 @@ public interface CartItemRepository extends JpaRepository<CartItem, Long> {
             """)
     List<CartItem> findCartWithProducts(@Param("memberId") Long memberId);
 
-    Optional<CartItem> findByMemberAndVariant(Member member, ProductVariant variant);
+    Optional<CartItem> findByMemberIdAndVariantId(Long memberId, Long variantId);
 
-    Optional<CartItem> findByIdAndMember(long l,Member member);
+    Optional<CartItem> findByIdAndMemberId(Long id, Long memberId);
 
-    long deleteByIdAndMember(Long id, Member member);
+    long deleteByIdAndMemberId(Long id, Long memberId);
 
     // ==================== 以下提供給訂單模組（CheckoutService 結帳）使用 ====================
 

@@ -1,7 +1,6 @@
 package com.EEIT25.unicloth.repository.coupon;
 
 import com.EEIT25.unicloth.dto.admin.coupon.CouponRecordResponse;
-import com.EEIT25.unicloth.entity.Member;
 import com.EEIT25.unicloth.entity.MemberCoupon;
 import com.EEIT25.unicloth.entity.Order;
 import com.EEIT25.unicloth.enums.coupon.CouponSource;
@@ -40,7 +39,7 @@ public interface MemberCouponRepository extends JpaRepository<MemberCoupon, Long
                                      @Param("source") CouponSource source,
                                      @Param("receivedFrom") LocalDateTime receivedFrom);
 
-    List<MemberCoupon> findByMemberOrderByExpireAtAsc(Member member);
+    List<MemberCoupon> findByMemberIdOrderByExpireAtAsc(Long memberId);
 
     /**
      * 後台發券紀錄：每張發出去的券一筆，發券時間新的排前面。<br>

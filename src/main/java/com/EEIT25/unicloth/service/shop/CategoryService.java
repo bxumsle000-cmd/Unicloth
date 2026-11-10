@@ -48,7 +48,7 @@ public class CategoryService {
         List<Category> category = categoryRepository.findByParentIsNullOrderByIdAsc();
         return category.stream()
                 .map(top -> {
-                    List<CategoryResponse> children = categoryRepository.findByParentOrderByIdAsc(top)
+                    List<CategoryResponse> children = categoryRepository.findByParentIdOrderByIdAsc(top.getId())
                             .stream().map(CategoryResponse::from).toList();
                     return CategoryResponse.from(top, children);
                 })
@@ -61,7 +61,7 @@ public class CategoryService {
         Category category = categoryRepository.findByCode(code)
                 .orElseThrow(() -> ApiException.notFound("找不到分類：" + code));
 
-        List<CategoryResponse> children = categoryRepository.findByParentOrderByIdAsc(category)
+        List<CategoryResponse> children = categoryRepository.findByParentIdOrderByIdAsc(category.getId())
                 .stream().map(CategoryResponse::from).toList();
 
         return new CategoryDetailResponse(category.getCode(), category.getName(), children);

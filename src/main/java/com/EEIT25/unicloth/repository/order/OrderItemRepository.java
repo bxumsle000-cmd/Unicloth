@@ -1,7 +1,6 @@
 package com.EEIT25.unicloth.repository.order;
 
 import com.EEIT25.unicloth.dto.admin.analytics.ProductSalesResponse;
-import com.EEIT25.unicloth.entity.Order;
 import com.EEIT25.unicloth.entity.OrderItem;
 import com.EEIT25.unicloth.enums.order.OrderStatus;
 import org.springframework.data.domain.Pageable;
@@ -16,8 +15,6 @@ public interface OrderItemRepository
         extends JpaRepository<OrderItem, Long> {
     // 一張訂單的所有明細（明細本身就是快照，不需要再 JOIN 商品）
     List<OrderItem> findByOrderId(Long orderId);
-
-    List<OrderItem> findByOrder(Order order);
 
     /**
      * 統計指定期間內各商品的有效銷售資料。

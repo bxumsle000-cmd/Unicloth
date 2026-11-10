@@ -133,9 +133,9 @@ public class AdminCategoryService {
 
         if (
                 categoryRepository
-                        .findByNameAndParent(
+                        .findByNameAndParentId(
                                 name,
-                                parent
+                                parent.getId()
                         )
                         .isPresent()
         ) {

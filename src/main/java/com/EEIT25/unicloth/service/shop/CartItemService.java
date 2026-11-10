@@ -56,7 +56,7 @@ public class CartItemService {
             throw ApiException.conflict("商品已下架");
         }
 
-        Optional<CartItem> cartItemOptional = cartItemRepository.findByMemberAndVariant(member,productVariant);
+        Optional<CartItem> cartItemOptional = cartItemRepository.findByMemberIdAndVariantId(member.getId(), productVariant.getId());
 
         // 要比的是「加完之後的總數」：購物車原本有的 + 這次要加的
         int currentQty = cartItemOptional.map(CartItem::getQty).orElse(0);
@@ -82,7 +82,7 @@ public class CartItemService {
     public void changeQty(ChangeCartItemQtyRequest request){
         Member member = currentMember.require();
 
-        CartItem cartItem = cartItemRepository.findByIdAndMember(request.cartItemId(), member)
+        CartItem cartItem = cartItemRepository.findByIdAndMemberId(request.cartItemId(), member.getId())
                 .orElseThrow(()->ApiException.notFound("找不到購物車編號"));
 
         ProductVariant productVariant = cartItem.getVariant();
@@ -98,6 +98,6 @@ public class CartItemService {
     public void remove(Long cartItemId){
         Member member = currentMember.require();
 
-        cartItemRepository.deleteByIdAndMember(cartItemId,member);
+        cartItemRepository.deleteByIdAndMemberId(cartItemId, member.getId());
     }
 }

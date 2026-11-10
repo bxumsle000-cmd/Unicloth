@@ -9,7 +9,7 @@ import java.util.Optional;
 public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     // 找某個分類底下、指定名稱的子分類
-    Optional<Category> findByNameAndParent(String name, Category parent);
+    Optional<Category> findByNameAndParentId(String name, Long parentId);
 
     // 用固定代碼找分類（男裝、女裝都有「大衣」，用名稱會找錯，用 code 不會）
     Optional<Category> findByCode(String code);
@@ -18,5 +18,5 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     List<Category> findByParentIsNullOrderByIdAsc();
 
     /** 某個分類底下的子分類（只往下一層） */
-    List<Category> findByParentOrderByIdAsc(Category parent);
+    List<Category> findByParentIdOrderByIdAsc(Long parentId);
 }

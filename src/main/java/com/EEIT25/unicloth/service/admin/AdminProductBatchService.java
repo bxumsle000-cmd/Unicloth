@@ -62,7 +62,7 @@ public class AdminProductBatchService {
                 );
 
         boolean hasChildren = !categoryRepository
-                .findByParentOrderByIdAsc(category)
+                .findByParentIdOrderByIdAsc(category.getId())
                 .isEmpty();
 
         if (hasChildren) {

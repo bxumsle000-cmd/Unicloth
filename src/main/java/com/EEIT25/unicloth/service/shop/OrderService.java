@@ -41,7 +41,7 @@ public class OrderService {
         List<Order> orderList = orderRepository.findByMemberIdOrderByCreatedAtDesc(member.getId());
 
         List<OrderResponse> myOrders = orderList.stream().map(order -> {
-            List<OrderItem>  orderItemList =  orderItemRepository.findByOrder(order);
+            List<OrderItem>  orderItemList =  orderItemRepository.findByOrderId(order.getId());
             return OrderResponse.from(order,orderItemList);
         }).toList();
 
@@ -75,7 +75,7 @@ public class OrderService {
 
         // 4. 庫存加回去
         //    商品被刪除時明細的 variant 會是 null，這種就沒有庫存可以還
-        List<OrderItem> orderItemList = orderItemRepository.findByOrder(order);
+        List<OrderItem> orderItemList = orderItemRepository.findByOrderId(order.getId());
         for (OrderItem orderItem : orderItemList) {
             if (orderItem.getVariant() != null) {
                 productVariantRepository.restoreStock(orderItem.getVariant().getId(), orderItem.getQty());

@@ -29,7 +29,7 @@ public class CouponService {
     @Transactional
     public List<CouponResponse> getMyCoupons(){
         Member member = currentMember.require();
-        return memberCouponRepository.findByMemberOrderByExpireAtAsc(member)
+        return memberCouponRepository.findByMemberIdOrderByExpireAtAsc(member.getId())
                 .stream().map(memberCoupon -> CouponResponse.from(memberCoupon))
                 .toList();
     }
@@ -44,7 +44,7 @@ public class CouponService {
 
         LocalDateTime now = LocalDateTime.now();
 
-        return memberCouponRepository.findByMemberOrderByExpireAtAsc(member)
+        return memberCouponRepository.findByMemberIdOrderByExpireAtAsc(member.getId())
                 .stream()
                 .filter(memberCoupon -> memberCoupon.getUsedAt()==null &&
                         memberCoupon.getExpireAt().isAfter(now))
