@@ -52,14 +52,23 @@ docker compose up -d
 ./mvnw spring-boot:run
 ```
 
-## 2. 開啟 React 前端
+## 2. 開啟網站
 
 > 前提：**Docker 和 Spring Boot 都要先跑起來**（照上面的啟動順序）。
-> React 前端的 `/api`、`/img`、`/video` 請求會轉給 `http://localhost:8080` 的 Spring Boot，後端沒開的話頁面會抓不到資料。
-> 電腦需要先安裝 [Node.js](https://nodejs.org/)（`npm` 指令是跟著 Node.js 一起裝的）。
 
-> ⚠️ **除了最後的 `npm run dev`，以下步驟都只有第一次才需要執行。**
-> 之後每次開前端，直接跳到「每次啟動前端」即可。
+React 前端已經 build 好，放在 `src/main/resources/static/`，由 Spring Boot 一起提供。
+**不用另外啟動前端**，Spring Boot 啟動後直接開：
+
+```bash
+http://localhost:8080/
+```
+
+後台登入頁是 `http://localhost:8080/admin/login`。
+
+## 2-1. 修改前端之後：重新 build
+
+> 只有**改了 `frontend/` 裡的程式**才需要這一段；只是要開網站的話不用做。
+> 電腦需要先安裝 [Node.js](https://nodejs.org/)（`npm` 指令是跟著 Node.js 一起裝的）。
 
 ### 第一次：安裝 Node.js
 
@@ -85,19 +94,49 @@ npm install
 
 > 之後只有 `package.json` 有變動（例如別人新增了套件）時，才需要再跑一次 `npm install`。
 
-### 每次啟動前端
+### 每次改完前端：build 並複製到 Spring Boot
 
-另外開一個終端機，進到 `frontend` 資料夾後啟動：
+在 `frontend` 資料夾執行（三行依序執行）：
+
+```bash
+# Windows PowerShell
+npm run build
+Remove-Item -Recurse -Force ..\src\main\resources\static\assets
+Copy-Item -Recurse -Force dist\* ..\src\main\resources\static\
+
+# Git Bash / macOS / Linux
+npm run build
+rm -rf ../src/main/resources/static/assets
+cp -r dist/. ../src/main/resources/static/
+```
+
+三行分別是：
+
+1. `npm run build`：把前端打包到 `frontend/dist`，最後一行出現 `✓ built in ...` 就是成功。
+2. 刪掉 `static/assets` 裡的舊檔：打包出來的檔名每次都不同（例如 `index-D8TUvaZQ.js`），不刪的話舊檔會一直累積。
+3. 把 `dist` 裡的 `index.html` 和 `assets` 複製到 `static/`（`static/img`、`static/video` 不會被動到）。
+
+做完後**重新啟動 Spring Boot**，再開 `http://localhost:8080/` 才會看到新的畫面。
+
+注意事項：
+
+- **新增頁面路徑時**（在 `frontend/src/App.jsx` 加了新的 `<Route path="...">`），要把同一個路徑加進 `SpaForwardController.java`，不然在那一頁按重新整理會出錯。
+- `frontend/.env` 的 Firebase 設定是 build 的時候寫進檔案的，改了 `.env` 要重新 build。
+
+### 開發前端時：用 `npm run dev` 即時看修改結果
+
+改前端的過程中不想每次都 build，可以另外開一個終端機：
 
 ```bash
 cd frontend
 npm run dev
 ```
 
-執行完可以點擊測試網址
-```bash
-http://localhost:8080/
-```
+然後開 `http://localhost:5173/`，改完存檔畫面就會更新（Spring Boot 一樣要開著，`/api`、`/img`、`/video` 的請求會轉給 `http://localhost:8080`）。
+
+- 5173 和 8080 的登入狀態是分開的，兩邊要各自登入。
+- 綠界付款後按「返回商店」會回到 `http://localhost:8080/orders`，不是 5173。
+- 改完之後還是要照上面的步驟 build，8080 才會是新版。
 
 ## 3. 帳號 & 密碼（SSMS 連線）
 
@@ -121,7 +160,7 @@ http://localhost:8080/
 
 ## 4. 綠界付款測試
 
-> 前提：**Docker、Spring Boot、React 前端都要先跑起來**（照上面的步驟）。
+> 前提：**Docker 和 Spring Boot 都要先跑起來**（照上面的步驟），並且電腦有安裝 Node.js（見 2-1 的「第一次：安裝 Node.js」）。
 > 只是逛網站、加購物車、貨到付款的話，不需要這一段。
 
 要測信用卡 / ATM 付款，**另外開一個終端機**，在專案資料夾執行：
