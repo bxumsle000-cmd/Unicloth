@@ -110,7 +110,7 @@ ecpay:
   # 問 tunnel 目前網址的地方（docker-compose 的 tunnel 服務開在本機 20241）
   tunnel-api-url: "${ECPAY_TUNNEL_API_URL:http://127.0.0.1:20241/quicktunnel}"
   # 綠界付款後返回 KINU 訂單頁（ClientBackURL，顧客在綠界頁面按「返回商店」會回到這裡）
-  client-back-url: "${ECPAY_CLIENT_BACK_URL:http://localhost:5173/orders}"
+  client-back-url: "${ECPAY_CLIENT_BACK_URL:http://localhost:8080/orders}"
 
 # ============================== 逾時未付款自動取消（OrderTimeoutScheduler） ==============================
 # 訂單相關的自訂設定

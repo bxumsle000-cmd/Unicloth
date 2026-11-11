@@ -96,7 +96,7 @@ npm run dev
 
 執行完可以點擊測試網址
 ```bash
-http://localhost:5173/
+http://localhost:8080/
 ```
 
 ## 3. 帳號 & 密碼（SSMS 連線）

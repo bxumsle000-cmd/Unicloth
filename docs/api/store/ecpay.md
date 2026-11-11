@@ -19,7 +19,7 @@
 ③ 前端把參數放進表單，POST 到 paymentUrl → 瀏覽器跳到綠界付款頁
 ④ 顧客付款
 ⑤ 綠界的伺服器 POST /api/payments/ecpay/notify → 後端把訂單改成 PENDING
-⑥ 顧客按「返回商店」→ 回到 ClientBackURL（預設 http://localhost:5173/orders）
+⑥ 顧客按「返回商店」→ 回到 ClientBackURL（預設 http://localhost:8080/orders）
 ```
 
 > 綠界的伺服器連不到 `localhost`，所以通知網址用 `docker-compose` 裡 Cloudflare Tunnel 的對外網址。tunnel 沒開時，步驟 ⑤ 的通知不會進來，訂單會一直是 `UNPAID`，最後被逾時排程取消。
@@ -56,7 +56,7 @@
     "TradeDesc": "Unicloth Order Payment",
     "ItemName": "Unicloth Clothing Order",
     "ReturnURL": "https://xxxx.trycloudflare.com/api/payments/ecpay/notify",
-    "ClientBackURL": "http://localhost:5173/orders",
+    "ClientBackURL": "http://localhost:8080/orders",
     "ChoosePayment": "Credit",
     "EncryptType": "1",
     "CheckMacValue": "A1B2C3..."

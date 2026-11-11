@@ -215,9 +215,9 @@ Local: http://localhost:5173/
 
 瀏覽器開啟：
 
-http://localhost:5173/
+http://localhost:8080/
 
-付款後按綠界的「返回商店」會回到 `http://localhost:5173/orders`（`ClientBackURL`）。
+付款後按綠界的「返回商店」會回到 `http://localhost:8080/orders`（`ClientBackURL`）。
 
 如果 5173 被占用，先確認是不是其他視窗已經在執行 Vite。不要直接關閉不認識的程序。
 
@@ -373,9 +373,9 @@ netstat -ano | findstr :8080
 
 ### 4. 付款後不能返回網站
 
-確認前端是否運作於 http://localhost:5173/ 。
+確認前端是否運作於 http://localhost:8080/ 。
 
-`ClientBackURL` 預設是 `http://localhost:5173/orders`，要改可以設定環境變數 `ECPAY_CLIENT_BACK_URL`。
+`ClientBackURL` 預設是 `http://localhost:8080/orders`，要改可以設定環境變數 `ECPAY_CLIENT_BACK_URL`。
 
 ### 5. 執行 node 時出現 Cannot find module
 
@@ -415,7 +415,7 @@ node ecpay-callback-proxy.cjs
 2. `docker compose up -d`：啟動 SQL Server 和 tunnel。
 3. `node ecpay-callback-proxy.cjs`：啟動 8787，視窗不要關。
 4. Spring Boot：`mvnw.cmd spring-boot:run`（不用設定 `ECPAY_RETURN_URL`）。
-5. React：在 `frontend` 執行 `npm run dev`，開 http://localhost:5173/ 。
+5. React：在 `frontend` 執行 `npm run dev`，開 http://localhost:8080/ 。
 6. 瀏覽器：登入網站進行測試付款。
 7. SSMS 或後端 log：確認 `payments.status = PAID`、`orders.paid_at` 有時間。
 
